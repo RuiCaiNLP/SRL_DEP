@@ -8,6 +8,7 @@ from torch import optim
 import time
 import random
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def make_local_voc(labels):
     return {i: label for i, label in enumerate(labels)}
@@ -19,6 +20,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     best_F1 = -0.1
     best_F1_gold = -0.1
     #optimizer = optim.Adadelta(model.parameters(), rho=0.95, eps=1e-6)
+    model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     random.seed(1234)
     for e in range(epochs):
@@ -42,15 +44,15 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             p_sentence = model_input[1]
 
 
-            sentence_in = torch.from_numpy(sentence)
-            p_sentence_in = torch.from_numpy(p_sentence)
+            sentence_in = torch.from_numpy(sentence).to(device)
+            p_sentence_in = torch.from_numpy(p_sentence).to(device)
             sentence_in.requires_grad_(False)
             p_sentence_in.requires_grad_(False)
 
 
 
             pos_tags = model_input[2]
-            pos_tags_in = torch.from_numpy(pos_tags)
+            pos_tags_in = torch.from_numpy(pos_tags).to(device)
             pos_tags_in.requires_grad_(False)
 
             sen_lengths = model_input[3].sum(axis=1)
@@ -59,16 +61,16 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             frames = model_input[5]
-            frames_in = torch.from_numpy(frames)
+            frames_in = torch.from_numpy(frames).to(device)
             frames_in.requires_grad_(False)
 
             local_roles_voc = model_input[6]
-            local_roles_voc_in = torch.from_numpy(local_roles_voc)
+            local_roles_voc_in = torch.from_numpy(local_roles_voc).to(device)
             local_roles_voc_in.requires_grad_(False)
 
 
             local_roles_mask = model_input[7]
-            local_roles_mask_in = torch.from_numpy(local_roles_mask)
+            local_roles_mask_in = torch.from_numpy(local_roles_mask).to(device)
             local_roles_mask_in.requires_grad_(False)
 
 
@@ -76,15 +78,15 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             # region_mark_in = Variable(torch.LongTensor(region_mark))
-            region_mark_in = torch.from_numpy(region_mark)
+            region_mark_in = torch.from_numpy(region_mark).to(device)
             region_mark_in.requires_grad_(False)
 
             sent_pred_lemmas_idx = model_input[10]
-            sent_pred_lemmas_idx_in = torch.from_numpy(sent_pred_lemmas_idx)
+            sent_pred_lemmas_idx_in = torch.from_numpy(sent_pred_lemmas_idx).to(device)
             sent_pred_lemmas_idx_in.requires_grad_(False)
 
             dep_tags = model_input[11]
-            dep_tags_in = Variable(torch.from_numpy(dep_tags))
+            dep_tags_in = torch.from_numpy(dep_tags).to(device)
 
 
             dep_heads = model_input[12]
@@ -93,21 +95,15 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             #root_dep_tags_in = Variable(torch.from_numpy(root_dep_tags), requires_grad=False)
 
             tags = model_input[13]
-            targets = torch.tensor(tags)
+            targets = torch.tensor(tags).to(device)
 
             specific_dep_tags = model_input[14]
-            specific_dep_tags_in = Variable(torch.from_numpy(specific_dep_tags))
+            specific_dep_tags_in = torch.from_numpy(specific_dep_tags).to(device)
 
             specific_dep_relations = model_input[15]
-            specific_dep_relations_in = Variable(torch.from_numpy(specific_dep_relations))
+            specific_dep_relations_in = torch.from_numpy(specific_dep_relations).to(device)
 
-            #log(specific_dep_tags)
-            #log(tags)
-            #log(tags)
-            #log(local_roles_voc)
-            #for i in range(len(tags)):
-            #    for l in tags[i]:
-             #       log(local_roles_voc[i][l])
+
             SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums,_,_ \
                 = model(sentence_in, p_sentence_in, pos_tags_in, sen_lengths, target_idx_in, region_mark_in,
                         local_roles_voc_in,
@@ -172,13 +168,13 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         sentence = model_input[0]
                         p_sentence = model_input[1]
 
-                        sentence_in = torch.from_numpy(sentence)
-                        p_sentence_in = torch.from_numpy(p_sentence)
+                        sentence_in = torch.from_numpy(sentence).to(device)
+                        p_sentence_in = torch.from_numpy(p_sentence).to(device)
                         sentence_in.requires_grad_(False)
                         p_sentence_in.requires_grad_(False)
 
                         pos_tags = model_input[2]
-                        pos_tags_in = torch.from_numpy(pos_tags)
+                        pos_tags_in = torch.from_numpy(pos_tags).to(device)
                         pos_tags_in.requires_grad_(False)
 
                         sen_lengths = model_input[3].sum(axis=1)
@@ -186,29 +182,29 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         target_idx_in = model_input[4]
 
                         frames = model_input[5]
-                        frames_in = torch.from_numpy(frames)
+                        frames_in = torch.from_numpy(frames).to(device)
                         frames_in.requires_grad_(False)
 
                         local_roles_voc = model_input[6]
-                        local_roles_voc_in = torch.from_numpy(local_roles_voc)
+                        local_roles_voc_in = torch.from_numpy(local_roles_voc).to(device)
                         local_roles_voc_in.requires_grad_(False)
 
                         local_roles_mask = model_input[7]
-                        local_roles_mask_in = torch.from_numpy(local_roles_mask)
+                        local_roles_mask_in = torch.from_numpy(local_roles_mask).to(device)
                         local_roles_mask_in.requires_grad_(False)
 
                         region_mark = model_input[9]
 
                         # region_mark_in = Variable(torch.LongTensor(region_mark))
-                        region_mark_in = torch.from_numpy(region_mark)
+                        region_mark_in = torch.from_numpy(region_mark).to(device)
                         region_mark_in.requires_grad_(False)
 
                         sent_pred_lemmas_idx = model_input[10]
-                        sent_pred_lemmas_idx_in = torch.from_numpy(sent_pred_lemmas_idx)
+                        sent_pred_lemmas_idx_in = torch.from_numpy(sent_pred_lemmas_idx).to(device)
                         sent_pred_lemmas_idx_in.requires_grad_(False)
 
                         dep_tags = model_input[11]
-                        dep_tags_in = Variable(torch.from_numpy(dep_tags))
+                        dep_tags_in = torch.from_numpy(dep_tags).to(device)
 
                         dep_heads = model_input[12]
 
@@ -216,13 +212,13 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         # root_dep_tags_in = Variable(torch.from_numpy(root_dep_tags), requires_grad=False)
 
                         tags = model_input[13]
-                        targets = torch.tensor(tags)
+                        targets = torch.tensor(tags).to(device)
 
                         specific_dep_tags = model_input[14]
-                        specific_dep_tags_in = Variable(torch.from_numpy(specific_dep_tags))
+                        specific_dep_tags_in = torch.from_numpy(specific_dep_tags).to(device)
 
                         specific_dep_relations = model_input[15]
-                        specific_dep_relations_in = Variable(torch.from_numpy(specific_dep_relations))
+                        specific_dep_relations_in = Variable(torch.from_numpy(specific_dep_relations)).to(device)
 
                         SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, spe_wrong_l_nums, spe_all_l_nums\
                             = model(sentence_in, p_sentence_in, pos_tags_in, sen_lengths, target_idx_in, region_mark_in,
