@@ -18,6 +18,7 @@ import torch.nn.utils.rnn as rnn
 import torch.nn.init as init
 _BIG_NUMBER = 10. ** 6.
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class BiLSTMTagger(nn.Module):
 
@@ -105,8 +106,8 @@ class BiLSTMTagger(nn.Module):
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         #return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
         #        Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
-        return (torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False),
-                torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False))
+        return (torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
+                torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
     def init_hidden_spe(self):
         # Before we've done anything, we dont have any hidden state.
@@ -115,8 +116,8 @@ class BiLSTMTagger(nn.Module):
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         #return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
         #        Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
-        return (torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False),
-                torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False))
+        return (torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
+                torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
 
     def forward(self, sentence, p_sentence,  pos_tags, lengths, target_idx_in, region_marks,
@@ -214,7 +215,7 @@ class BiLSTMTagger(nn.Module):
         # b, roles
         #sub = torch.div(torch.add(local_roles_mask, -1.0), _BIG_NUMBER)
         sub = torch.add(local_roles_mask, -1.0) * _BIG_NUMBER
-        sub = torch.FloatTensor(sub.numpy())
+        sub = torch.FloatTensor(sub.cpu().numpy()).to(device)
         # b, roles, times
         tag_space = torch.transpose(tag_space, 0, 1)
         tag_space += sub
@@ -225,8 +226,8 @@ class BiLSTMTagger(nn.Module):
 
         wrong_l_nums_spe = 0.0
         all_l_nums_spe = 0.0
-        spe_dep_labels = np.argmax(dep_tag_space_spe.data.numpy(), axis=1)
-        for predict_l, gold_l in zip(spe_dep_labels, specific_dep_relations.view(-1).data.numpy()):
+        spe_dep_labels = np.argmax(dep_tag_space_spe.cpu().data.numpy(), axis=1)
+        for predict_l, gold_l in zip(spe_dep_labels, specific_dep_relations.cpu().view(-1).data.numpy()):
             if gold_l != 0:
                 all_l_nums_spe += 1
             if predict_l != gold_l and gold_l != 0:
