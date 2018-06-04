@@ -250,12 +250,11 @@ class BiLSTMTagger(nn.Module):
                 wrong_l_nums += 1
 
 
-        targets = targets.view(-1)
         #tag_scores = F.log_softmax(tag_space)
         #loss = loss_function(tag_scores, targets)
         loss_function = nn.CrossEntropyLoss(ignore_index=0)
 
-        SRLloss = loss_function(tag_space, targets)
+        SRLloss = loss_function(tag_space, targets.view(-1))
         DEPloss = loss_function(dep_tag_space, dep_tags.view(-1))
         #SPEDEPloss = loss_function(dep_tag_space_spe, specific_dep_relations.view(-1))
 

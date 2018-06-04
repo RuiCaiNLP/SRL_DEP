@@ -43,13 +43,10 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             sentence = model_input[0]
             p_sentence = model_input[1]
 
-
             sentence_in = torch.from_numpy(sentence).to(device)
             p_sentence_in = torch.from_numpy(p_sentence).to(device)
             sentence_in.requires_grad_(False)
             p_sentence_in.requires_grad_(False)
-
-
 
             pos_tags = model_input[2]
             pos_tags_in = torch.from_numpy(pos_tags).to(device)

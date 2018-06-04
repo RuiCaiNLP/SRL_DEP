@@ -138,7 +138,6 @@ class SRLRunner(Runner):
                 dep_head.append([int(p[2]) for p in w])
 
 
-
             frames = [self.frame_voc.vocalize(f) for f in frames]
             labels_voc = [self.role_voc.vocalize(r) for r in labels_voc]
 
@@ -153,10 +152,18 @@ class SRLRunner(Runner):
 
             pos_batch, _ = mask_batch(pos_tags)
             dep_tag_batch, _ = mask_batch(dep_tags)
+
             specific_dep_tag_batch, _ = mask_batch(specific_dep_tags)
             specific_dep_relations_batch, _ = mask_batch(specific_dep_relations)
             dep_head_batch, _ = mask_batch(dep_head)
             labels_voc_batch, labels_voc_mask = mask_batch(labels_voc)
+
+            ##mask no predicate deptags"
+            for i in range(len(dep_tag_batch)):
+                for j in range(len(dep_tag_batch[0])):
+                    if specific_dep_relations_batch[i][j] == 3:
+                        dep_tag_batch[i][j] = 0
+
 
             for line in labels_voc_mask:
                 line[0] = 0
