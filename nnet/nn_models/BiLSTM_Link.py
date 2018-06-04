@@ -227,19 +227,17 @@ class BiLSTMTagger(nn.Module):
         all_l_nums_spe = 0.0
         spe_dep_labels = np.argmax(dep_tag_space_spe.data.numpy(), axis=1)
         for predict_l, gold_l in zip(spe_dep_labels, specific_dep_relations.view(-1).data.numpy()):
-
             if gold_l != 0:
                 all_l_nums_spe += 1
             if predict_l != gold_l and gold_l != 0:
                 wrong_l_nums_spe += 1
 
         #loss_function = nn.NLLLoss(ignore_index=0)
-        targets = targets.view(-1)
         #tag_scores = F.log_softmax(tag_space)
         #loss = loss_function(tag_scores, targets)
-        loss_function = nn.CrossEntropyLoss(ignore_index=0)
 
-        SRLloss = loss_function(tag_space, targets)
+        loss_function = nn.CrossEntropyLoss(ignore_index=0)
+        SRLloss = loss_function(tag_space, targets.view(-1))
 
         SPEDEPloss = loss_function(dep_tag_space_spe, specific_dep_relations.view(-1))
         loss = SRLloss + 0.1*SPEDEPloss
