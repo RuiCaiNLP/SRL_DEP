@@ -258,10 +258,10 @@ class BiLSTMTagger(nn.Module):
         DEPloss = loss_function(dep_tag_space, dep_tags.view(-1))
         #SPEDEPloss = loss_function(dep_tag_space_spe, specific_dep_relations.view(-1))
 
-        #weight =  float(SRLloss.data.numpy())
-        #if weight > 0.1:
-        #    weight = 0.1
-        loss = SRLloss + 0.1*DEPloss #+ 0.1*SPEDEPloss
+        weight = float(SRLloss.cpu().data.numpy())
+        if weight > 0.1:
+            weight = 0.1
+        loss = SRLloss + weight*DEPloss #+ 0.1*SPEDEPloss
         return SRLloss, DEPloss, DEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, 1, 1
 
     @staticmethod
