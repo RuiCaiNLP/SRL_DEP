@@ -60,6 +60,12 @@ class BiLSTMTagger(nn.Module):
         self.hidden2tag_spe = nn.Linear(100, 100)
         self.MLP_spe = nn.Linear(100, 4)
 
+
+
+        self.word_emb_dropout = nn.Dropout(p=0.3)
+        self.hidden_state_dropout = nn.Dropout(p=0.3)
+        self.label_dropout = nn.Dropout(p=0.5)
+
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
         self.num_layers = 2
@@ -137,6 +143,7 @@ class BiLSTMTagger(nn.Module):
         region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
         embeds = torch.cat((embeds, fixed_embeds, pos_embeds,  sent_pred_lemmas_embeds, region_marks), 2)
         #embeds = torch.cat((embeds, fixed_embeds, pos_embeds, region_marks), 2)
+        embeds = self.word_emb_dropout(embeds)
 
         # share_layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds, lengths)
@@ -166,7 +173,7 @@ class BiLSTMTagger(nn.Module):
         forward_e = forward_h[:, :, :50]
         backward_e = backward_h[:, :, :50]
         bf_e = torch.cat((forward_e, backward_e), 2)
-        dep_tag_space_spe = self.MLP_spe(F.tanh(self.hidden2tag_spe(bf_e))).view(
+        dep_tag_space_spe = self.MLP_spe(self.label_dropout(F.tanh(self.hidden2tag_spe(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
 
         # SRL layer
@@ -180,6 +187,7 @@ class BiLSTMTagger(nn.Module):
         # hidden_states = hidden_states.transpose(0, 1)
         hidden_states = hidden_states[unsort_idx]
 
+        hidden_states = self.hidden_state_dropout(hidden_states)
 
         # B * H
         hidden_states_3 = hidden_states
