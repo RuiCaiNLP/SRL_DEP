@@ -126,7 +126,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)
-            #clip_grad_value_(parameters=model.hidden2tag_spe.parameters(), clip_value=1.5)
+            clip_grad_value_(parameters=model.hidden2tag_spe.parameters(), clip_value=1.5)
             #DEPloss.backward()
             optimizer.step()
 
