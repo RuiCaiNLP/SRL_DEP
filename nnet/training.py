@@ -3,7 +3,7 @@ import torch.tensor
 from nnet.util import *
 import torch.autograd
 from torch.autograd import Variable
-from torch.nn.utils import clip_grad_norm_
+from torch.nn.utils import clip_grad_value_
 from torch import optim
 import time
 import random
@@ -126,6 +126,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)
+            #clip_grad_value_(parameters=model.hidden2tag_spe.parameters(), clip_value=0.3)
             #DEPloss.backward()
             optimizer.step()
 
