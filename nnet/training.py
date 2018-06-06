@@ -100,7 +100,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             specific_dep_relations = model_input[15]
             specific_dep_relations_in = torch.from_numpy(specific_dep_relations).to(device)
 
-
+            #log(dep_tags_in)
+            #log(specific_dep_relations)
             SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums,_,_ \
                 = model(sentence_in, p_sentence_in, pos_tags_in, sen_lengths, target_idx_in, region_mark_in,
                         local_roles_voc_in,
