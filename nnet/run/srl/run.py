@@ -158,11 +158,20 @@ class SRLRunner(Runner):
             dep_head_batch, _ = mask_batch(dep_head)
             labels_voc_batch, labels_voc_mask = mask_batch(labels_voc)
 
+
             ##mask no predicate deptags"
             for i in range(len(dep_tag_batch)):
                 for j in range(len(dep_tag_batch[0])):
+                    if specific_dep_relations_batch[i][j] == 2:
+                        dep_tag_batch[i][j] = dep_tag_batch[i][targets[i]]
+
+
+            for i in range(len(dep_tag_batch)):
+                for j in range(len(dep_tag_batch[0])):
                     if specific_dep_relations_batch[i][j] == 3:
-                        dep_tag_batch[i][j] = 0
+                        dep_tag_batch[i][j] = 1
+
+
 
 
             for line in labels_voc_mask:
