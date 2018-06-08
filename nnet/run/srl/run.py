@@ -169,7 +169,7 @@ class SRLRunner(Runner):
             for i in range(len(dep_tag_batch)):
                 for j in range(len(dep_tag_batch[0])):
                     if specific_dep_relations_batch[i][j] == 3:
-                        dep_tag_batch[i][j] = 0
+                        dep_tag_batch[i][j] = 1
 
 
 
