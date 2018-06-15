@@ -94,7 +94,7 @@ class BiLSTMTagger(nn.Module):
         init.orthogonal_(self.BiLSTM_Spe.all_weights[1][1])
 
         self.num_layers = 1
-        self.BiLSTM_SRL = nn.LSTM(input_size=lstm_hidden_dim * 2 + 2 * self.pos_size , hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_SRL = nn.LSTM(input_size=lstm_hidden_dim * 2 + 0 * self.pos_size , hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
@@ -197,14 +197,14 @@ class BiLSTMTagger(nn.Module):
             len(sentence[0]) * self.batch_size, -1)
 
         TagProbs = torch.FloatTensor(F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
-        LinkProbs = torch.FloatTensor(F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
+        #LinkProbs = torch.FloatTensor(F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
 
 
         #TagProbs = F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1)
         #LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
-        h1 = F.relu(self.tag2hidden(TagProbs))
-        h2 = F.relu(self.Link2hidden(LinkProbs))
-        hidden_states = torch.cat((hidden_states, h1, h2), 2)
+        #h1 = F.relu(self.tag2hidden(TagProbs))
+        #h2 = F.relu(self.Link2hidden(LinkProbs))
+        hidden_states = torch.cat((hidden_states), 2)
 
         # SRL layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
@@ -299,7 +299,7 @@ class BiLSTMTagger(nn.Module):
         #weight = float(SRLloss.data.numpy())
         #if weight > 0.1:
         #    weight = 0.1
-        loss = SRLloss + DEPloss + SPEDEPloss
+        loss = SRLloss + 0.1 * DEPloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe
 
     @staticmethod
