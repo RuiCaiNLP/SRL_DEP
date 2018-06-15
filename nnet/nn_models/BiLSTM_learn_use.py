@@ -200,11 +200,11 @@ class BiLSTMTagger(nn.Module):
         #LinkProbs = torch.FloatTensor(F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
 
 
-        #TagProbs = F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1)
-        LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
-        #h1 = F.relu(self.tag2hidden(TagProbs))
-        h2 = F.relu(self.Link2hidden(LinkProbs))
-        #hidden_states = torch.cat((hidden_states, h2), 2)
+        TagProbs = F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1)
+        #LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
+        h1 = F.relu(self.tag2hidden(TagProbs))
+        #h2 = F.relu(self.Link2hidden(LinkProbs))
+        hidden_states = torch.cat((hidden_states, h1), 2)
 
         # SRL layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
