@@ -261,7 +261,7 @@ class BiLSTMTagger(nn.Module):
         weight = float(SRLloss.cpu().data.numpy())
         if weight > 0.1:
             weight = 0.1
-        loss = SRLloss + weight*DEPloss #+ 0.1*SPEDEPloss
+        loss = SRLloss + 0.1*DEPloss #+ 0.1*SPEDEPloss
         return SRLloss, DEPloss, DEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, 1, 1
 
     @staticmethod
