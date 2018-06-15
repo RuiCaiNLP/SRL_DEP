@@ -60,8 +60,6 @@ class BiLSTMTagger(nn.Module):
         self.hidden2tag_spe = nn.Linear(100, 100)
         self.MLP_spe = nn.Linear(100, 4)
 
-
-
         self.word_emb_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
         self.label_dropout = nn.Dropout(p=0.5)
@@ -249,7 +247,7 @@ class BiLSTMTagger(nn.Module):
         SRLloss = loss_function(tag_space, targets.view(-1))
 
         SPEDEPloss = loss_function(dep_tag_space_spe, specific_dep_relations.view(-1))
-        loss = SRLloss #+ 0.1*SPEDEPloss
+        loss = SRLloss + 0.1*SPEDEPloss
         return SRLloss, SPEDEPloss, SPEDEPloss, loss, SRLprobs, 1, 1, wrong_l_nums_spe, all_l_nums_spe
 
     @staticmethod
