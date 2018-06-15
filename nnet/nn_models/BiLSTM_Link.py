@@ -247,7 +247,7 @@ class BiLSTMTagger(nn.Module):
         SRLloss = loss_function(tag_space, targets.view(-1))
 
         SPEDEPloss = loss_function(dep_tag_space_spe, specific_dep_relations.view(-1))
-        loss = SRLloss + 0.05*SPEDEPloss
+        loss = SRLloss + 0.5*SPEDEPloss
         return SRLloss, SPEDEPloss, SPEDEPloss, loss, SRLprobs, 1, 1, wrong_l_nums_spe, all_l_nums_spe
 
     @staticmethod
