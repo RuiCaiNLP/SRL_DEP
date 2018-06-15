@@ -179,14 +179,13 @@ class BiLSTMTagger(nn.Module):
         dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.tanh(self.hidden2tag_spe(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
 
-        dep_tag_space_spe_nodrop = self.MLP_spe(F.tanh(self.hidden2tag_spe(bf_e))).view(
-            len(sentence[0]) * self.batch_size, -1)
+
         #TagProbs = torch.FloatTensor(F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
-        LinkProbs = torch.FloatTensor(F.softmax(dep_tag_space_spe_nodrop, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
+        #LinkProbs = torch.FloatTensor(F.softmax(dep_tag_space_spe_nodrop, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
 
 
         #TagProbs = F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1)
-        #LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
+        LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
         #h1 = F.relu(self.tag2hidden(TagProbs))
         h2 = F.relu(self.Link2hidden(LinkProbs))
         hidden_states = torch.cat((hidden_states,  h2), 2)
