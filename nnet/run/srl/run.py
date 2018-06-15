@@ -1,7 +1,7 @@
 from nnet.run.runner import *
 from nnet.ml.voc import *
 from functools import partial
-from nnet.nn_models.BiLSTM_learn_use import BiLSTMTagger
+from nnet.nn_models.BiLSTM_Link_use import BiLSTMTagger
 
 def make_local_voc(labels):
     return {i: label for i, label in enumerate(labels)}
@@ -157,6 +157,7 @@ class SRLRunner(Runner):
             specific_dep_relations_batch, _ = mask_batch(specific_dep_relations)
             dep_head_batch, _ = mask_batch(dep_head)
             labels_voc_batch, labels_voc_mask = mask_batch(labels_voc)
+
 
 
             ##mask no predicate deptags"

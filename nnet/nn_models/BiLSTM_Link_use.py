@@ -64,9 +64,9 @@ class BiLSTMTagger(nn.Module):
 
         self.word_emb_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
-        self.label_dropout = nn.Dropout(p=0.5)
+        self.link_dropout = nn.Dropout(p=0.5)
 
-        self.Label_hidden2hidden = nn.Linear(100, 20)
+        self.Link2hidden = nn.Linear(4, self.pos_size)
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
@@ -89,7 +89,7 @@ class BiLSTMTagger(nn.Module):
         init.orthogonal_(self.BiLSTM_Spe.all_weights[1][1])
 
         self.num_layers = 1
-        self.BiLSTM_SRL = nn.LSTM(input_size=lstm_hidden_dim * 2+ 20, hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_SRL = nn.LSTM(input_size=lstm_hidden_dim * 2 + self.pos_size , hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
@@ -171,17 +171,23 @@ class BiLSTMTagger(nn.Module):
         # hidden_states = hidden_states.transpose(0, 1)
         hidden_states = hidden_states[unsort_idx]
 
+
         forward_h, backward_h = torch.split(hidden_states, self.hidden_dim, 2)
         forward_e = forward_h[:, :, :50]
         backward_e = backward_h[:, :, :50]
         bf_e = torch.cat((forward_e, backward_e), 2)
-        dep_tag_space_spe = self.MLP_spe(self.label_dropout(F.tanh(self.hidden2tag_spe(bf_e)))).view(
+        dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.tanh(self.hidden2tag_spe(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
 
+        #TagProbs = torch.FloatTensor(F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
+        LinkProbs = torch.FloatTensor(F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
 
-        Label_hidden = self.hidden2tag_spe(bf_e).clone()
-        Label_hidden = F.relu(self.Label_hidden2hidden(Label_hidden))
-        hidden_states = torch.cat((hidden_states, Label_hidden), 2)
+
+        #TagProbs = F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1)
+        #LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
+        #h1 = F.relu(self.tag2hidden(TagProbs))
+        h2 = F.relu(self.Link2hidden(LinkProbs))
+        hidden_states = torch.cat((hidden_states,  h2), 2)
 
 
         # SRL layer
