@@ -268,7 +268,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 log('Best F1: ' + str(best_F1))
                 if F1 > best_F1:
                     best_F1 = F1
-                    #torch.save(model.state_dict(), params_path)
+                    torch.save(model.state_dict(), params_path)
                     log('New best, model saved')
 
 
