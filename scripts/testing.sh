@@ -2,8 +2,8 @@
 
 cd ..
 python -mnnet.run.srl.run \
---train conll2009_batch_2.dev \
---test conll2009_batch_2.dev \
+--train conll2009_batch.ood.dep_l \
+--test conll2009_batch.test.dep_l \
 --data_partition dev \
 --batch 30 \
 --freq-voc freq.voc_unk.conll2009 \
@@ -13,12 +13,13 @@ python -mnnet.run.srl.run \
 --frame-voc frames.voc.conll2009 \
 --pos-voc pos.voc.conll2009 \
 --dep-voc dep.voc.conll2009_2 \
+--specific-dep-voc Specific_Dep.voc \
 --word-embeddings word_embeddings_proper.sskip.conll2009.txt \
 --dbg-print-rate 500 \
 --eval-dir ./data/ \
 --epochs 10 \
 --out conll2009_rm0_pl_a.25_sskip_h512_d.0_l4 \
---params-path Model1_4L_F_R_P_embedsSDP_withEgate_onTrainSetJK_depInHigway_relu.pkl \
+--params-path model81.pkl \
 --test-mode True \
 --hps "{'id': 1, 'sent_edim': 100, 'sent_hdim': 256, \
 'frame_edim': 128, 'role_edim': 128, 'pos_edim': 16, 'rec_layers': 1, 'gc_layers': 0, \
