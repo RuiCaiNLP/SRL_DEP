@@ -190,8 +190,7 @@ def test(model, train_set, test_set, converter, params_path):
 
 
         for i, sent_labels in enumerate(labels):
-            labels_voc = batch[i][-3]
-
+            labels_voc = batch[i][-4]
             local_voc = make_local_voc(labels_voc)
 
             """
@@ -259,11 +258,11 @@ def test(model, train_set, test_set, converter, params_path):
                     if true == best:
                         right_NonNullPredict += 1
                         Right_predict_dis[int(syntax_distances[i][j])] += 1
-            format = '%10s\t' * len(sentences[i]) + '\n'
-            result_file.write(format % tuple(best_labels))
-            format = '%10s\t' * len(sentences[i]) + '\n'
-            result_file.write(format % tuple(true_labels))
-            result_file.write('\n')
+            #format = '%10s\t' * len(sentences[i]) + '\n'
+            #result_file.write(format % tuple(best_labels))
+            #format = '%10s\t' * len(sentences[i]) + '\n'
+            #result_file.write(format % tuple(true_labels))
+            #result_file.write('\n')
         NonNullPredicts += NonNullPredict
         right_NonNullPredicts += right_NonNullPredict
         NonNullTruths += NonNullTruth
