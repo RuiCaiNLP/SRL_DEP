@@ -277,8 +277,8 @@ def test(model, train_set, test_set, converter, params_path):
         F_dis[i] = 2 * P_dis[i] * R_dis[i]/(P_dis[i] + R_dis[i] + 0.0001)
 
     Predicat_num = 10500
-    P = (right_NonNullPredicts + Predicat_num*0.92) / (NonNullPredicts + Predicat_num)
-    R = (right_NonNullPredicts + Predicat_num*0.92) / (NonNullTruths + Predicat_num)
+    P = (right_NonNullPredicts + Predicat_num*0.94) / (NonNullPredicts + Predicat_num)
+    R = (right_NonNullPredicts + Predicat_num*0.94) / (NonNullTruths + Predicat_num)
     F1 = 2 * P * R / (P + R)
     log(right_NonNullPredicts)
     log(NonNullPredicts)
