@@ -3,7 +3,7 @@
 cd ..
 python -mnnet.run.srl.run \
 --train conll2009_batch.test.dep_l \
---test conll2009_batch.ood.dep_l \
+--test conll2009_batch.test.dep_l \
 --data_partition dev \
 --batch 30 \
 --freq-voc freq.voc_unk.conll2009 \
