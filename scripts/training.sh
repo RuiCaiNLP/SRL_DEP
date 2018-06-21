@@ -3,7 +3,7 @@
 cd ..
 python -mnnet.run.srl.run \
 --train conll2009_batch.train.dep_l \
---test conll2009_batch.test.dep_l \
+--test conll2009_batch.dev.dep_l \
 --data_partition dev \
 --batch 30 \
 --freq-voc freq.voc_unk.conll2009 \
@@ -15,7 +15,7 @@ python -mnnet.run.srl.run \
 --dep-voc dep.voc.conll2009_2 \
 --specific-dep-voc Specific_Dep.voc \
 --word-embeddings word_embeddings_proper.sskip.conll2009.txt \
---dbg-print-rate 500 \
+--dbg-print-rate 5 \
 --eval-dir ./data/ \
 --epochs 20 \
 --out conll2009_rm0_pl_a.25_sskip_h512_d.0_l4 \

@@ -106,7 +106,7 @@ class Runner(object):
             train(
                 model=model,
                 train_set=train_set,
-                dev_set=dev_set,
+                dev_set=test_set,
                 test_set=test_set,
                 epochs=a.epochs,
                 converter=self.get_converter(),
