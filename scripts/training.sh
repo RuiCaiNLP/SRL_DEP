@@ -2,7 +2,7 @@
 
 cd ..
 python -mnnet.run.srl.run \
---train conll2009_batch.ood.dep_l \
+--train conll2009_batch.train.dep_l \
 --test conll2009_batch.test.dep_l \
 --data_partition dev \
 --batch 30 \
