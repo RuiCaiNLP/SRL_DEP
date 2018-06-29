@@ -70,6 +70,7 @@ class BiLSTMTagger(nn.Module):
         self.hidden_state_dropout = nn.Dropout(p=0.3)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
+        self.use_dropout = nn.Dropout(p=0.2)
 
 
 
@@ -203,7 +204,8 @@ class BiLSTMTagger(nn.Module):
         LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
         h1 = F.relu(self.tag2hidden(TagProbs))
         h2 = F.relu(self.Link2hidden(LinkProbs))
-        hidden_states = torch.cat((hidden_states, h1, h2), 2)
+        H_use = self.use_dropout(torch.cat((h1, h2), 2))
+        hidden_states = torch.cat((hidden_states, H_use), 2)
 
         # SRL layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
