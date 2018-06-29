@@ -122,7 +122,11 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             idx += 1
-            loss.backward()
+            #iterate over auxiliary tasks and SRL
+            if e%2 == 0:
+                (DEPloss+SPEDEPloss).backward()
+            else:
+                SRLloss.backward()
             #norm = 0.1/(e+2)
 
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
