@@ -122,11 +122,11 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             idx += 1
-            if e == 0:
-                (DEPloss + SPEDEPloss).backward()
-            else:
-                loss.backward()
-            #loss.backward()
+            #if e == 0:
+            #    (DEPloss + SPEDEPloss).backward()
+            #else:
+            #    loss.backward()
+            loss.backward()
             #iterate over auxiliary tasks and SRL
             #if e%2 == 0:
             #    (DEPloss+SPEDEPloss).backward()
