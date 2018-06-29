@@ -303,7 +303,7 @@ class BiLSTMTagger(nn.Module):
         #    weight = 0.1
         p = nr.rand()
         if p<0.1:
-            loss = SRLloss + 0.1*DEPloss + 0.1 * SPEDEPloss
+            loss = SRLloss + DEPloss +  SPEDEPloss
         else:
             loss = SRLloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe
