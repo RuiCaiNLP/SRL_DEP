@@ -58,12 +58,12 @@ class BiLSTMTagger(nn.Module):
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
 
-        self.hidden2tag = nn.Linear(200, 200)
+        self.hidden2tag = nn.Linear(512, 200)
         self.MLP = nn.Linear(200, self.dep_size)
 
         self.tag2hidden = nn.Linear(self.dep_size, self.pos_size)
 
-        self.hidden2tag_spe = nn.Linear(100, 100)
+        self.hidden2tag_spe = nn.Linear(256, 100)
         self.MLP_spe = nn.Linear(100, 4)
         self.Link2hidden = nn.Linear(4, self.pos_size)
 
@@ -167,8 +167,8 @@ class BiLSTMTagger(nn.Module):
         hidden_states = hidden_states[unsort_idx]
 
         forward_h, backward_h = torch.split(hidden_states, self.hidden_dim, 2)
-        forward_e = forward_h[:, :, :50]
-        backward_e = backward_h[:, :, :50]
+        forward_e = forward_h[:, :, :128]
+        backward_e = backward_h[:, :, :128]
         bf_e = torch.cat((forward_e, backward_e), 2)
 
         predicate_embeds = bf_e[np.arange(0, bf_e.size()[0]), target_idx_in]
@@ -192,8 +192,8 @@ class BiLSTMTagger(nn.Module):
         hidden_states = hidden_states[unsort_idx]
 
         forward_h, backward_h = torch.split(hidden_states, self.hidden_dim, 2)
-        forward_e = forward_h[:, :, :50]
-        backward_e = backward_h[:, :, :50]
+        forward_e = forward_h[:, :, :128]
+        backward_e = backward_h[:, :, :128]
         bf_e = torch.cat((forward_e, backward_e), 2)
         dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.tanh(self.hidden2tag_spe(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
