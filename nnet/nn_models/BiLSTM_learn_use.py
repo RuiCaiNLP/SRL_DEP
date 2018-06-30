@@ -58,12 +58,12 @@ class BiLSTMTagger(nn.Module):
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
 
-        self.hidden2tag = nn.Linear(512, 200)
+        self.hidden2tag = nn.Linear(200, 200)
         self.MLP = nn.Linear(200, self.dep_size)
 
         self.tag2hidden = nn.Linear(self.dep_size, self.pos_size)
 
-        self.hidden2tag_spe = nn.Linear(256, 100)
+        self.hidden2tag_spe = nn.Linear(100, 100)
         self.MLP_spe = nn.Linear(100, 4)
         self.Link2hidden = nn.Linear(4, self.pos_size)
 
@@ -167,8 +167,8 @@ class BiLSTMTagger(nn.Module):
         hidden_states = hidden_states[unsort_idx]
 
         forward_h, backward_h = torch.split(hidden_states, self.hidden_dim, 2)
-        forward_e = forward_h[:, :, :128]
-        backward_e = backward_h[:, :, :128]
+        forward_e = forward_h[:, :, :50]
+        backward_e = backward_h[:, :, :50]
         bf_e = torch.cat((forward_e, backward_e), 2)
 
         predicate_embeds = bf_e[np.arange(0, bf_e.size()[0]), target_idx_in]
@@ -176,7 +176,7 @@ class BiLSTMTagger(nn.Module):
         added_embeds = torch.zeros(bf_e.size()[1], bf_e.size()[0], bf_e.size()[2]).to(device)
         concat_embeds = added_embeds + predicate_embeds
         bf_e = torch.cat((bf_e, concat_embeds.transpose(0, 1)), 2)
-        dep_tag_space = self.MLP(self.label_dropout(F.tanh(self.hidden2tag(bf_e)))).view(
+        dep_tag_space = self.MLP(self.label_dropout(F.relu(self.hidden2tag(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
 
 
@@ -192,10 +192,10 @@ class BiLSTMTagger(nn.Module):
         hidden_states = hidden_states[unsort_idx]
 
         forward_h, backward_h = torch.split(hidden_states, self.hidden_dim, 2)
-        forward_e = forward_h[:, :, :128]
-        backward_e = backward_h[:, :, :128]
+        forward_e = forward_h[:, :, :50]
+        backward_e = backward_h[:, :, :50]
         bf_e = torch.cat((forward_e, backward_e), 2)
-        dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.tanh(self.hidden2tag_spe(bf_e)))).view(
+        dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.relu(self.hidden2tag_spe(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
 
         #TagProbs = torch.FloatTensor(F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1).cpu().data.numpy()).to(device)
