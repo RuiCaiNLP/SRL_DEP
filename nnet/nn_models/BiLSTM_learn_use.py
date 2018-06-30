@@ -205,7 +205,7 @@ class BiLSTMTagger(nn.Module):
         LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
         h1 = F.relu(self.tag2hidden(TagProbs))
         h2 = F.relu(self.Link2hidden(LinkProbs))
-        H_use = torch.cat((h1, h2), 2)
+        H_use = self.use_dropout(torch.cat((h1, h2), 2))
         hidden_states = torch.cat((hidden_states, H_use), 2)
 
         # SRL layer
@@ -264,8 +264,6 @@ class BiLSTMTagger(nn.Module):
         tag_space = tag_space.view(len(sentence[0])*self.batch_size, -1)
 
         SRLprobs = F.softmax(tag_space, dim=1)
-
-
 
         #+++++++++++++++++++++++
         wrong_l_nums = 0.0
