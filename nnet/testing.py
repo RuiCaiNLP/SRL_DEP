@@ -249,15 +249,15 @@ def test(model, train_set, test_set, converter, params_path):
                     true_labels.append(true)
                 if true != '<pad>' and true != 'O':
                     NonNullTruth += 1
-                    #NonNullTruth_dis[int(syntax_distances[i][j])] += 1
+                    NonNullTruth_dis[int(syntax_distances[i][j])] += 1
                 if true != best:
                     errors += 1
                 if best != '<pad>' and best != 'O' and true != '<pad>':
                     NonNullPredict += 1
-                    #NonNullPre_dis[int(syntax_distances[i][j])] += 1
+                    NonNullPre_dis[int(syntax_distances[i][j])] += 1
                     if true == best:
                         right_NonNullPredict += 1
-                        #Right_predict_dis[int(syntax_distances[i][j])] += 1
+                        Right_predict_dis[int(syntax_distances[i][j])] += 1
             #format = '%10s\t' * len(sentences[i]) + '\n'
             #result_file.write(format % tuple(best_labels))
             #format = '%10s\t' * len(sentences[i]) + '\n'
@@ -268,13 +268,17 @@ def test(model, train_set, test_set, converter, params_path):
         NonNullTruths += NonNullTruth
 
     for i in range(20):
-        break
+
         if NonNullTruth_dis[i] == 0:
             continue
-
         P_dis[i] = Right_predict_dis[i]*1.0 / (NonNullPre_dis[i] + 0.0001)
         R_dis[i] = Right_predict_dis[i]*1.0 / (NonNullTruth_dis[i] + 0.0001)
         F_dis[i] = 2 * P_dis[i] * R_dis[i]/(P_dis[i] + R_dis[i] + 0.0001)
+
+        log(Right_predict_dis[i])
+        log(NonNullPre_dis[i])
+        log(NonNullTruth_dis[i])
+        log(F_dis[i])
 
     Predicat_num = 6390
     P = (right_NonNullPredicts + Predicat_num*0.9438) / (NonNullPredicts + Predicat_num)
