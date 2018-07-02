@@ -85,9 +85,6 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             dep_tags = model_input[11]
             dep_tags_in = torch.from_numpy(dep_tags).to(device)
 
-            log(dep_tags_in)
-
-
             dep_heads = model_input[12]
 
             #root_dep_tags = model_input[12]
@@ -102,7 +99,6 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             specific_dep_relations = model_input[15]
             specific_dep_relations_in = torch.from_numpy(specific_dep_relations).to(device)
 
-            log(specific_dep_relations_in)
 
             #log(dep_tags_in)
             #log(specific_dep_relations)
