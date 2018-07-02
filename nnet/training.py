@@ -26,7 +26,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     for e in range(epochs):
         tic = time.time()
         dataset = [batch for batch in train_set.batches()]
-        #random.shuffle(dataset)
+        random.shuffle(dataset)
         for batch in dataset:
             sample_count += len(batch)
 
