@@ -269,7 +269,7 @@ def test(model, train_set, test_set, converter, params_path):
         NonNullTruths += NonNullTruth
 
     for i in range(20):
-
+        log('syntactic distance:', i)
         if NonNullTruth_dis[i] == 0:
             continue
         P_dis[i] = Right_predict_dis[i]*1.0 / (NonNullPre_dis[i] + 0.0001)
