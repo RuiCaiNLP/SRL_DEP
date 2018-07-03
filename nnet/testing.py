@@ -90,7 +90,7 @@ def test(model, train_set, test_set, converter, params_path):
 
     model.eval()
     best_F1 = -0.1
-    result_file = open('model_bilstm_4L_seed1_30_256_only_deptags_gold_dev.result', 'w')
+    result_file = open('dev.result', 'w')
     for gold_batch, batch in zip(train_set.batches(), test_set.batches()):
         #log(batch[0])
         #log(batch[0][1][4])
@@ -193,13 +193,14 @@ def test(model, train_set, test_set, converter, params_path):
             labels_voc = batch[i][-4]
             local_voc = make_local_voc(labels_voc)
 
-            """
+
 
             format = '%10s\t' * len(sentences[i]) + '\n'
             result_file.write(format % tuple(sentences[i]))
             format = '%10d\t' * len(sentences[i]) + '\n'
             result_file.write(format % tuple(syntax_distances[i]))
 
+            """
             for level in range(len(iof_values)):
 
                 i_value_forward = []
@@ -258,11 +259,11 @@ def test(model, train_set, test_set, converter, params_path):
                     if true == best:
                         right_NonNullPredict += 1
                         Right_predict_dis[int(syntax_distances[i][j])] += 1
-            #format = '%10s\t' * len(sentences[i]) + '\n'
-            #result_file.write(format % tuple(best_labels))
-            #format = '%10s\t' * len(sentences[i]) + '\n'
-            #result_file.write(format % tuple(true_labels))
-            #result_file.write('\n')
+            format = '%10s\t' * len(sentences[i]) + '\n'
+            result_file.write(format % tuple(best_labels))
+            format = '%10s\t' * len(sentences[i]) + '\n'
+            result_file.write(format % tuple(true_labels))
+            result_file.write('\n')
         NonNullPredicts += NonNullPredict
         right_NonNullPredicts += right_NonNullPredict
         NonNullTruths += NonNullTruth
