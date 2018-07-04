@@ -23,6 +23,12 @@ def bio_reader(record):
     specific_dep_relations = specific_dep_relations.split(' ')
 
 
+    if pos_tags[int(target)].startswith("V"):
+        dbg_header = 'V'
+    elif pos_tags[int(target)].startswith("N"):
+        dbg_header = 'N'
+
+
     assert (len(words) == len(labels))
 
     # convert labels into indexes in labels_voc

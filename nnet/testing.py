@@ -205,6 +205,8 @@ def test(model, train_set, test_set, converter, params_path):
 
         for i, sent_labels in enumerate(labels):
             labels_voc = batch[i][-4]
+            NorV = batch[i][0]
+            log(NorV)
             local_voc = make_local_voc(labels_voc)
 
 
