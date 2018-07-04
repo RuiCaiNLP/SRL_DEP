@@ -371,10 +371,22 @@ def test(model, train_set, test_set, converter, params_path):
         log(NonNullTruth_dis[i])
         log(F_dis[i])
 
+    all_Right_predict_N = 0.0
+    all_NonNullPre_N = 0.0
+    all_NonNullTruth_N = 0.0
+
+    all_Right_predict_V = 0.0
+    all_NonNullPre_V = 0.0
+    all_NonNullTruth_V = 0.0
+
     for i in range(4):
         P_N = Right_predict_N[i] / NonNullPre_N[i]
         R_N = Right_predict_N[i] / NonNullTruth_N[i]
         F_N = 2 * P_N * R_N/(P_N + R_N + 0.0001)
+
+        all_Right_predict_N += Right_predict_N[i]
+        all_NonNullPre_N += NonNullPre_N[i]
+        all_NonNullTruth_N += NonNullPre_N[i]
 
         log(P_N, R_N, F_N)
 
@@ -382,7 +394,21 @@ def test(model, train_set, test_set, converter, params_path):
         R_V = Right_predict_V[i] / NonNullTruth_V[i]
         F_V = 2 * P_V * R_V / (P_V + R_V + 0.0001)
 
+        all_Right_predict_V += Right_predict_V[i]
+        all_NonNullPre_V += NonNullPre_V[i]
+        all_NonNullTruth_V += NonNullPre_V[i]
+
         log(P_V, R_V, F_V)
+
+    P_N = all_Right_predict_N / all_NonNullPre_N
+    R_N = all_Right_predict_N / all_NonNullTruth_N
+    F_N = 2 * P_N * R_N / (P_N + R_N + 0.0001)
+    log(P_N, R_N, F_N)
+
+    P_V = all_Right_predict_V / all_NonNullPre_V
+    R_V = all_Right_predict_V / all_NonNullTruth_V
+    F_V = 2 * P_V * R_V / (P_V + R_V + 0.0001)
+    log(P_V, R_V, F_V)
 
     Predicat_num = 6390
     P = (right_NonNullPredicts + Predicat_num*0.9438) / (NonNullPredicts + Predicat_num)
