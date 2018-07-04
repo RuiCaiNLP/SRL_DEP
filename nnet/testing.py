@@ -58,6 +58,16 @@ def syntax_analyse(tree, predicate_index):
     distances = [-1]*len(tree)
     current_dis = 0
     current_level = [predicate_index+1]
+
+    for i in range(len(tree)):
+        if i < predicate_index:
+            distances[i] = predicate_index - i
+        else:
+            distances[i] = i - predicate_index
+
+    return distances
+
+    """
     while len(covered) < len(tree):
         covered.extend(current_level)
         next_level = []
@@ -69,7 +79,7 @@ def syntax_analyse(tree, predicate_index):
         current_level = next_level
 
     return distances
-
+    """
 
 
 
