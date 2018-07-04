@@ -403,11 +403,13 @@ def test(model, train_set, test_set, converter, params_path):
     P_N = all_Right_predict_N / all_NonNullPre_N
     R_N = all_Right_predict_N / all_NonNullTruth_N
     F_N = 2 * P_N * R_N / (P_N + R_N + 0.0001)
+    log('all_N')
     log(P_N, R_N, F_N)
 
     P_V = all_Right_predict_V / all_NonNullPre_V
     R_V = all_Right_predict_V / all_NonNullTruth_V
     F_V = 2 * P_V * R_V / (P_V + R_V + 0.0001)
+    log("all_V")
     log(P_V, R_V, F_V)
 
     Predicat_num = 6390
