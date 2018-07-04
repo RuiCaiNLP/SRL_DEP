@@ -103,9 +103,9 @@ def test(model, train_set, test_set, converter, params_path):
     F_dis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     #verbal -A0, A1, A2, AM
-    NonNullTruth_V = [0, 0, 0, 0]
-    Right_predict_V = [0, 0, 0, 0]
-    NonNullPre_V = [0, 0, 0, 0]
+    NonNullTruth_V = [0.0, 0.0, 0.0, 0.0]
+    Right_predict_V = [0.0, 0.0, 0.0, 0.0]
+    NonNullPre_V = [0.0, 0.0, 0.0, 0.0]
 
     # Nominal -A0, A1, A2, AM
     NonNullTruth_N = [0.0, 0.0, 0.0, 0.0]
