@@ -102,6 +102,16 @@ def test(model, train_set, test_set, converter, params_path):
     R_dis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     F_dis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+    #verbal -A0, A1, A2, AM
+    NonNullTruth_V = [0, 0, 0, 0]
+    Right_predict_V = [0, 0, 0, 0]
+    NonNullPre_V = [0, 0, 0, 0]
+
+    # Nominal -A0, A1, A2, AM
+    NonNullTruth_N = [0.0, 0.0, 0.0, 0.0]
+    Right_predict_N = [0.0, 0.0, 0.0, 0.0]
+    NonNullPre_N = [0.0, 0.0, 0.0, 0.0]
+
     model.eval()
     best_F1 = -0.1
     result_file = open('dev.result', 'w')
@@ -206,7 +216,6 @@ def test(model, train_set, test_set, converter, params_path):
         for i, sent_labels in enumerate(labels):
             labels_voc = batch[i][-4]
             NorV = batch[i][0]
-            log(NorV)
             local_voc = make_local_voc(labels_voc)
 
 
@@ -264,22 +273,87 @@ def test(model, train_set, test_set, converter, params_path):
                 if true != '<pad>':
                     best_labels.append(best)
                     true_labels.append(true)
+
+
+
                 if true != '<pad>' and true != 'O':
                     NonNullTruth += 1
                     NonNullTruth_dis[int(syntax_distances[i][j])] += 1
+
+                    if NorV == 'N':
+                        if true.startswith("AM"):
+                            NonNullTruth_N[3] += 1
+                        elif true == 'A0':
+                            NonNullTruth_N[0] += 1
+                        elif true == 'A1':
+                            NonNullTruth_N[1] += 1
+                        elif true == 'A2':
+                            NonNullTruth_N[2] += 1
+                    elif NorV == 'V':
+                        if true.startswith("AM"):
+                            NonNullTruth_V[3] += 1
+                        elif true == 'A0':
+                            NonNullTruth_V[0] += 1
+                        elif true == 'A1':
+                            NonNullTruth_V[1] += 1
+                        elif true == 'A2':
+                            NonNullTruth_V[2] += 1
+
                 if true != best:
                     errors += 1
                 if best != '<pad>' and best != 'O' and true != '<pad>':
                     NonNullPredict += 1
                     NonNullPre_dis[int(syntax_distances[i][j])] += 1
+
+                    if NorV == 'N':
+                        if best.startswith("AM"):
+                            NonNullPre_N[3] += 1
+                        elif best == 'A0':
+                            NonNullPre_N[0] += 1
+                        elif best == 'A1':
+                            NonNullPre_N[1] += 1
+                        elif best == 'A2':
+                            NonNullPre_N[2] += 1
+                    elif NorV == 'V':
+                        if best.startswith("AM"):
+                            NonNullPre_V[3] += 1
+                        elif best == 'A0':
+                            NonNullPre_V[0] += 1
+                        elif best == 'A1':
+                            NonNullPre_V[1] += 1
+                        elif best == 'A2':
+                            NonNullPre_V[2] += 1
+
                     if true == best:
                         right_NonNullPredict += 1
                         Right_predict_dis[int(syntax_distances[i][j])] += 1
-            format = '%10s\t' * len(sentences[i]) + '\n'
-            result_file.write(format % tuple(best_labels))
-            format = '%10s\t' * len(sentences[i]) + '\n'
-            result_file.write(format % tuple(true_labels))
-            result_file.write('\n')
+
+                        if NorV == 'N':
+                            if best.startswith("AM"):
+                                Right_predict_N[3] += 1
+                            elif best == 'A0':
+                                Right_predict_N[0] += 1
+                            elif best == 'A1':
+                                Right_predict_N[1] += 1
+                            elif best == 'A2':
+                                Right_predict_N[2] += 1
+                        elif NorV == 'V':
+                            if best.startswith("AM"):
+                                Right_predict_V[3] += 1
+                            elif best == 'A0':
+                                Right_predict_V[0] += 1
+                            elif best == 'A1':
+                                Right_predict_V[1] += 1
+                            elif best == 'A2':
+                                Right_predict_V[2] += 1
+
+
+            #format = '%10s\t' * len(sentences[i]) + '\n'
+            #result_file.write(format % tuple(best_labels))
+            #format = '%10s\t' * len(sentences[i]) + '\n'
+            #result_file.write(format % tuple(true_labels))
+            #result_file.write('\n')
+
         NonNullPredicts += NonNullPredict
         right_NonNullPredicts += right_NonNullPredict
         NonNullTruths += NonNullTruth
@@ -296,6 +370,19 @@ def test(model, train_set, test_set, converter, params_path):
         log(NonNullPre_dis[i])
         log(NonNullTruth_dis[i])
         log(F_dis[i])
+
+    for i in range(4):
+        P_N = Right_predict_N[i] / NonNullPre_N[i]
+        R_N = Right_predict_N[i] / NonNullTruth_N[i]
+        F_N = 2 * P_N * R_N/(P_N + R_N + 0.0001)
+
+        log(P_N, R_N, F_N)
+
+        P_V = Right_predict_V[i] / NonNullPre_V[i]
+        R_V = Right_predict_V[i] / NonNullTruth_V[i]
+        F_V = 2 * P_V * R_V / (P_V + R_V + 0.0001)
+
+        log(P_V, R_V, F_V)
 
     Predicat_num = 6390
     P = (right_NonNullPredicts + Predicat_num*0.9438) / (NonNullPredicts + Predicat_num)
