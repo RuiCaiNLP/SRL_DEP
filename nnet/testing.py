@@ -65,6 +65,9 @@ def syntax_analyse(tree, predicate_index):
         else:
             distances[i] = i - predicate_index
 
+        if distances[i]>15:
+            distances[i] = 16
+
     return distances
 
     """
