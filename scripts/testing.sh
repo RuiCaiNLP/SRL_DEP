@@ -19,7 +19,7 @@ python -mnnet.run.srl.run \
 --eval-dir ./data/ \
 --epochs 10 \
 --out conll2009_rm0_pl_a.25_sskip_h512_d.0_l4 \
---params-path model_4L_15e.pkl \
+--params-path model_4L.pkl \
 --test-mode True \
 --hps "{'id': 1, 'sent_edim': 100, 'sent_hdim': 128, \
 'frame_edim': 128, 'role_edim': 128, 'pos_edim': 16, 'rec_layers': 1, 'gc_layers': 0, \
