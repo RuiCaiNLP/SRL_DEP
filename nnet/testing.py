@@ -386,7 +386,7 @@ def test(model, train_set, test_set, converter, params_path):
 
         all_Right_predict_N += Right_predict_N[i]
         all_NonNullPre_N += NonNullPre_N[i]
-        all_NonNullTruth_N += NonNullPre_N[i]
+        all_NonNullTruth_N += NonNullTruth_N[i]
 
         log(P_N, R_N, F_N)
 
@@ -396,7 +396,7 @@ def test(model, train_set, test_set, converter, params_path):
 
         all_Right_predict_V += Right_predict_V[i]
         all_NonNullPre_V += NonNullPre_V[i]
-        all_NonNullTruth_V += NonNullPre_V[i]
+        all_NonNullTruth_V += NonNullTruth_V[i]
 
         log(P_V, R_V, F_V)
 
