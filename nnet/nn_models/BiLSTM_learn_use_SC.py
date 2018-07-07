@@ -204,9 +204,10 @@ class BiLSTMTagger(nn.Module):
         bf_e = torch.cat((bf_e, concat_embeds.transpose(0, 1)), 2)
         dep_tag_space = self.MLP(self.label_dropout(F.tanh(self.hidden2tag(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
-
         # short cut connections
         hidden_states = torch.cat((hidden_states, word_embeds, fixed_embeds), 2)
+
+
         # Spe layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
