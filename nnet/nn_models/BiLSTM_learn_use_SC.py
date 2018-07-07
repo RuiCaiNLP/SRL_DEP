@@ -58,12 +58,12 @@ class BiLSTMTagger(nn.Module):
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
 
-        self.hidden2tag = nn.Linear(200 + 400, 200)
+        self.hidden2tag = nn.Linear(200, 200)
         self.MLP = nn.Linear(200, self.dep_size)
 
         self.tag2hidden = nn.Linear(self.dep_size, self.pos_size)
 
-        self.hidden2tag_spe = nn.Linear(100 + 200, 100)
+        self.hidden2tag_spe = nn.Linear(100, 100)
         self.MLP_spe = nn.Linear(100, 4)
         self.Link2hidden = nn.Linear(4, self.pos_size)
 
@@ -77,17 +77,25 @@ class BiLSTMTagger(nn.Module):
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
-        self.num_layers = 2
-        self.BiLSTM_share = nn.LSTM(input_size=sent_embedding_dim, hidden_size=lstm_hidden_dim, batch_first=True,
+        self.num_layers = 1
+        self.BiLSTM_share_1 = nn.LSTM(input_size=sent_embedding_dim, hidden_size=lstm_hidden_dim, batch_first=True,
                               bidirectional=True, num_layers=self.num_layers)
 
-        init.orthogonal_(self.BiLSTM_share.all_weights[0][0])
-        init.orthogonal_(self.BiLSTM_share.all_weights[0][1])
-        init.orthogonal_(self.BiLSTM_share.all_weights[1][0])
-        init.orthogonal_(self.BiLSTM_share.all_weights[1][1])
+        init.orthogonal_(self.BiLSTM_share_1.all_weights[0][0])
+        init.orthogonal_(self.BiLSTM_share_1.all_weights[0][1])
+        init.orthogonal_(self.BiLSTM_share_1.all_weights[1][0])
+        init.orthogonal_(self.BiLSTM_share_1.all_weights[1][1])
+
+        self.BiLSTM_share_2 = nn.LSTM(input_size=lstm_hidden_dim * 2 + 200, hidden_size=lstm_hidden_dim, batch_first=True,
+                                      bidirectional=True, num_layers=self.num_layers)
+
+        init.orthogonal_(self.BiLSTM_share_2.all_weights[0][0])
+        init.orthogonal_(self.BiLSTM_share_2.all_weights[0][1])
+        init.orthogonal_(self.BiLSTM_share_2.all_weights[1][0])
+        init.orthogonal_(self.BiLSTM_share_2.all_weights[1][1])
 
         self.num_layers = 1
-        self.BiLSTM_Spe = nn.LSTM(input_size=lstm_hidden_dim * 2, hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_Spe = nn.LSTM(input_size=lstm_hidden_dim * 2 + 200, hidden_size=lstm_hidden_dim, batch_first=True,
                                   bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_Spe.all_weights[0][0])
@@ -109,7 +117,8 @@ class BiLSTMTagger(nn.Module):
         self.role_map = nn.Linear(in_features=role_embedding_dim * 2, out_features=self.hidden_dim * 4)
 
         # Init hidden state
-        self.hidden = self.init_hidden_share()
+        self.hidden = self.init_hidden_spe()
+        self.hidden_0 = self.init_hidden_spe()
         self.hidden_2 = self.init_hidden_spe()
         self.hidden_3 = self.init_hidden_spe()
         self.hidden_4 = self.init_hidden_spe()
@@ -161,19 +170,32 @@ class BiLSTMTagger(nn.Module):
 
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
-        hidden_states, self.hidden = self.BiLSTM_share(embeds_sort, self.hidden)
+        hidden_states, self.hidden = self.BiLSTM_share_1(embeds_sort, self.hidden)
         # it seems that hidden states is already batch first, we don't need swap the dims
         # hidden_states = hidden_states.permute(1, 2, 0).contiguous().view(self.batch_size, -1, )
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
         #hidden_states = hidden_states.transpose(0, 1)
         hidden_states = hidden_states[unsort_idx]
 
+        #short cut connections
+        hidden_states = torch.cat((hidden_states, word_embeds, fixed_embeds), 2)
+
+        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
+        embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
+        # hidden states [time_steps * batch_size * hidden_units]
+        hidden_states, self.hidden_0 = self.BiLSTM_share_2(embeds_sort, self.hidden_0)
+        # it seems that hidden states is already batch first, we don't need swap the dims
+        # hidden_states = hidden_states.permute(1, 2, 0).contiguous().view(self.batch_size, -1, )
+        hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
+        # hidden_states = hidden_states.transpose(0, 1)
+        hidden_states = hidden_states[unsort_idx]
+
+
         forward_h, backward_h = torch.split(hidden_states, self.hidden_dim, 2)
         forward_e = forward_h[:, :, :50]
         backward_e = backward_h[:, :, :50]
         bf_e = torch.cat((forward_e, backward_e), 2)
-        #short cut connection
-        bf_e = torch.cat((bf_e, word_embeds, fixed_embeds), 2)
+
 
         predicate_embeds = bf_e[np.arange(0, bf_e.size()[0]), target_idx_in]
         # T * B * H
@@ -183,7 +205,8 @@ class BiLSTMTagger(nn.Module):
         dep_tag_space = self.MLP(self.label_dropout(F.tanh(self.hidden2tag(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
 
-
+        # short cut connections
+        hidden_states = torch.cat((hidden_states, word_embeds, fixed_embeds), 2)
         # Spe layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
@@ -199,8 +222,6 @@ class BiLSTMTagger(nn.Module):
         forward_e = forward_h[:, :, :50]
         backward_e = backward_h[:, :, :50]
         bf_e = torch.cat((forward_e, backward_e), 2)
-        # short cut connection
-        bf_e = torch.cat((bf_e, word_embeds, fixed_embeds), 2)
 
         dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.tanh(self.hidden2tag_spe(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
