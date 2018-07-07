@@ -17,7 +17,7 @@ python -mnnet.run.srl.run \
 --word-embeddings word_embeddings_proper.sskip.conll2009.txt \
 --dbg-print-rate 500 \
 --eval-dir ./data/ \
---epochs 15 \
+--epochs 20 \
 --out conll2009_rm0_pl_a.25_sskip_h512_d.0_l4 \
 --params-path model_SC.pkl \
 --hps "{'id': 1, 'sent_edim': 100, 'sent_hdim': 128, \
