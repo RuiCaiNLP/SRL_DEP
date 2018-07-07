@@ -35,6 +35,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             model.train()
             record_ids, batch = zip(*batch)
             model_input = converter(batch)
+
             model.hidden = model.init_hidden_spe()
             model.hidden_0 = model.init_hidden_spe()
             model.hidden_2 = model.init_hidden_spe()
