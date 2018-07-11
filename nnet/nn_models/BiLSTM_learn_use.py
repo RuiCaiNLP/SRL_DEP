@@ -196,8 +196,6 @@ class BiLSTMTagger(nn.Module):
         backward_e = backward_h[:, :, :50]
         bf_e = torch.cat((forward_e, backward_e), 2)
 
-
-
         dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.tanh(self.hidden2tag_spe(bf_e)))).view(
             len(sentence[0]) * self.batch_size, -1)
 
@@ -271,22 +269,43 @@ class BiLSTMTagger(nn.Module):
         #+++++++++++++++++++++++
         wrong_l_nums = 0.0
         all_l_nums = 0.0
+
+        right_noNull_predict = 0.0
+        noNull_predict = 0.0
+        noNUll_truth = 0.0
         dep_labels = np.argmax(dep_tag_space.cpu().data.numpy(), axis=1)
         for predict_l, gold_l in zip(dep_labels, dep_tags.cpu().view(-1).data.numpy()):
+            if predict_l >1:
+                noNull_predict += 1
             if gold_l != 0:
                 all_l_nums += 1
+                if gold_l != 1:
+                    noNUll_truth += 1
+                    if gold_l == predict_l:
+                        right_noNull_predict += 1
             if predict_l != gold_l and gold_l != 0:
                 wrong_l_nums += 1
+
 
         #+++++++++++++++++++++++
         wrong_l_nums_spe = 0.0
         all_l_nums_spe = 0.0
+
+        right_noNull_predict_spe = 0.0
+        noNull_predict_spe = 0.0
+        noNUll_truth_spe = 0.0
         spe_dep_labels = np.argmax(dep_tag_space_spe.cpu().data.numpy(), axis=1)
         for predict_l, gold_l in zip(spe_dep_labels, specific_dep_relations.cpu().view(-1).data.numpy()):
+            if predict_l >1:
+                noNull_predict_spe += 1
             if gold_l != 0:
                 all_l_nums_spe += 1
+                if gold_l != 1:
+                    noNUll_truth_spe += 1
+                    if gold_l == predict_l:
+                        right_noNull_predict_spe += 1
             if predict_l != gold_l and gold_l != 0:
-               wrong_l_nums_spe += 1
+                wrong_l_nums_spe += 1
 
         #loss_function = nn.NLLLoss(ignore_index=0)
         targets = targets.view(-1)
@@ -308,7 +327,9 @@ class BiLSTMTagger(nn.Module):
         #else:
         #    loss = SRLloss
         loss = SRLloss + 0.1*DEPloss + 0.1*SPEDEPloss
-        return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe
+        return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe,  \
+               right_noNull_predict, noNull_predict, noNUll_truth,\
+               right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
 
     @staticmethod
     def sort_batch(x, l):

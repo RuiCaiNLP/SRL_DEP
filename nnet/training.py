@@ -104,7 +104,9 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             #log(dep_tags_in)
             #log(specific_dep_relations)
-            SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, _, _ \
+            SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, spe_wrong_l_nums, spe_all_l_nums, \
+            right_noNull_predict, noNull_predict, noNUll_truth, \
+            right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe\
                 = model(sentence_in, p_sentence_in, pos_tags_in, sen_lengths, target_idx_in, region_mark_in,
                         local_roles_voc_in,
                         frames_in, local_roles_mask_in, sent_pred_lemmas_idx_in, dep_tags_in, dep_heads,
@@ -152,6 +154,14 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 wrong_labels_num = 0.0
                 spe_total_labels_num = 0.0
                 spe_wrong_labels_num = 0.0
+
+                right_noNull_predict =0.0
+                noNull_predict = 0
+                noNUll_truth = 0.0
+                right_noNull_predict_spe = 0
+                noNull_predict_spe = 0
+                noNUll_truth_spe = 0
+
                 log('now dev test')
                 index = 0
 
@@ -231,7 +241,9 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         specific_dep_relations = model_input[15]
                         specific_dep_relations_in = Variable(torch.from_numpy(specific_dep_relations)).to(device)
 
-                        SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, spe_wrong_l_nums, spe_all_l_nums\
+                        SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, spe_wrong_l_nums, spe_all_l_nums, \
+                        right_noNull_predict_b, noNull_predict_b, noNUll_truth_b, \
+                        right_noNull_predict_spe_b, noNull_predict_spe_b, noNUll_truth_spe_b\
                             = model(sentence_in, p_sentence_in, pos_tags_in, sen_lengths, target_idx_in, region_mark_in,
                                     local_roles_voc_in,
                                     frames_in, local_roles_mask_in, sent_pred_lemmas_idx_in, dep_tags_in, dep_heads,
@@ -243,6 +255,14 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         total_labels_num += all_l_nums
                         spe_wrong_labels_num += spe_wrong_l_nums
                         spe_total_labels_num += spe_all_l_nums
+
+                        right_noNull_predict += right_noNull_predict_b
+                        noNull_predict += noNull_predict_b
+                        noNUll_truth += noNUll_truth_b
+                        right_noNull_predict_spe += right_noNull_predict_spe_b
+                        noNull_predict_spe += noNull_predict_spe_b
+                        noNUll_truth_spe += noNUll_truth_spe_b
+
                         for i, sent_labels in enumerate(labels):
                             labels_voc = batch[i][-4]
                             local_voc = make_local_voc(labels_voc)
@@ -270,8 +290,6 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 log(right_NonNullPredicts)
                 log(NonNullPredicts)
                 log(NonNullTruths)
-                log('Lable Precision:' + str(wrong_labels_num / total_labels_num))
-                log('Specific_Lable Precision:' + str(spe_wrong_labels_num / spe_total_labels_num))
                 log('Precision: ' + str(P), 'recall: ' + str(R), 'F1: ' + str(F1))
                 P = (right_NonNullPredicts) / (NonNullPredicts + 1)
                 R = (right_NonNullPredicts) / (NonNullTruths)
@@ -282,6 +300,18 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                     best_F1 = F1
                     torch.save(model.state_dict(), params_path)
                     log('New best, model saved')
+
+                P = right_noNull_predict / (noNull_predict+ 0.0001)
+                R = right_noNull_predict / (noNUll_truth+ 0.0001)
+                F = 2 * P * R / (P + R + 0.0001)
+                log('Lable Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' +str(F))
+
+                P = right_noNull_predict_spe / (noNull_predict_spe+ 0.0001)
+                R = right_noNull_predict_spe / (noNUll_truth_spe+ 0.0001)
+                F = 2 * P * R / (P + R + 0.0001)
+                log('Lable Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F))
+
+
 
 
        ##########################################################################################
