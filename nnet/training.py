@@ -36,8 +36,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             record_ids, batch = zip(*batch)
             model_input = converter(batch)
 
-            model.hidden = model.init_hidden_spe()
-            model.hidden_0 = model.init_hidden_spe()
+            model.hidden = model.init_hidden_share()
+            #model.hidden_0 = model.init_hidden_spe()
             model.hidden_2 = model.init_hidden_spe()
             model.hidden_3 = model.init_hidden_spe()
             model.hidden_4 = model.init_hidden_spe()
@@ -170,8 +170,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
                         record_ids, batch = zip(*batch)
                         model_input = converter(batch)
-                        model.hidden = model.init_hidden_spe()
-                        model.hidden_0 = model.init_hidden_spe()
+                        model.hidden = model.init_hidden_share()
+                        #model.hidden_0 = model.init_hidden_spe()
                         model.hidden_2 = model.init_hidden_spe()
                         model.hidden_3 = model.init_hidden_spe()
                         model.hidden_4 = model.init_hidden_spe()
