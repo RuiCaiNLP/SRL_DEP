@@ -298,7 +298,7 @@ class BiLSTMTagger(nn.Module):
         for predict_l, gold_l in zip(spe_dep_labels, specific_dep_relations.cpu().view(-1).data.numpy()):
             if predict_l != 0 and gold_l != 3:
                 noNull_predict_spe += 1
-            if gold_l != 0 :
+            if gold_l != 0:
                 all_l_nums_spe += 1
                 if gold_l != 3:
                     noNUll_truth_spe += 1
