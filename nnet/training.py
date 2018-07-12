@@ -58,7 +58,6 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             target_idx_in = model_input[4]
 
-
             frames = model_input[5]
             frames_in = torch.from_numpy(frames).to(device)
             frames_in.requires_grad_(False)
@@ -67,14 +66,11 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             local_roles_voc_in = torch.from_numpy(local_roles_voc).to(device)
             local_roles_voc_in.requires_grad_(False)
 
-
             local_roles_mask = model_input[7]
             local_roles_mask_in = torch.from_numpy(local_roles_mask).to(device)
             local_roles_mask_in.requires_grad_(False)
 
-
             region_mark = model_input[9]
-
 
             # region_mark_in = Variable(torch.LongTensor(region_mark))
             region_mark_in = torch.from_numpy(region_mark).to(device)
@@ -158,6 +154,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 right_noNull_predict =0.0
                 noNull_predict = 0
                 noNUll_truth = 0.0
+
                 right_noNull_predict_spe = 0
                 noNull_predict_spe = 0
                 noNUll_truth_spe = 0
@@ -301,15 +298,15 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                     torch.save(model.state_dict(), params_path)
                     log('New best, model saved')
 
-                P = right_noNull_predict / (noNull_predict+ 0.0001)
-                R = right_noNull_predict / (noNUll_truth+ 0.0001)
+                P = right_noNull_predict / (noNull_predict + 0.0001)
+                R = right_noNull_predict / (noNUll_truth + 0.0001)
                 F = 2 * P * R / (P + R + 0.0001)
-                log('Lable Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' +str(F))
+                log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F))
 
-                P = right_noNull_predict_spe / (noNull_predict_spe+ 0.0001)
-                R = right_noNull_predict_spe / (noNUll_truth_spe+ 0.0001)
+                P = right_noNull_predict_spe / (noNull_predict_spe + 0.0001)
+                R = right_noNull_predict_spe / (noNUll_truth_spe + 0.0001)
                 F = 2 * P * R / (P + R + 0.0001)
-                log('Lable Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F))
+                log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F))
 
 
 
