@@ -83,6 +83,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             dep_tags = model_input[11]
             dep_tags_in = torch.from_numpy(dep_tags).to(device)
 
+
+
             dep_heads = model_input[12]
 
             #root_dep_tags = model_input[12]
@@ -158,6 +160,15 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 right_noNull_predict_spe = 0
                 noNull_predict_spe = 0
                 noNUll_truth_spe = 0
+
+
+                Dep_NoNull_Truth = [0.0] * 100
+                Dep_NoNull_Predict = [0.0] * 100
+                Dep_Right_NoNull_Predict = [0.0] * 100
+
+                Dep_P = [0.0] * 100
+                Dep_R = [0.0] * 100
+                Dep_F = [0.0] * 100
 
                 log('now dev test')
                 index = 0
@@ -269,17 +280,25 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
                                 if true != '<pad>' and true != 'O':
                                     NonNullTruth += 1
+                                    Dep_NoNull_Truth[dep_tags_in[i][j]] += 1
                                 if true != best:
                                     errors += 1
                                 if best != '<pad>' and best != 'O' and true != '<pad>':
                                     NonNullPredict += 1
+                                    Dep_NoNull_Predict[dep_tags_in[i][j]] += 1
                                     if true == best:
                                         right_NonNullPredict += 1
+                                        Dep_Right_NoNull_Predict[dep_tags_in[i][j]] += 1
 
                         NonNullPredicts += NonNullPredict
                         right_NonNullPredicts += right_NonNullPredict
                         NonNullTruths += NonNullTruth
 
+                for i in range(len(Dep_P)):
+                    Dep_P[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Predict[i] + 0.0001)
+                    Dep_R[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Truth[i] + 0.0001)
+                    Dep_F[i] = 2 * Dep_P[i] * Dep_R[i] / (Dep_P[i] + Dep_R[i] + 0.0001)
+                    log(Dep_P[i], Dep_R[i], Dep_F[i])
                 Predicat_num = 6300
                 P = (right_NonNullPredicts + Predicat_num) / (NonNullPredicts + Predicat_num)
                 R = (right_NonNullPredicts + Predicat_num) / (NonNullTruths + Predicat_num)
