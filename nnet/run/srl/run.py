@@ -1,7 +1,7 @@
 from nnet.run.runner import *
 from nnet.ml.voc import *
 from functools import partial
-from nnet.nn_models.BiLSTM_learn_use import BiLSTMTagger
+from nnet.nn_models.BiLSTM_learn_use_Elmo import BiLSTMTagger
 
 def make_local_voc(labels):
     return {i: label for i, label in enumerate(labels)}
@@ -96,6 +96,12 @@ class SRLRunner(Runner):
         )
         parser.add_argument(
             "--word-embeddings", required=True
+        )
+        parser.add_argument(
+            "--elmo-embeddings-0", required=False
+        )
+        parser.add_argument(
+            "--elmo-embeddings-1", required=False
         )
         parser.add_argument(
             "--data_partition", required=True
@@ -233,6 +239,8 @@ class SRLRunner(Runner):
         hps['svdep'] = self.specific_dep_voc.size()
         ## do not use pre-trained embedding for now
         hps['word_embeddings'] = parse_word_embeddings(self.a.word_embeddings)
+        hps['elmo_embeddings_0'] = parse_word_embeddings(self.a.elmo_embeddings_0)
+        hps['elmo_embeddings_1'] = parse_word_embeddings(self.a.elmo_embeddings_1)
         hps['in_arcs'] = True
         hps['out_arcs'] = True
         torch.manual_seed(1)
