@@ -57,11 +57,11 @@ class BiLSTMTagger(nn.Module):
 
         self.elmo_embeddings_0 = nn.Embedding(vocab_size, 1024)
         self.elmo_embeddings_0.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_0']))
-        self.elmo_embeddings_0.weight.requires_grad_(False)
+        #self.elmo_embeddings_0.weight.requires_grad_(False)
 
         self.elmo_embeddings_1 = nn.Embedding(vocab_size, 1024)
         self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
-        self.elmo_embeddings_1.weight.requires_grad_(False)
+        #self.elmo_embeddings_1.weight.requires_grad_(False)
 
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
@@ -166,7 +166,7 @@ class BiLSTMTagger(nn.Module):
         elmo_embedding_1 = self.elmo_embeddings_1(sentence).view(self.batch_size, len(sentence[0]), 1024)
         w = F.softmax(self.elmo_w, dim=0)
         elmo_emb = self.elmo_gamma * (w[0] * elmo_embedding_0 + w[1]* elmo_embedding_1)
-        elmo_emb_weighted = F.relu(self.elmo_project(elmo_emb))
+        elmo_emb_weighted = F.relu(self.elmo_project(elmo_emb), inplace=True)
 
         region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
         embeds = torch.cat((embeds, fixed_embeds,  elmo_emb_weighted, pos_embeds,  sent_pred_lemmas_embeds, region_marks), 2)
@@ -223,8 +223,8 @@ class BiLSTMTagger(nn.Module):
 
         TagProbs = F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1)
         LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
-        h1 = F.relu(self.tag2hidden(TagProbs))
-        h2 = F.relu(self.Link2hidden(LinkProbs))
+        h1 = F.relu(self.tag2hidden(TagProbs), inplace=True)
+        h2 = F.relu(self.Link2hidden(LinkProbs), inplace=True)
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
         hidden_states = torch.cat((hidden_states, h1, h2), 2)
 
