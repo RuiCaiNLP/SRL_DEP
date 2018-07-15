@@ -2,8 +2,8 @@
 
 cd ..
 python -mnnet.run.srl.run \
---train conll2009_batch.train.dep_l \
---test conll2009_batch.dev.dep_l \
+--train conll2009_batch.train.dep_prune \
+--test conll2009_batch.dev.dep_prune \
 --data_partition dev \
 --batch 30 \
 --freq-voc freq.voc_unk.conll2009 \
@@ -15,11 +15,13 @@ python -mnnet.run.srl.run \
 --dep-voc dep.voc.conll2009_2 \
 --specific-dep-voc Specific_Dep.voc \
 --word-embeddings word_embeddings_proper.sskip.conll2009.txt \
+--elmo-embeddings-0 elmo_embeddings_0 \
+--elmo-embeddings-1 elmo_embeddings_1 \
 --dbg-print-rate 500 \
 --eval-dir ./data/ \
 --epochs 20 \
 --out conll2009_rm0_pl_a.25_sskip_h512_d.0_l4 \
---params-path model_SC.pkl \
+--params-path model_character_pruned.pkl \
 --hps "{'id': 1, 'sent_edim': 100, 'sent_hdim': 128, \
 'frame_edim': 128, 'role_edim': 128, 'pos_edim': 16, 'rec_layers': 1, 'gc_layers': 0, \
 'pos': True, 'rm':0, 'alpha': 0.25, \

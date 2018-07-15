@@ -298,7 +298,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                     Dep_P[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Predict[i] + 0.0001)
                     Dep_R[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Truth[i] + 0.0001)
                     Dep_F[i] = 2 * Dep_P[i] * Dep_R[i] / (Dep_P[i] + Dep_R[i] + 0.0001)
-                    log(Dep_P[i], Dep_R[i], Dep_F[i])
+                    log(Dep_NoNull_Truth[i], Dep_P[i], Dep_R[i], Dep_F[i])
                 Predicat_num = 6300
                 P = (right_NonNullPredicts + Predicat_num) / (NonNullPredicts + Predicat_num)
                 R = (right_NonNullPredicts + Predicat_num) / (NonNullTruths + Predicat_num)
