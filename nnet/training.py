@@ -28,6 +28,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
         dataset = [batch for batch in train_set.batches()]
         random.shuffle(dataset)
         for batch in dataset:
+            torch.cuda.empty_cache()
             sample_count += len(batch)
 
             model.zero_grad()
@@ -110,7 +111,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         frames_in, local_roles_mask_in, sent_pred_lemmas_idx_in, dep_tags_in, dep_heads,
                         targets, specific_dep_tags_in, specific_dep_relations_in)
 
-            if idx % 50 ==0:
+            if idx % 1 ==0:
                 log(idx)
                 log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
                 log('SRLloss')
