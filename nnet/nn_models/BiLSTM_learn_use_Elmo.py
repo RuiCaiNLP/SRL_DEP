@@ -159,7 +159,7 @@ class BiLSTMTagger(nn.Module):
         embeds = embeds.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
         fixed_embeds = self.word_fixed_embeddings(sentence)
-        log(len(sentence[0]))
+        #log(len(sentence[0]))
         fixed_embeds = fixed_embeds.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         sent_pred_lemmas_embeds = self.p_lemma_embeddings(sent_pred_lemmas_idx)
 
