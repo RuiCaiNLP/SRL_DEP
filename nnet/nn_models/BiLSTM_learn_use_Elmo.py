@@ -29,7 +29,7 @@ class BiLSTMTagger(nn.Module):
 
         batch_size = hps['batch_size']
         lstm_hidden_dim = hps['sent_hdim']
-        sent_embedding_dim = 3*hps['sent_edim'] + 1*hps['pos_edim'] + 50
+        sent_embedding_dim = 3*hps['sent_edim'] + 1*hps['pos_edim'] + 10
         ## for the region mark
         sent_embedding_dim += 1
         role_embedding_dim = hps['role_edim']
@@ -84,7 +84,7 @@ class BiLSTMTagger(nn.Module):
         self.elmo_w = nn.Parameter(torch.Tensor([0.5, 0.5]))
 
         self.elmo_gamma = nn.Parameter(torch.ones(1))
-        self.elmo_project = nn.Linear(1024, 50)
+        self.elmo_project = nn.Linear(1024, 10)
 
 
 
