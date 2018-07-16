@@ -111,23 +111,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         frames_in, local_roles_mask_in, sent_pred_lemmas_idx_in, dep_tags_in, dep_heads,
                         targets, specific_dep_tags_in, specific_dep_relations_in)
 
-            if idx % 1 ==0:
-                log(idx)
-                log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                log('SRLloss')
-                log(SRLloss)
-                log("DEPloss")
-                log(DEPloss)
-                log("SPEDEPloss")
-                log(SPEDEPloss)
-                log("sum")
-                log(loss)
 
-                del SRLloss
-                del DEPloss
-                del SPEDEPloss
-                del loss
-                del SRLprobs
 
 
             idx += 1
@@ -148,6 +132,24 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             #clip_grad_value_(parameters=model.hidden2tag_spe.parameters(), clip_value=1.5)
             #DEPloss.backward()
             optimizer.step()
+
+            if idx % 1 ==0:
+                log(idx)
+                log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                log('SRLloss')
+                log(SRLloss)
+                log("DEPloss")
+                log(DEPloss)
+                log("SPEDEPloss")
+                log(SPEDEPloss)
+                log("sum")
+                log(loss)
+
+                del SRLloss
+                del DEPloss
+                del SPEDEPloss
+                del loss
+                del SRLprobs
 
             if idx % dbg_print_rate == 0:
                 log('[epoch %i, %i * %i] ' %
