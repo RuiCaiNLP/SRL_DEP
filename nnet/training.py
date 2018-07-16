@@ -21,7 +21,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     best_F1_gold = -0.1
     #optimizer = optim.Adadelta(model.parameters(), rho=0.95, eps=1e-6)
     model.to(device)
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
     random.seed(1234)
     for e in range(epochs):
         tic = time.time()

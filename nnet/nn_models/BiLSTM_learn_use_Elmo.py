@@ -57,11 +57,11 @@ class BiLSTMTagger(nn.Module):
 
         self.elmo_embeddings_0 = nn.Embedding(vocab_size, 1024)
         self.elmo_embeddings_0.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_0']))
-        #self.elmo_embeddings_0.weight.requires_grad_(False)
+        self.elmo_embeddings_0.weight.requires_grad_(False)
 
         self.elmo_embeddings_1 = nn.Embedding(vocab_size, 1024)
         self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
-        #self.elmo_embeddings_1.weight.requires_grad_(False)
+        self.elmo_embeddings_1.weight.requires_grad_(False)
 
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
@@ -349,7 +349,7 @@ class BiLSTMTagger(nn.Module):
         #    loss = SRLloss + DEPloss + SPEDEPloss
         #else:
         #    loss = SRLloss
-        loss = SRLloss #+ 0.1*DEPloss + 0.1*SPEDEPloss
+        loss = SRLloss + 0.1*DEPloss + 0.1*SPEDEPloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
