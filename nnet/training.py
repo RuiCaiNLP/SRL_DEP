@@ -150,6 +150,10 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 del SPEDEPloss
                 del loss
                 del SRLprobs
+                del model.hidden
+                del model.hidden_2
+                del model.hidden_3
+                del model.hidden_4
 
             if idx % dbg_print_rate == 0:
                 log('[epoch %i, %i * %i] ' %
