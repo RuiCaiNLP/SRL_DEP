@@ -307,6 +307,16 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         right_NonNullPredicts += right_NonNullPredict
                         NonNullTruths += NonNullTruth
 
+                        del SRLloss
+                        del DEPloss
+                        del SPEDEPloss
+                        del loss
+                        del SRLprobs
+                        del model.hidden
+                        del model.hidden_2
+                        del model.hidden_3
+                        del model.hidden_4
+
                 for i in range(len(Dep_P)):
                     Dep_P[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Predict[i] + 0.0001)
                     Dep_R[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Truth[i] + 0.0001)
