@@ -123,6 +123,12 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 log("sum")
                 log(loss)
 
+                del SRLloss
+                del DEPloss
+                del SPEDEPloss
+                del loss
+                del SRLprobs
+
 
             idx += 1
             #if e == -1:
