@@ -133,7 +133,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             #DEPloss.backward()
             optimizer.step()
 
-            if idx % 1 ==0:
+            if idx % 100 ==0:
                 log(idx)
                 log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
                 log('SRLloss')
