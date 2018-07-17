@@ -29,7 +29,7 @@ class BiLSTMTagger(nn.Module):
 
         batch_size = hps['batch_size']
         lstm_hidden_dim = hps['sent_hdim']
-        sent_embedding_dim = 3*hps['sent_edim'] + 1*hps['pos_edim'] + 100
+        sent_embedding_dim = 3*hps['sent_edim'] + 1*hps['pos_edim'] #+ 100
         ## for the region mark
         sent_embedding_dim += 1
         role_embedding_dim = hps['role_edim']
@@ -167,13 +167,14 @@ class BiLSTMTagger(nn.Module):
         elmo_embedding_1 = self.elmo_embeddings_1(sentence).view(self.batch_size, len(sentence[0]), 1024)
         w = F.softmax(self.elmo_w, dim=0)
         elmo_emb = self.elmo_gamma * (w[0] * elmo_embedding_0 + w[1]* elmo_embedding_1)
-        del elmo_embedding_0
-        del elmo_embedding_1
+        #del elmo_embedding_0
+        #del elmo_embedding_1
         elmo_emb_weighted = F.relu(self.elmo_project(elmo_emb), inplace=True)
 
         region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
-        embeds = torch.cat((embeds, fixed_embeds,  pos_embeds, elmo_emb_weighted, sent_pred_lemmas_embeds, region_marks), 2)
-        del elmo_emb_weighted
+        #embeds = torch.cat((embeds, fixed_embeds,  pos_embeds, elmo_emb_weighted, sent_pred_lemmas_embeds, region_marks), 2)
+        embeds = torch.cat((embeds, fixed_embeds, pos_embeds, sent_pred_lemmas_embeds, region_marks), 2)
+        #del elmo_emb_weighted
         #embeds = torch.cat((embeds, fixed_embeds, pos_embeds, region_marks), 2)
         embeds = self.word_emb_dropout(embeds)
 
@@ -349,7 +350,7 @@ class BiLSTMTagger(nn.Module):
         #    loss = SRLloss + DEPloss + SPEDEPloss
         #else:
         #    loss = SRLloss
-        loss = SRLloss + 0.1*DEPloss + 0.1*SPEDEPloss
+        loss = SRLloss #+ 0.1*DEPloss + 0.1*SPEDEPloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
