@@ -87,8 +87,6 @@ class BiLSTMTagger(nn.Module):
         self.elmo_project = nn.Linear(1024, 100)
 
 
-
-
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
         self.num_layers = 2
