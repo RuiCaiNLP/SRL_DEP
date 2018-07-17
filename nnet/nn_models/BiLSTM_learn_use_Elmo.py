@@ -56,11 +56,11 @@ class BiLSTMTagger(nn.Module):
         self.word_fixed_embeddings.weight.data.copy_(torch.from_numpy(hps['word_embeddings']))
 
         self.elmo_embeddings_0 = nn.Embedding(vocab_size, 1024)
-        self.elmo_embeddings_0.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_0']))
+        #self.elmo_embeddings_0.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_0']))
         self.elmo_embeddings_0.weight.requires_grad_(False)
 
         self.elmo_embeddings_1 = nn.Embedding(vocab_size, 1024)
-        self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
+        #self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
         self.elmo_embeddings_1.weight.requires_grad_(False)
 
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
