@@ -29,7 +29,7 @@ class BiLSTMTagger(nn.Module):
 
         batch_size = hps['batch_size']
         lstm_hidden_dim = hps['sent_hdim']
-        sent_embedding_dim = 3*hps['sent_edim'] + 1*hps['pos_edim'] #+ 100
+        sent_embedding_dim = 3*hps['sent_edim'] + 1*hps['pos_edim'] + 100
         ## for the region mark
         sent_embedding_dim += 1
         role_embedding_dim = hps['role_edim']
@@ -56,11 +56,11 @@ class BiLSTMTagger(nn.Module):
         self.word_fixed_embeddings.weight.data.copy_(torch.from_numpy(hps['word_embeddings']))
 
         self.elmo_embeddings_0 = nn.Embedding(vocab_size, 1024)
-        #self.elmo_embeddings_0.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_0']))
+        self.elmo_embeddings_0.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_0']))
         self.elmo_embeddings_0.weight.requires_grad_(False)
 
         self.elmo_embeddings_1 = nn.Embedding(vocab_size, 1024)
-        #self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
+        self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
         self.elmo_embeddings_1.weight.requires_grad_(False)
 
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
@@ -173,7 +173,7 @@ class BiLSTMTagger(nn.Module):
 
         region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
         #embeds = torch.cat((embeds, fixed_embeds,  pos_embeds, elmo_emb_weighted, sent_pred_lemmas_embeds, region_marks), 2)
-        embeds = torch.cat((embeds, fixed_embeds, pos_embeds, sent_pred_lemmas_embeds, region_marks), 2)
+        embeds = torch.cat((embeds, fixed_embeds, pos_embeds, elmo_emb_weighted, sent_pred_lemmas_embeds, region_marks), 2)
         #del elmo_emb_weighted
         #embeds = torch.cat((embeds, fixed_embeds, pos_embeds, region_marks), 2)
         embeds = self.word_emb_dropout(embeds)
