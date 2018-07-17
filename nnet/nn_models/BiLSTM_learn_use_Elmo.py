@@ -110,7 +110,7 @@ class BiLSTMTagger(nn.Module):
         init.orthogonal_(self.BiLSTM_Spe.all_weights[1][1])
 
         self.num_layers = 1
-        self.BiLSTM_SRL = nn.LSTM(input_size=lstm_hidden_dim * 2 + 2 * self.pos_size , hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_SRL = nn.LSTM(input_size=lstm_hidden_dim * 2 + 0 * self.pos_size , hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
@@ -231,7 +231,7 @@ class BiLSTMTagger(nn.Module):
         h1 = F.relu(self.tag2hidden(TagProbs), inplace=True)
         h2 = F.relu(self.Link2hidden(LinkProbs), inplace=True)
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
-        hidden_states = torch.cat((hidden_states, h1, h2), 2)
+        #hidden_states = torch.cat((hidden_states, h1, h2), 2)
 
         # SRL layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
