@@ -26,7 +26,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     for e in range(epochs):
         tic = time.time()
         dataset = [batch for batch in train_set.batches()]
-        random.shuffle(dataset)
+        #random.shuffle(dataset)
         for batch in dataset:
             torch.cuda.empty_cache()
             sample_count += len(batch)
@@ -37,7 +37,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             record_ids, batch = zip(*batch)
             model_input = converter(batch)
 
-            model.hidden = model.init_hidden_share()
+            model.hidden = model.init_hidden_spe()
             #model.hidden_0 = model.init_hidden_spe()
             model.hidden_2 = model.init_hidden_spe()
             model.hidden_3 = model.init_hidden_spe()
@@ -48,12 +48,14 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             sentence_in = torch.from_numpy(sentence).to(device)
             p_sentence_in = torch.from_numpy(p_sentence).to(device)
-            sentence_in.requires_grad_(False)
-            p_sentence_in.requires_grad_(False)
+            #log(sentence_in)
+            #log(p_sentence_in)
+            #sentence_in.requires_grad_(False)
+            #p_sentence_in.requires_grad_(False)
 
             pos_tags = model_input[2]
             pos_tags_in = torch.from_numpy(pos_tags).to(device)
-            pos_tags_in.requires_grad_(False)
+            #pos_tags_in.requires_grad_(False)
 
             sen_lengths = model_input[3].sum(axis=1)
 
@@ -61,29 +63,28 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             frames = model_input[5]
             frames_in = torch.from_numpy(frames).to(device)
-            frames_in.requires_grad_(False)
+            #frames_in.requires_grad_(False)
 
             local_roles_voc = model_input[6]
             local_roles_voc_in = torch.from_numpy(local_roles_voc).to(device)
-            local_roles_voc_in.requires_grad_(False)
+            #local_roles_voc_in.requires_grad_(False)
 
             local_roles_mask = model_input[7]
             local_roles_mask_in = torch.from_numpy(local_roles_mask).to(device)
-            local_roles_mask_in.requires_grad_(False)
+            #local_roles_mask_in.requires_grad_(False)
 
             region_mark = model_input[9]
 
             # region_mark_in = Variable(torch.LongTensor(region_mark))
             region_mark_in = torch.from_numpy(region_mark).to(device)
-            region_mark_in.requires_grad_(False)
+            #region_mark_in.requires_grad_(False)
 
             sent_pred_lemmas_idx = model_input[10]
             sent_pred_lemmas_idx_in = torch.from_numpy(sent_pred_lemmas_idx).to(device)
-            sent_pred_lemmas_idx_in.requires_grad_(False)
+            #sent_pred_lemmas_idx_in.requires_grad_(False)
 
             dep_tags = model_input[11]
             dep_tags_in = torch.from_numpy(dep_tags).to(device)
-
 
 
             dep_heads = model_input[12]
@@ -115,18 +116,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             idx += 1
-            #if e == -1:
-            #    (DEPloss + SPEDEPloss).backward()
-            #else:
-            #    loss.backward()
             loss.backward()
-            #iterate over auxiliary tasks and SRL
-            #if e%2 == 0:
-            #    (DEPloss+SPEDEPloss).backward()
-            #else:
-            #    SRLloss.backward()
-            #norm = 0.1/(e+2)
-
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)
             #clip_grad_value_(parameters=model.hidden2tag_spe.parameters(), clip_value=1.5)
@@ -201,7 +191,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
                         record_ids, batch = zip(*batch)
                         model_input = converter(batch)
-                        model.hidden = model.init_hidden_share()
+                        model.hidden = model.init_hidden_spe()
                         #model.hidden_0 = model.init_hidden_spe()
                         model.hidden_2 = model.init_hidden_spe()
                         model.hidden_3 = model.init_hidden_spe()
