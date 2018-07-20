@@ -227,7 +227,7 @@ class BiLSTMTagger(nn.Module):
         h1 = F.relu(self.tag2hidden(TagProbs))
         h2 = F.relu(self.Link2hidden(LinkProbs))
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
-        hidden_states = torch.cat((hidden_states, h1), 2)
+        hidden_states = torch.cat((hidden_states, h2), 2)
 
         # SRL layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
@@ -346,7 +346,7 @@ class BiLSTMTagger(nn.Module):
         #    loss = SRLloss + DEPloss + SPEDEPloss
         #else:
         #    loss = SRLloss
-        loss = SRLloss + 0.1*DEPloss# + 0.1*SPEDEPloss
+        loss = SRLloss + 0.1*SPEDEPloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
