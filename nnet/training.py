@@ -41,7 +41,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             #model.hidden_0 = model.init_hidden_spe()
             model.hidden_2 = model.init_hidden_spe()
             model.hidden_3 = model.init_hidden_spe()
-            model.hidden_4 = model.init_hidden_spe()
+            model.hidden_4 = model.init_hidden_share()
 
             sentence = model_input[0]
             p_sentence = model_input[1]
@@ -195,7 +195,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         #model.hidden_0 = model.init_hidden_spe()
                         model.hidden_2 = model.init_hidden_spe()
                         model.hidden_3 = model.init_hidden_spe()
-                        model.hidden_4 = model.init_hidden_spe()
+                        model.hidden_4 = model.init_hidden_share()
 
                         sentence = model_input[0]
                         p_sentence = model_input[1]

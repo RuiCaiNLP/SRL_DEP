@@ -124,7 +124,7 @@ class BiLSTMTagger(nn.Module):
         self.hidden = self.init_hidden_spe()
         self.hidden_2 = self.init_hidden_spe()
         self.hidden_3 = self.init_hidden_spe()
-        self.hidden_4 = self.init_hidden_spe()
+        self.hidden_4 = self.init_hidden_share()
 
     def init_hidden_share(self):
         # Before we've done anything, we dont have any hidden state.
@@ -133,8 +133,8 @@ class BiLSTMTagger(nn.Module):
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         #return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
         #        Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
-        return (torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
-                torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
+        return (torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
+                torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
     def init_hidden_spe(self):
         # Before we've done anything, we dont have any hidden state.
@@ -182,7 +182,7 @@ class BiLSTMTagger(nn.Module):
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_0, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
-        hidden_states, self.hidden = self.BiLSTM_1(embeds_sort, self.hidden)
+        hidden_states, self.hidden = self.BiLSTM_1(embeds_sort, self.hidden_2)
         # it seems that hidden states is already batch first, we don't need swap the dims
         # hidden_states = hidden_states.permute(1, 2, 0).contiguous().view(self.batch_size, -1, )
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
@@ -195,7 +195,7 @@ class BiLSTMTagger(nn.Module):
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_1, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
-        hidden_states, self.hidden_2 = self.BiLSTM_2(embeds_sort, self.hidden_2)
+        hidden_states, self.hidden_2 = self.BiLSTM_2(embeds_sort, self.hidden_3)
         # it seems that hidden states is already batch first, we don't need swap the dims
         # hidden_states = hidden_states.permute(1, 2, 0).contiguous().view(self.batch_size, -1, )
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
@@ -219,8 +219,8 @@ class BiLSTMTagger(nn.Module):
 
         TagProbs = F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1)
         LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
-        TagProbs_noGrad = TagProbs
-        LinkProbs_noGrad = LinkProbs
+        TagProbs_noGrad = TagProbs.detach()
+        LinkProbs_noGrad = LinkProbs.detach()
         h1 = F.relu(self.tag2hidden(TagProbs_noGrad))
         h2 = F.relu(self.Link2hidden(LinkProbs_noGrad))
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
@@ -233,7 +233,7 @@ class BiLSTMTagger(nn.Module):
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(SRL_hidden_states, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
-        hidden_states, self.hidden_3 = self.BiLSTM_3(embeds_sort, self.hidden_3)
+        hidden_states, self.hidden_3 = self.BiLSTM_3(embeds_sort, self.hidden_4)
         # it seems that hidden states is already batch first, we don't need swap the dims
         # hidden_states = hidden_states.permute(1, 2, 0).contiguous().view(self.batch_size, -1, )
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
