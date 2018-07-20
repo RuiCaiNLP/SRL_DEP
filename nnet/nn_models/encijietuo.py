@@ -73,8 +73,8 @@ class BiLSTMTagger(nn.Module):
 
         self.word_emb_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
-        self.label_dropout = nn.Dropout(p=0.0)
-        self.link_dropout = nn.Dropout(p=0.0)
+        self.label_dropout = nn.Dropout(p=0.5)
+        self.link_dropout = nn.Dropout(p=0.5)
         #self.use_dropout = nn.Dropout(p=0.2)
 
 
@@ -224,6 +224,8 @@ class BiLSTMTagger(nn.Module):
 
         TagProbs = F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1)
         LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
+        TagProbs.requires_grad_(False)
+        LinkProbs.requires_grad_(False)
         h1 = F.relu(self.tag2hidden(TagProbs))
         h2 = F.relu(self.Link2hidden(LinkProbs))
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
