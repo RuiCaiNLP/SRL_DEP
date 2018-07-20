@@ -227,7 +227,7 @@ class BiLSTMTagger(nn.Module):
         h1 = F.relu(self.tag2hidden(TagProbs))
         h2 = F.relu(self.Link2hidden(LinkProbs))
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
-        hidden_states = torch.cat((hidden_states), 2)
+        #hidden_states = torch.cat((hidden_states), 2)
 
         # SRL layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
