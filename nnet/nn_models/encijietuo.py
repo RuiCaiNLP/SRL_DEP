@@ -73,8 +73,8 @@ class BiLSTMTagger(nn.Module):
 
         self.word_emb_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
-        self.label_dropout = nn.Dropout(p=0.5)
-        self.link_dropout = nn.Dropout(p=0.5)
+        self.label_dropout = nn.Dropout(p=0.0)
+        self.link_dropout = nn.Dropout(p=0.0)
         #self.use_dropout = nn.Dropout(p=0.2)
 
 
