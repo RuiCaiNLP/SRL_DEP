@@ -219,8 +219,8 @@ class BiLSTMTagger(nn.Module):
 
         TagProbs = F.softmax(dep_tag_space, dim=1).view(self.batch_size, len(sentence[0]), -1)
         LinkProbs = F.softmax(dep_tag_space_spe, dim=1).view(self.batch_size, len(sentence[0]), -1)
-        TagProbs_noGrad = TagProbs.detach()
-        LinkProbs_noGrad = LinkProbs.detach()
+        TagProbs_noGrad = TagProbs
+        LinkProbs_noGrad = LinkProbs
         h1 = F.relu(self.tag2hidden(TagProbs_noGrad))
         h2 = F.relu(self.Link2hidden(LinkProbs_noGrad))
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
