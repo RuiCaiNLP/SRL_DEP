@@ -71,6 +71,7 @@ class BiLSTMTagger(nn.Module):
         self.Link2hidden = nn.Linear(4, self.pos_size)
 
         self.word_emb_dropout = nn.Dropout(p=0.3)
+        self.SRL_emb_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
@@ -164,10 +165,10 @@ class BiLSTMTagger(nn.Module):
         region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
         embeds = torch.cat((embeds, fixed_embeds, pos_embeds,  sent_pred_lemmas_embeds, region_marks), 2)
         #embeds = torch.cat((embeds, fixed_embeds, pos_embeds, region_marks), 2)
-        embeds = self.word_emb_dropout(embeds)
+        embeds_droped = self.word_emb_dropout(embeds)
 
         #first layer
-        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds, lengths)
+        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds_droped, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
         hidden_states, self.hidden = self.BiLSTM_0(embeds_sort, self.hidden)
