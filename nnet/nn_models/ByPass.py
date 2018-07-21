@@ -108,7 +108,7 @@ class BiLSTMTagger(nn.Module):
         init.orthogonal_(self.BiLSTM_2.all_weights[1][1])
 
         self.num_layers = 2
-        self.BiLSTM_3 = nn.LSTM(input_size=lstm_hidden_dim * 2 + 2 * self.pos_size , hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_3 = nn.LSTM(input_size=lstm_hidden_dim * 2 + 2 * self.pos_size + sent_embedding_dim , hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_3.all_weights[0][0])
@@ -227,7 +227,7 @@ class BiLSTMTagger(nn.Module):
 
         SRL_composer = self.SRL_W_0(hidden_states_0) + self.SRL_W_1(hidden_states_1) + self.SRL_W_2(hidden_states_2)
         SRL_composer = F.tanh(SRL_composer)
-        SRL_hidden_states = torch.cat((SRL_composer, h1, h2), 2)
+        SRL_hidden_states = torch.cat((embeds, SRL_composer, h1, h2), 2)
 
         # SRL layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(SRL_hidden_states, lengths)
