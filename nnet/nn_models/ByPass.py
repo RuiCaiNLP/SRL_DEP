@@ -228,7 +228,7 @@ class BiLSTMTagger(nn.Module):
 
         SRL_composer = self.SRL_W_0(hidden_states_0) + self.SRL_W_1(hidden_states_1) + self.SRL_W_2(hidden_states_2)
         SRL_composer = F.tanh(SRL_composer)
-        SRL_hidden_states = torch.cat((embeds, SRL_composer, h1, h2), 2)
+        SRL_hidden_states = self.SRL_emb_dropout(torch.cat((embeds, SRL_composer, h1, h2), 2))
 
         # SRL layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(SRL_hidden_states, lengths)
