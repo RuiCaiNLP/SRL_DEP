@@ -134,8 +134,8 @@ class BiLSTMTagger(nn.Module):
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         #return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
         #        Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
-        return (torch.zeros(3 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
-                torch.zeros(3 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
+        return (torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
+                torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
     def init_hidden_spe(self):
         # Before we've done anything, we dont have any hidden state.
@@ -227,9 +227,9 @@ class BiLSTMTagger(nn.Module):
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
 
 
-        h_layer_0 = hidden_states_0.detach()
-        h_layer_1 = hidden_states_1.detach()
-        h_layer_2 = hidden_states_2.detach()
+        h_layer_0 = hidden_states_0#.detach()
+        h_layer_1 = hidden_states_1#.detach()
+        h_layer_2 = hidden_states_2#.detach()
         SRL_composer = self.SRL_W_0(h_layer_0) + self.SRL_W_1(h_layer_1) + self.SRL_W_2(h_layer_2)
         SRL_composer = F.tanh(SRL_composer)
         SRL_hidden_states = torch.cat((embeds_droped, SRL_composer, h1, h2), 2)
@@ -351,7 +351,7 @@ class BiLSTMTagger(nn.Module):
         #    loss = SRLloss + DEPloss + SPEDEPloss
         #else:
         #    loss = SRLloss
-        loss = SRLloss + 0.1*DEPloss + 0.1*SPEDEPloss
+        loss = SRLloss + 0.3*DEPloss + 0.3*SPEDEPloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
