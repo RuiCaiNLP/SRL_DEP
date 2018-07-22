@@ -108,7 +108,7 @@ class BiLSTMTagger(nn.Module):
         init.orthogonal_(self.BiLSTM_2.all_weights[1][0])
         init.orthogonal_(self.BiLSTM_2.all_weights[1][1])
 
-        self.num_layers = 2
+        self.num_layers = 3
         self.BiLSTM_3 = nn.LSTM(input_size=lstm_hidden_dim * 2 + 2 * self.pos_size + sent_embedding_dim , hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
@@ -134,8 +134,8 @@ class BiLSTMTagger(nn.Module):
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         #return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
         #        Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
-        return (torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
-                torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
+        return (torch.zeros(3 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
+                torch.zeros(3 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
     def init_hidden_spe(self):
         # Before we've done anything, we dont have any hidden state.
@@ -227,9 +227,9 @@ class BiLSTMTagger(nn.Module):
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
 
 
-        h_layer_0 = hidden_states_0#.detach()
-        h_layer_1 = hidden_states_1#.detach()
-        h_layer_2 = hidden_states_2#.detach()
+        h_layer_0 = hidden_states_0.detach()
+        h_layer_1 = hidden_states_1.detach()
+        h_layer_2 = hidden_states_2.detach()
         SRL_composer = self.SRL_W_0(h_layer_0) + self.SRL_W_1(h_layer_1) + self.SRL_W_2(h_layer_2)
         SRL_composer = F.tanh(SRL_composer)
         SRL_hidden_states = torch.cat((embeds_droped, SRL_composer, h1, h2), 2)
