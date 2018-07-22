@@ -227,9 +227,9 @@ class BiLSTMTagger(nn.Module):
         #H_use = self.use_dropout(torch.cat((h1, h2), 2))
 
 
-        h_layer_0 = hidden_states_0.detach()
-        h_layer_1 = hidden_states_1.detach()
-        h_layer_2 = hidden_states_2.detach()
+        h_layer_0 = hidden_states_0#.detach()
+        h_layer_1 = hidden_states_1#.detach()
+        h_layer_2 = hidden_states_2#.detach()
         SRL_composer = self.SRL_W_0(h_layer_0) + self.SRL_W_1(h_layer_1) + self.SRL_W_2(h_layer_2)
         SRL_composer = F.tanh(SRL_composer)
         SRL_hidden_states = torch.cat((embeds_droped, SRL_composer, h1, h2), 2)
