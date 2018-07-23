@@ -135,7 +135,7 @@ class BiLSTMTagger(nn.Module):
         region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
         embeds = torch.cat((embeds, fixed_embeds, pos_embeds,  sent_pred_lemmas_embeds, region_marks), 2)
         #embeds = torch.cat((embeds, fixed_embeds, pos_embeds, region_marks), 2)
-        #embeds = self.word_emb_drop(embeds)
+        embeds = self.word_emb_drop(embeds)
 
         # share_layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds, lengths)
@@ -174,7 +174,7 @@ class BiLSTMTagger(nn.Module):
         # hidden_states = hidden_states.transpose(0, 1)
         hidden_states = hidden_states[unsort_idx]
 
-        #hidden_states = self.hidden_states_drop(hidden_states)
+        hidden_states = self.hidden_states_drop(hidden_states)
 
         # B * H
         hidden_states_3 = hidden_states
@@ -231,7 +231,7 @@ class BiLSTMTagger(nn.Module):
         SRLloss = loss_function(tag_space, targets)
 
         loss = SRLloss
-        return SRLloss, loss, loss, loss, SRLprobs, 1, 1, 1, 1
+        return SRLloss, loss, loss, loss, SRLprobs, 1, 1, 1, 1, 1,1,1,1,1,1
 
     @staticmethod
     def sort_batch(x, l):
