@@ -19,6 +19,8 @@ import torch.nn.init as init
 _BIG_NUMBER = 10. ** 6.
 
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 class BiLSTMTagger(nn.Module):
 
     #def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size):
@@ -104,8 +106,8 @@ class BiLSTMTagger(nn.Module):
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         #return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
         #        Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
-        return (torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False),
-                torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False))
+        return (torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
+                torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
     def init_hidden_spe(self):
         # Before we've done anything, we dont have any hidden state.
@@ -114,8 +116,8 @@ class BiLSTMTagger(nn.Module):
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         #return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
         #        Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
-        return (torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False),
-                torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False))
+        return (torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
+                torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
 
     def forward(self, sentence, p_sentence,  pos_tags, lengths, target_idx_in, region_marks,
@@ -180,7 +182,7 @@ class BiLSTMTagger(nn.Module):
         hidden_states_3 = hidden_states
         predicate_embeds = hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]
         # T * B * H
-        added_embeds = Variable(torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2]))
+        added_embeds = Variable(torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2])).to(device)
         predicate_embeds = added_embeds + predicate_embeds
         # B * T * H
         predicate_embeds = predicate_embeds.transpose(0, 1)
@@ -210,7 +212,7 @@ class BiLSTMTagger(nn.Module):
         # b, roles
         #sub = torch.div(torch.add(local_roles_mask, -1.0), _BIG_NUMBER)
         sub = torch.add(local_roles_mask, -1.0) * _BIG_NUMBER
-        sub = torch.FloatTensor(sub.numpy())
+        sub = torch.FloatTensor(sub.cpu().numpy()).to(device)
         # b, roles, times
         tag_space = torch.transpose(tag_space, 0, 1)
         tag_space += sub
