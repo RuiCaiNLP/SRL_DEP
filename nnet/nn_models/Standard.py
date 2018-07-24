@@ -55,6 +55,9 @@ class BiLSTMTagger(nn.Module):
         self.word_fixed_embeddings = nn.Embedding(vocab_size, hps['sent_edim'])
         self.word_fixed_embeddings.weight.data.copy_(torch.from_numpy(hps['word_embeddings']))
 
+        self.word_fixed_embeddings_SRL = nn.Embedding(vocab_size, hps['sent_edim'])
+        self.word_fixed_embeddings_SRL.weight.data.copy_(torch.from_numpy(hps['word_embeddings']))
+
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
 
@@ -239,8 +242,10 @@ class BiLSTMTagger(nn.Module):
         embeds_SRL = self.word_embeddings_SRL(sentence)
         embeds_SRL = embeds_SRL.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         embeds_DEP_use = embeds_DEP.detach()
+        fixed_embeds_SRL = self.word_fixed_embeddings_SRL(p_sentence)
+        fixed_embeds_SRL = fixed_embeds_SRL.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
-        SRL_hidden_states = torch.cat((embeds_SRL, embeds_DEP_use, fixed_embeds, sent_pred_lemmas_embeds, pos_embeds, region_marks, SRL_composer, h1, h2), 2)
+        SRL_hidden_states = torch.cat((embeds_SRL, embeds_DEP_use, fixed_embeds_SRL, sent_pred_lemmas_embeds, pos_embeds, region_marks, SRL_composer, h1, h2), 2)
         SRL_hidden_states = self.SRL_input_dropout(SRL_hidden_states)
 
         # SRL layer
