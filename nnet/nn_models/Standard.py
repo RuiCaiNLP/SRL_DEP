@@ -176,7 +176,6 @@ class BiLSTMTagger(nn.Module):
         # hidden_states = hidden_states.transpose(0, 1)
         hidden_states_0 = hidden_states[unsort_idx]
 
-
         # second_layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_0, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
@@ -188,8 +187,6 @@ class BiLSTMTagger(nn.Module):
         #hidden_states = hidden_states.transpose(0, 1)
         hidden_states_1 = hidden_states[unsort_idx]
 
-
-
         # third layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_1, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
@@ -200,8 +197,6 @@ class BiLSTMTagger(nn.Module):
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
         # hidden_states = hidden_states.transpose(0, 1)
         hidden_states_2 = hidden_states[unsort_idx]
-
-
 
         Label_composer = hidden_states_2
         predicate_embeds = Label_composer[np.arange(0, Label_composer.size()[0]), target_idx_in]
@@ -363,7 +358,7 @@ class BiLSTMTagger(nn.Module):
         #    loss = SRLloss + DEPloss + SPEDEPloss
         #else:
         #    loss = SRLloss
-        loss = SRLloss + 0.1*DEPloss + 0.1*SPEDEPloss
+        loss = SRLloss + 0.5*DEPloss + 0.5*SPEDEPloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
