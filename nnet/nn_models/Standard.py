@@ -112,7 +112,7 @@ class BiLSTMTagger(nn.Module):
         init.orthogonal_(self.BiLSTM_2.all_weights[1][0])
         init.orthogonal_(self.BiLSTM_2.all_weights[1][1])
 
-        self.num_layers = 2
+        self.num_layers = 3
         self.BiLSTM_SRL = nn.LSTM(input_size=self.elmo_emb_size + 2 * self.pos_size + sent_embedding_dim_SRL , hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
@@ -137,8 +137,8 @@ class BiLSTMTagger(nn.Module):
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         #return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
         #        Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
-        return (torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
-                torch.zeros(2 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
+        return (torch.zeros(3 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
+                torch.zeros(3 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
     def init_hidden_spe(self):
         # Before we've done anything, we dont have any hidden state.
