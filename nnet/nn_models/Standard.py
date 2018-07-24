@@ -29,7 +29,7 @@ class BiLSTMTagger(nn.Module):
 
         batch_size = hps['batch_size']
         lstm_hidden_dim = hps['sent_hdim']
-        sent_embedding_dim_DEP = 1*hps['sent_edim'] + 1*hps['pos_edim']+1
+        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim']+1
         sent_embedding_dim_SRL = 4 * hps['sent_edim'] + 1 * hps['pos_edim'] + 1
         ## for the region mark
         role_embedding_dim = hps['role_edim']
@@ -162,7 +162,10 @@ class BiLSTMTagger(nn.Module):
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
         region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
-        embeds_forDEP = torch.cat((embeds_DEP, pos_embeds, region_marks), 2)
+        fixed_embeds = self.word_fixed_embeddings(p_sentence)
+        fixed_embeds = fixed_embeds.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
+
+        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds, pos_embeds, region_marks), 2)
 
 
         #first layer
@@ -236,8 +239,7 @@ class BiLSTMTagger(nn.Module):
         embeds_SRL = self.word_embeddings_SRL(sentence)
         embeds_SRL = embeds_SRL.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         embeds_DEP_use = embeds_DEP.detach()
-        fixed_embeds = self.word_fixed_embeddings(p_sentence)
-        fixed_embeds = fixed_embeds.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
+
         SRL_hidden_states = torch.cat((embeds_SRL, embeds_DEP_use, fixed_embeds, sent_pred_lemmas_embeds, pos_embeds, region_marks, SRL_composer, h1, h2), 2)
         SRL_hidden_states = self.SRL_input_dropout(SRL_hidden_states)
 
