@@ -196,6 +196,7 @@ class BiLSTMTagger(nn.Module):
         #hidden_states = hidden_states.transpose(0, 1)
         hidden_states_1 = hidden_states[unsort_idx]
 
+
         # third layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_1, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
