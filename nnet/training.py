@@ -368,6 +368,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         weight_i.data.copy_(last_weight_i)
                     for weight_i, last_weight_i in zip(model.BiLSTM_2.parameters(), Last_BiLSTM_2_data):
                         weight_i.data.copy_(last_weight_i)
+                    log('backward!')
                 else:
                     for last_weight_i, weight_i in zip(Last_BiLSTM_0_data, model.BiLSTM_0.parameters()):
                         last_weight_i.copy_(weight_i.data)
