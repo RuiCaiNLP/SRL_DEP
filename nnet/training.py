@@ -363,18 +363,18 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
                 if F1 < Last_SRL_score and F_label+F_link < Last_DEP_score:
                     for weight_i, last_weight_i in zip(model.BiLSTM_0.parameters(), Last_BiLSTM_0_data):
-                        weight_i.data.copy_(last_weight_i.weight.data)
+                        weight_i.data.copy_(last_weight_i)
                     for weight_i, last_weight_i in zip(model.BiLSTM_1.parameters(), Last_BiLSTM_1_data):
-                        weight_i.data.copy_(last_weight_i.weight.data)
+                        weight_i.data.copy_(last_weight_i)
                     for weight_i, last_weight_i in zip(model.BiLSTM_2.parameters(), Last_BiLSTM_2_data):
-                        weight_i.data.copy_(last_weight_i.weight.data)
+                        weight_i.data.copy_(last_weight_i)
                 else:
                     for last_weight_i, weight_i in zip(Last_BiLSTM_0_data, model.BiLSTM_0.parameters()):
-                        last_weight_i.data.copy_(weight_i.weight.data)
+                        last_weight_i.copy_(weight_i.data)
                     for last_weight_i, weight_i in zip(Last_BiLSTM_1_data, model.BiLSTM_1.parameters()):
-                        last_weight_i.data.copy_(weight_i.weight.data)
+                        last_weight_i.copy_(weight_i.data)
                     for last_weight_i, weight_i in zip(Last_BiLSTM_2_data, model.BiLSTM_2.parameters()):
-                        last_weight_i.data.copy_(weight_i.weight.data)
+                        last_weight_i.copy_(weight_i.data)
 
                 Last_SRL_score = F1
                 Last_DEP_score = F_label + F_link
