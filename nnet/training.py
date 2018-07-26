@@ -18,7 +18,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     idx = 0
     sample_count = 0.0
     best_F1 = -0.1
-    best_F1_gold = -0.1
+    best_Label = -0.1
+    best_Link = -0.1
     #optimizer = optim.Adadelta(model.parameters(), rho=0.95, eps=1e-6)
     model.to(device)
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
@@ -333,14 +334,17 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
                 P = right_noNull_predict / (noNull_predict + 0.0001)
                 R = right_noNull_predict / (noNUll_truth + 0.0001)
-                F = 2 * P * R / (P + R + 0.0001)
-                log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F))
+                F_label = 2 * P * R / (P + R + 0.0001)
+                log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F_label))
 
                 P = right_noNull_predict_spe / (noNull_predict_spe + 0.0001)
                 R = right_noNull_predict_spe / (noNUll_truth_spe + 0.0001)
-                F = 2 * P * R / (P + R + 0.0001)
-                log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F))
-
+                F_link = 2 * P * R / (P + R + 0.0001)
+                log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F_link))
+                if F_label> best_Label and F_link > best_Link:
+                    best_Label = F_label
+                    best_Link = F_link
+                    log('New Dep best:' + str(best_Label) + ' ' + str(best_Link))
 
 
 
