@@ -23,9 +23,16 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     #optimizer = optim.Adadelta(model.parameters(), rho=0.95, eps=1e-6)
     model.to(device)
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
-    Last_BiLSTM_0_data = model.BiLSTM_0.all_weights
-    Last_BiLSTM_1_data = model.BiLSTM_1.all_weights
-    Last_BiLSTM_2_data = model.BiLSTM_2.all_weights
+    Last_BiLSTM_0_data = []
+    for weight in model.BiLSTM_0.parameters():
+        Last_BiLSTM_0_data.append(weight.data)
+    Last_BiLSTM_1_data = []
+    for weight in model.BiLSTM_1.parameters():
+        Last_BiLSTM_1_data.append(weight.data)
+    Last_BiLSTM_2_data = []
+    for weight in model.BiLSTM_2.parameters():
+        Last_BiLSTM_2_data.append(weight.data)
+
     Last_SRL_score = -0.1
     Last_DEP_score = -0.1
     random.seed(1234)
@@ -355,18 +362,18 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                     log('New Dep best:' + str(best_Label) + ' ' + str(best_Link))
 
                 if F1 < Last_SRL_score and F_label+F_link < Last_DEP_score:
-                    for weight_i, last_weight_i in zip(model.BiLSTM_0.all_weights, Last_BiLSTM_0_data):
+                    for weight_i, last_weight_i in zip(model.BiLSTM_0.parameters(), Last_BiLSTM_0_data):
                         weight_i.data.copy_(last_weight_i.weight.data)
-                    for weight_i, last_weight_i in zip(model.BiLSTM_1.all_weights, Last_BiLSTM_1_data):
+                    for weight_i, last_weight_i in zip(model.BiLSTM_1.parameters(), Last_BiLSTM_1_data):
                         weight_i.data.copy_(last_weight_i.weight.data)
-                    for weight_i, last_weight_i in zip(model.BiLSTM_2.all_weights, Last_BiLSTM_2_data):
+                    for weight_i, last_weight_i in zip(model.BiLSTM_2.parameters(), Last_BiLSTM_2_data):
                         weight_i.data.copy_(last_weight_i.weight.data)
                 else:
-                    for last_weight_i, weight_i in zip(Last_BiLSTM_0_data, model.BiLSTM_0.all_weights):
+                    for last_weight_i, weight_i in zip(Last_BiLSTM_0_data, model.BiLSTM_0.parameters()):
                         last_weight_i.data.copy_(weight_i.weight.data)
-                    for last_weight_i, weight_i in zip(Last_BiLSTM_1_data, model.BiLSTM_1.all_weights):
+                    for last_weight_i, weight_i in zip(Last_BiLSTM_1_data, model.BiLSTM_1.parameters()):
                         last_weight_i.data.copy_(weight_i.weight.data)
-                    for last_weight_i, weight_i in zip(Last_BiLSTM_2_data, model.BiLSTM_2.all_weights):
+                    for last_weight_i, weight_i in zip(Last_BiLSTM_2_data, model.BiLSTM_2.parameters()):
                         last_weight_i.data.copy_(weight_i.weight.data)
 
                 Last_SRL_score = F1
