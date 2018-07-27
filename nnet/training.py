@@ -132,7 +132,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             loss.backward()
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)
-            #clip_grad_value_(parameters=model.hidden2tag_spe.parameters(), clip_value=1.5)
+            clip_grad_value_(parameters=model.parameters(), clip_value=3)
             #DEPloss.backward()
             optimizer.step()
 
@@ -361,6 +361,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                     best_Link = F_link
                     log('New Dep best:' + str(best_Label) + ' ' + str(best_Link))
 
+                """
+
                 if F1 < Last_SRL_score and F_label+F_link < Last_DEP_score:
                     for weight_i, last_weight_i in zip(model.BiLSTM_0.parameters(), Last_BiLSTM_0_data):
                         weight_i.data.copy_(last_weight_i)
@@ -379,7 +381,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
                 Last_SRL_score = F1
                 Last_DEP_score = F_label + F_link
-
+                """
 
 
 
