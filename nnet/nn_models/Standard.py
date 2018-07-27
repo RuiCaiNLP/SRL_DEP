@@ -79,7 +79,7 @@ class BiLSTMTagger(nn.Module):
         self.elmo_gamma = nn.Parameter(torch.ones(1))
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
-        self.DEP_input_dropout = nn.Dropout(p=0.3)
+        self.DEP_input_dropout = nn.Dropout(p=0.5)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
@@ -169,8 +169,9 @@ class BiLSTMTagger(nn.Module):
         fixed_embeds = self.word_fixed_embeddings(p_sentence)
         fixed_embeds = fixed_embeds.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
-        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds, pos_embeds, region_marks), 2)
+        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds, pos_embeds), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
+        embeds_DEP = torch.cat((embeds_DEP, region_marks), 2)
 
         #first layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds_forDEP, lengths)
