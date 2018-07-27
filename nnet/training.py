@@ -377,8 +377,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                     for last_weight_i, weight_i in zip(Last_BiLSTM_2_data, model.BiLSTM_2.parameters()):
                         last_weight_i.copy_(weight_i.data)
 
-                Last_SRL_score = F1
-                Last_DEP_score = F_label + F_link
+                    Last_SRL_score = F1
+                    Last_DEP_score = F_label + F_link
 
 
 
