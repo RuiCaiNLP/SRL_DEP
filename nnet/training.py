@@ -25,13 +25,13 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
     Last_BiLSTM_0_data = []
     for weight in model.BiLSTM_0.parameters():
-        Last_BiLSTM_0_data.append(weight.data)
+        Last_BiLSTM_0_data.append(weight.data.clone())
     Last_BiLSTM_1_data = []
     for weight in model.BiLSTM_1.parameters():
-        Last_BiLSTM_1_data.append(weight.data)
+        Last_BiLSTM_1_data.append(weight.data.clone())
     Last_BiLSTM_2_data = []
     for weight in model.BiLSTM_2.parameters():
-        Last_BiLSTM_2_data.append(weight.data)
+        Last_BiLSTM_2_data.append(weight.data.clone())
 
     Last_SRL_score = -0.1
     Last_DEP_score = -0.1
