@@ -187,7 +187,7 @@ class BiLSTMTagger(nn.Module):
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_0, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
-        hidden_states, self.hidden = self.BiLSTM_1(embeds_sort, self.hidden_2)
+        hidden_states, self.hidden_2 = self.BiLSTM_1(embeds_sort, self.hidden_2)
         # it seems that hidden states is already batch first, we don't need swap the dims
         # hidden_states = hidden_states.permute(1, 2, 0).contiguous().view(self.batch_size, -1, )
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
@@ -199,7 +199,7 @@ class BiLSTMTagger(nn.Module):
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_1, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
-        hidden_states, self.hidden_2 = self.BiLSTM_2(embeds_sort, self.hidden_3)
+        hidden_states, self.hidden_3 = self.BiLSTM_2(embeds_sort, self.hidden_3)
         # it seems that hidden states is already batch first, we don't need swap the dims
         # hidden_states = hidden_states.permute(1, 2, 0).contiguous().view(self.batch_size, -1, )
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
@@ -251,7 +251,7 @@ class BiLSTMTagger(nn.Module):
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(SRL_hidden_states, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
-        hidden_states, self.hidden_3 = self.BiLSTM_SRL(embeds_sort, self.hidden_4)
+        hidden_states, self.hidden_4 = self.BiLSTM_SRL(embeds_sort, self.hidden_4)
         # it seems that hidden states is already batch first, we don't need swap the dims
         # hidden_states = hidden_states.permute(1, 2, 0).contiguous().view(self.batch_size, -1, )
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
