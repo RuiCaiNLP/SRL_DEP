@@ -55,8 +55,6 @@ class BiLSTMTagger(nn.Module):
         self.word_fixed_embeddings = nn.Embedding(vocab_size, hps['sent_edim'])
         self.word_fixed_embeddings.weight.data.copy_(torch.from_numpy(hps['word_embeddings']))
 
-        self.word_fixed_embeddings_SRL = nn.Embedding(vocab_size, hps['sent_edim'])
-        self.word_fixed_embeddings_SRL.weight.data.copy_(torch.from_numpy(hps['word_embeddings']))
 
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
@@ -364,7 +362,7 @@ class BiLSTMTagger(nn.Module):
         #    loss = SRLloss + DEPloss + SPEDEPloss
         #else:
         #    loss = SRLloss
-        loss = SRLloss + 0.1*DEPloss + 0.1*SPEDEPloss
+        loss = SRLloss + 0.5*DEPloss + 0.5*SPEDEPloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
