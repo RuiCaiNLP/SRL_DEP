@@ -217,11 +217,9 @@ class BiLSTMTagger(nn.Module):
         dep_tag_space_use = self.MLP(F.tanh(self.hidden2tag(Label_features))).view(
             len(sentence[0]) * self.batch_size, -1)
 
-
-        Link_composer = torch.cat((hidden_states_2, concat_embeds), 2)
-        dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.tanh(self.hidden2tag_spe(Link_composer)))).view(
+        dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.tanh(self.hidden2tag_spe(Label_features)))).view(
             len(sentence[0]) * self.batch_size, -1)
-        dep_tag_space_spe_use = self.MLP_spe(F.tanh(self.hidden2tag_spe(Link_composer))).view(
+        dep_tag_space_spe_use = self.MLP_spe(F.tanh(self.hidden2tag_spe(Label_features))).view(
             len(sentence[0]) * self.batch_size, -1)
 
 
