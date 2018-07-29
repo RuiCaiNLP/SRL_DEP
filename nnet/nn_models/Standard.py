@@ -79,7 +79,7 @@ class BiLSTMTagger(nn.Module):
         self.elmo_gamma = nn.Parameter(torch.ones(1))
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
-        self.DEP_input_dropout = nn.Dropout(p=0.5)
+        self.DEP_input_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
@@ -169,9 +169,9 @@ class BiLSTMTagger(nn.Module):
         fixed_embeds = self.word_fixed_embeddings(p_sentence)
         fixed_embeds = fixed_embeds.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
-        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds, pos_embeds), 2)
+        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds, pos_embeds, region_marks), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
-        embeds_forDEP = torch.cat((embeds_forDEP, region_marks), 2)
+
 
         #first layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds_forDEP, lengths)
@@ -219,7 +219,7 @@ class BiLSTMTagger(nn.Module):
         dep_tag_space_use = self.MLP(F.tanh(self.hidden2tag(Label_features))).view(
             len(sentence[0]) * self.batch_size, -1)
 
-        Link_composer = hidden_states_2
+        Link_composer = hidden_states_1
         dep_tag_space_spe = self.MLP_spe(self.link_dropout(F.tanh(self.hidden2tag_spe(Link_composer)))).view(
             len(sentence[0]) * self.batch_size, -1)
         dep_tag_space_spe_use = self.MLP_spe(F.tanh(self.hidden2tag_spe(Link_composer))).view(
@@ -367,7 +367,7 @@ class BiLSTMTagger(nn.Module):
         #    loss = SRLloss + DEPloss + SPEDEPloss
         #else:
         #    loss = SRLloss
-        loss = SRLloss + 0.5*DEPloss + 0.5*SPEDEPloss
+        loss = SRLloss + 0.1*DEPloss + 0.1*SPEDEPloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
