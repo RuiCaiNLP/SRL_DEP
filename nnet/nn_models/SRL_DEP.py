@@ -59,9 +59,9 @@ class BiLSTMTagger(nn.Module):
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
 
-        self.SRL_W_0 = nn.Linear(2 * lstm_hidden_dim, 2 * lstm_hidden_dim)
-        self.SRL_W_1 = nn.Linear(2 * lstm_hidden_dim, 2 * lstm_hidden_dim)
-        self.SRL_W_2 = nn.Linear(2 * lstm_hidden_dim, 2 * lstm_hidden_dim)
+        self.SRL_W_0 = nn.Linear(2 * lstm_hidden_dim, 100)
+        self.SRL_W_1 = nn.Linear(2 * lstm_hidden_dim, 100)
+        self.SRL_W_2 = nn.Linear(2 * lstm_hidden_dim, 100)
 
         self.hidden2tag = nn.Linear(4*lstm_hidden_dim, 2*lstm_hidden_dim)
         self.MLP = nn.Linear(2*lstm_hidden_dim, self.dep_size)
@@ -240,10 +240,13 @@ class BiLSTMTagger(nn.Module):
         h_layer_0 = hidden_states_0#.detach()
         h_layer_1 = hidden_states_1#.detach()
         h_layer_2 = hidden_states_2#.detach()
-        #SRL_composer = self.elmo_gamma(self.SRL_W_0(h_layer_0) + self.SRL_W_1(h_layer_1) + self.SRL_W_2(h_layer_2))
+        SRL_composer = self.elmo_gamma * (self.SRL_W_0(h_layer_0) + self.SRL_W_1(h_layer_1) + self.SRL_W_2(h_layer_2))
+        SRL_composer = F.relu(SRL_composer)
+        """
         w = F.softmax(self.elmo_w, dim=0)
         SRL_composer = self.elmo_gamma*(w[0] * h_layer_0 + w[1] * h_layer_1 + w[2] * h_layer_2)
         SRL_composer = self.elmo_mlp(SRL_composer)
+        """
         sent_pred_lemmas_embeds = self.p_lemma_embeddings(sent_pred_lemmas_idx)
         embeds_SRL = self.word_embeddings_SRL(sentence)
         embeds_SRL = embeds_SRL.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
