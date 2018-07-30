@@ -29,7 +29,7 @@ class BiLSTMTagger(nn.Module):
 
         batch_size = hps['batch_size']
         lstm_hidden_dim = hps['sent_hdim']
-        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim']
+        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim'] + 1
         sent_embedding_dim_SRL = 4 * hps['sent_edim'] + 1 * hps['pos_edim'] + 1
         ## for the region mark
         role_embedding_dim = hps['role_edim']
@@ -77,7 +77,7 @@ class BiLSTMTagger(nn.Module):
         self.elmo_gamma = nn.Parameter(torch.ones(1))
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
-        self.DEP_input_dropout = nn.Dropout(p=0.3)
+        self.DEP_input_dropout = nn.Dropout(p=0.5)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
@@ -169,6 +169,7 @@ class BiLSTMTagger(nn.Module):
 
         embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds, pos_embeds), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
+        embeds_forDEP = torch.cat((embeds_forDEP, region_marks))
 
         #first layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds_forDEP, lengths)
@@ -215,7 +216,7 @@ class BiLSTMTagger(nn.Module):
         dep_tag_space_use = self.MLP(F.tanh(self.hidden2tag(Label_features))).view(
             len(sentence[0]) * self.batch_size, -1)
 
-        Link_composer = hidden_states_1
+        Link_composer = hidden_states_2
         predicate_embeds = Link_composer[np.arange(0, Link_composer.size()[0]), target_idx_in]
         # T * B * H
         added_embeds = torch.zeros(Link_composer.size()[1], Link_composer.size()[0], Link_composer.size()[2]).to(
@@ -241,7 +242,7 @@ class BiLSTMTagger(nn.Module):
         h_layer_2 = hidden_states_2#.detach()
         #SRL_composer = self.elmo_gamma(self.SRL_W_0(h_layer_0) + self.SRL_W_1(h_layer_1) + self.SRL_W_2(h_layer_2))
         w = F.softmax(self.elmo_w, dim=0)
-        SRL_composer = self.elmo_gamma*(w[0]* h_layer_0 + w[1] * h_layer_1 + w[2] * h_layer_2)
+        SRL_composer = self.elmo_gamma*(w[0] * h_layer_0 + w[1] * h_layer_1 + w[2] * h_layer_2)
         SRL_composer = self.elmo_mlp(SRL_composer)
         sent_pred_lemmas_embeds = self.p_lemma_embeddings(sent_pred_lemmas_idx)
         embeds_SRL = self.word_embeddings_SRL(sentence)
@@ -369,7 +370,7 @@ class BiLSTMTagger(nn.Module):
         #    loss = SRLloss + DEPloss + SPEDEPloss
         #else:
         #    loss = SRLloss
-        loss = SRLloss + 0.1*DEPloss + 0.1*SPEDEPloss
+        loss = SRLloss + 0.5*DEPloss + 0.5*SPEDEPloss
         return SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums_spe, all_l_nums_spe,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe

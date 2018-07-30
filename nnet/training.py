@@ -23,6 +23,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     #optimizer = optim.Adadelta(model.parameters(), rho=0.95, eps=1e-6)
     model.to(device)
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
+    """
     Last_BiLSTM_0_data = []
     for weight in model.BiLSTM_0.parameters():
         Last_BiLSTM_0_data.append(weight.data.clone())
@@ -35,6 +36,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
     Last_SRL_score = -0.1
     Last_DEP_score = -0.1
+    """
     random.seed(1234)
     for e in range(epochs):
         tic = time.time()
