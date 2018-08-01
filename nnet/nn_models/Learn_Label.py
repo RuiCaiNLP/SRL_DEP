@@ -29,7 +29,7 @@ class BiLSTMTagger(nn.Module):
 
         batch_size = hps['batch_size']
         lstm_hidden_dim = hps['sent_hdim']
-        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim']
+        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim'] + 1
         sent_embedding_dim_SRL = 3 * hps['sent_edim'] + 1 * hps['pos_edim'] + 1
         ## for the region mark
         role_embedding_dim = hps['role_edim']
@@ -145,12 +145,14 @@ class BiLSTMTagger(nn.Module):
         embeds_DEP = self.word_embeddings_DEP(sentence)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
+        pos_embeds_DEP = self.pos_embeddings(pos_tags)
         region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
         fixed_embeds_DEP = self.word_fixed_embeddings_DEP(p_sentence)
         fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
-        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds_DEP, pos_embeds), 2)
+        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds_DEP, pos_embeds_DEP, region_marks), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
+        embeds_forDEP = torch.cat((embeds_forDEP, region_marks), 2)
 
 
         #first layer
@@ -183,6 +185,7 @@ class BiLSTMTagger(nn.Module):
         added_embeds = torch.zeros(Label_composer.size()[1], Label_composer.size()[0], Label_composer.size()[2]).to(device)
         concat_embeds = (added_embeds + predicate_embeds).transpose(0, 1)
         Label_features = torch.cat((Label_composer, concat_embeds), 2)
+
         dep_tag_space = self.MLP(self.label_dropout(F.tanh(self.hidden2tag(Label_features)))).view(
             len(sentence[0]) * self.batch_size, -1)
         dep_tag_space_use = self.MLP(F.tanh(self.hidden2tag(Label_features))).view(
@@ -289,7 +292,7 @@ class BiLSTMTagger(nn.Module):
         SRLloss = loss_function(tag_space, targets)
         DEPloss = loss_function(dep_tag_space, dep_tags.view(-1))
 
-        loss = DEPloss
+        loss = DEPloss + SRLloss
         return SRLloss, DEPloss, DEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums, all_l_nums,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict, noNull_predict, noNUll_truth
