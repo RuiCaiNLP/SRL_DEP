@@ -17,6 +17,7 @@ import torch.nn.functional as F
 import torch.nn.utils.rnn as rnn
 import torch.nn.init as init
 from numpy import random as nr
+from operator import itemgetter
 _BIG_NUMBER = 10. ** 6.
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -270,17 +271,27 @@ class BiLSTMTagger(nn.Module):
 
         SRLprobs = F.softmax(tag_space, dim=1)
 
-        #+++++++++++++++++++++++
+
+        goldLabelInd = dep_tags.view(-1).cpu().data.numpy()
+        rscores = dep_tag_space.view(self.batch_size*len(sentence[0]), -1).cpu().data.numpy()
+        rexprs = dep_tag_space.view(self.batch_size*len(sentence[0]), -1)
+        lerrs = []
+        # for every word in the batch
+        for i in range(len(rscores)):
+            wrongLabelInd = \
+                max(((l, scr) for l, scr in enumerate(rscores[i]) if l != goldLabelInd[i]), key=itemgetter(1))[0]
+            if rscores[i][goldLabelInd[i]] < rscores[i][wrongLabelInd] + 1:
+                lerrs += [rexprs[i][wrongLabelInd] - rexprs[i][goldLabelInd[i]]]
+        # +++++++++++++++++++++++
         wrong_l_nums = 0.0
         all_l_nums = 0.0
 
         right_noNull_predict = 0.0
         noNull_predict = 0.0
         noNUll_truth = 0.0
-        dep_labels = torch.argmax(dep_tag_space, dim=1)
-        New_loss = []
+        dep_labels = np.argmax(dep_tag_space.cpu().data.numpy(), axis=1)
         for predict_l, gold_l in zip(dep_labels, dep_tags.cpu().view(-1).data.numpy()):
-            if predict_l >1:
+            if predict_l > 1:
                 noNull_predict += 1
             if gold_l != 0:
                 all_l_nums += 1
@@ -288,11 +299,8 @@ class BiLSTMTagger(nn.Module):
                     noNUll_truth += 1
                     if gold_l == predict_l:
                         right_noNull_predict += 1
-                    else:
-                        New_loss.append(dep_tag_space[predict_l] - dep_tag_space[gold_l])
             if predict_l != gold_l and gold_l != 0:
                 wrong_l_nums += 1
-
 
         targets = targets.view(-1)
 
@@ -301,8 +309,8 @@ class BiLSTMTagger(nn.Module):
         SRLloss = loss_function(tag_space, targets)
         #DEPloss = loss_function(dep_tag_space, dep_tags.view(-1))
 
-        if len(New_loss) > 0:
-            DEPloss = torch.sum(cat(New_loss))
+        if len(lerrs) > 0:
+            DEPloss = sum(lerrs)
             loss = SRLloss + DEPloss
         else:
             loss = SRLloss
