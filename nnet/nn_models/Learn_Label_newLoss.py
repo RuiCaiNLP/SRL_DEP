@@ -278,6 +278,8 @@ class BiLSTMTagger(nn.Module):
         lerrs = []
         # for every word in the batch
         for i in range(len(rscores)):
+            if goldLabelInd[i] == 0:
+                continue
             wrongLabelInd = \
                 max(((l, scr) for l, scr in enumerate(rscores[i]) if l != goldLabelInd[i]), key=itemgetter(1))[0]
             if rscores[i][goldLabelInd[i]] < rscores[i][wrongLabelInd] + 1:
