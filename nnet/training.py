@@ -277,7 +277,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                             = model(sentence_in, p_sentence_in, pos_tags_in, sen_lengths, target_idx_in, region_mark_in,
                                     local_roles_voc_in,
                                     frames_in, local_roles_mask_in, sent_pred_lemmas_idx_in, dep_tags_in, dep_heads,
-                                    targets, specific_dep_tags_in, specific_dep_relations_in)
+                                    targets, specific_dep_tags_in, specific_dep_relations_in, True)
 
                         labels = np.argmax(SRLprobs.cpu().data.numpy(), axis=1)
                         labels = np.reshape(labels, sentence.shape)
