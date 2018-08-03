@@ -315,6 +315,7 @@ class BiLSTMTagger(nn.Module):
             DEPloss = sum(lerrs)
             loss = SRLloss + DEPloss
         else:
+            DEPloss = SRLloss
             loss = SRLloss
         return SRLloss, DEPloss, DEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums, all_l_nums,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\

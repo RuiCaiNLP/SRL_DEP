@@ -19,7 +19,7 @@ python -mnnet.run.srl.run \
 --elmo-embeddings-1 elmo_embeddings_1 \
 --dbg-print-rate 500 \
 --eval-dir ./data/ \
---epochs 20 \
+--epochs 30 \
 --out conll2009_rm0_pl_a.25_sskip_h512_d.0_l4 \
 --params-path model_pruned.pkl \
 --hps "{'id': 1, 'sent_edim': 100, 'sent_hdim': 128, \

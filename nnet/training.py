@@ -131,8 +131,10 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             idx += 1
-
-            loss.backward()
+            if e < 10:
+                DEPloss.backward()
+            else:
+                loss.backward()
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)
             #clip_grad_value_(parameters=model.parameters(), clip_value=3)
