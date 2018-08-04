@@ -311,14 +311,14 @@ class BiLSTMTagger(nn.Module):
         loss_function = nn.CrossEntropyLoss(ignore_index=0)
 
         SRLloss = loss_function(tag_space, targets)
-        #DEPloss = loss_function(dep_tag_space, dep_tags.view(-1))
+        DEPloss = loss_function(dep_tag_space, dep_tags.view(-1))
 
         if len(lerrs) > 0:
-            DEPloss = sum(lerrs)
+            #DEPloss = sum(lerrs)
             loss = SRLloss + DEPloss
         else:
-            DEPloss = SRLloss
-            loss = SRLloss
+            #DEPloss = SRLloss
+            loss = SRLloss + DEPloss
         return SRLloss, DEPloss, DEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums, all_l_nums,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict, noNull_predict, noNUll_truth
