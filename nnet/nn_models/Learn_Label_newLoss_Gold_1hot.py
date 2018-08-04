@@ -111,6 +111,7 @@ class BiLSTMTagger(nn.Module):
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][1])
+        init.orthogonal_(self.BiLSTM_SRL.all_weights[1][0])
         init.orthogonal_(self.BiLSTM_SRL.all_weights[1][1])
 
 
