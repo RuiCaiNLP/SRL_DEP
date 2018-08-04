@@ -28,11 +28,11 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     Best_BiLSTM_1_data = []
     for weight in model.BiLSTM_1.parameters():
         Best_BiLSTM_1_data.append(weight.data.clone())
-    best_word_embeddings_DEP = model.word_embeddings_DEP.weight.data
-    best_pos_embeddings_DEP = model.pos_embeddings_DEP.weight.data
-    best_word_fixed_embeddings_DEP = model.word_fixed_embeddings_DEP.weight.data
-    best_hidden2tag = model.hidden2tag.weight.data
-    best_MLP = model.MLP.weight.data
+    best_word_embeddings_DEP = model.word_embeddings_DEP.weight.data.clone()
+    best_pos_embeddings_DEP = model.pos_embeddings_DEP.weight.data.clone()
+    best_word_fixed_embeddings_DEP = model.word_fixed_embeddings_DEP.weight.data.clone()
+    best_hidden2tag = model.hidden2tag.weight.data.clone()
+    best_MLP = model.MLP.weight.data.clone()
 
     Best_DEP_score = -0.1
 
@@ -380,11 +380,11 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         best_weight_i.copy_(weight_i.data)
                     for best_weight_i, weight_i in zip(Best_BiLSTM_1_data, model.BiLSTM_1.parameters()):
                         best_weight_i.copy_(weight_i.data)
-                    best_word_embeddings_DEP = model.word_embeddings_DEP.weight.data
-                    best_pos_embeddings_DEP = model.pos_embeddings_DEP.weight.data
-                    best_word_fixed_embeddings_DEP = model.word_fixed_embeddings_DEP.weight.data
-                    best_hidden2tag = model.hidden2tag.weight.data
-                    best_MLP = model.MLP.weight.data
+                    best_word_embeddings_DEP = model.word_embeddings_DEP.weight.data.clone()
+                    best_pos_embeddings_DEP = model.pos_embeddings_DEP.weight.data.clone()
+                    best_word_fixed_embeddings_DEP = model.word_fixed_embeddings_DEP.weight.data.clone()
+                    best_hidden2tag = model.hidden2tag.weight.data.clone()
+                    best_MLP = model.MLP.weight.data.clone()
                     log("best dep params preserved")
 
 
