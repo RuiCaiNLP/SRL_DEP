@@ -143,7 +143,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             idx += 1
-            if e < 20:
+            if e < 1:
                 DEPloss.backward()
             else:
                 loss.backward()
@@ -226,8 +226,6 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         model.hidden_2 = model.init_hidden_spe()
                         model.hidden_3 = model.init_hidden_spe()
                         model.hidden_4 = model.init_hidden_share()
-
-
 
 
                         sentence = model_input[0]
