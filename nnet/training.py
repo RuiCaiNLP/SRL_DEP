@@ -18,30 +18,42 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     idx = 0
     sample_count = 0.0
     best_F1 = -0.1
-    best_Label = -0.1
-    best_Link = -0.1
     #optimizer = optim.Adadelta(model.parameters(), rho=0.95, eps=1e-6)
     model.to(device)
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
-    """
-    Last_BiLSTM_0_data = []
-    for weight in model.BiLSTM_0.parameters():
-        Last_BiLSTM_0_data.append(weight.data.clone())
-    Last_BiLSTM_1_data = []
-    for weight in model.BiLSTM_1.parameters():
-        Last_BiLSTM_1_data.append(weight.data.clone())
-    Last_BiLSTM_2_data = []
-    for weight in model.BiLSTM_2.parameters():
-        Last_BiLSTM_2_data.append(weight.data.clone())
 
-    Last_SRL_score = -0.1
-    Last_DEP_score = -0.1
-    """
+    Best_BiLSTM_0_data = []
+    for weight in model.BiLSTM_0.parameters():
+        Best_BiLSTM_0_data.append(weight.data.clone())
+    Best_BiLSTM_1_data = []
+    for weight in model.BiLSTM_1.parameters():
+        Best_BiLSTM_1_data.append(weight.data.clone())
+    best_word_embeddings_DEP = model.word_embeddings_DEP.weight.data
+    best_pos_embeddings_DEP = model.pos_embeddings_DEP.weight.data
+    best_word_fixed_embeddings_DEP = model.word_fixed_embeddings_DEP.weight.data
+    best_hidden2tag = model.hidden2tag.weight.data
+    best_MLP = model.MLP.weight.data
+
+    Best_DEP_score = -0.1
+
     random.seed(1234)
     for e in range(epochs):
         tic = time.time()
+        if e == 1:
+            for weight_i, best_weight_i in zip(model.BiLSTM_0.parameters(), Best_BiLSTM_0_data):
+                weight_i.data.copy_(best_weight_i)
+            for weight_i, best_weight_i in zip(model.BiLSTM_1.parameters(), Best_BiLSTM_1_data):
+                weight_i.data.copy_(best_weight_i)
+            model.word_embeddings_DEP.weight.data.copy_(best_word_embeddings_DEP)
+            model.pos_embeddings_DEP.weight.data.copy_(best_pos_embeddings_DEP)
+            model.word_fixed_embeddings_DEP.weight.data.copy_(best_word_fixed_embeddings_DEP)
+            model.hidden2tag.weight.data.copy_(best_hidden2tag)
+            model.MLP.weight.data.copy_(best_MLP)
+            log('best params equiped')
+
+
         dataset = [batch for batch in train_set.batches()]
-        #random.shuffle(dataset)
+        random.shuffle(dataset)
         for batch in dataset:
             torch.cuda.empty_cache()
             sample_count += len(batch)
@@ -131,7 +143,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             idx += 1
-            if e < 10:
+            if e < 20:
                 DEPloss.backward()
             else:
                 loss.backward()
@@ -361,32 +373,38 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 R = right_noNull_predict_spe / (noNUll_truth_spe + 0.0001)
                 F_link = 2 * P * R / (P + R + 0.0001)
                 log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F_link))
-                if F_label> best_Label and F_link > best_Link:
-                    best_Label = F_label
-                    best_Link = F_link
-                    log('New Dep best:' + str(best_Label) + ' ' + str(best_Link))
+                if F_label> Best_DEP_score and e < 20:
+                    Best_DEP_score = F_label
+                    log('New Dep best:' + str(Best_DEP_score))
+                    for best_weight_i, weight_i in zip(Best_BiLSTM_0_data, model.BiLSTM_0.parameters()):
+                        best_weight_i.copy_(weight_i.data)
+                    for best_weight_i, weight_i in zip(Best_BiLSTM_1_data, model.BiLSTM_1.parameters()):
+                        best_weight_i.copy_(weight_i.data)
+                    best_word_embeddings_DEP = model.word_embeddings_DEP.weight.data
+                    best_pos_embeddings_DEP = model.pos_embeddings_DEP.weight.data
+                    best_word_fixed_embeddings_DEP = model.word_fixed_embeddings_DEP.weight.data
+                    best_hidden2tag = model.hidden2tag.weight.data
+                    best_MLP = model.MLP.weight.data
+                    log("best dep params preserved")
+
+
 
                 """
-
                 if F1 < Last_SRL_score and F_label+F_link < Last_DEP_score:
-                    for weight_i, last_weight_i in zip(model.BiLSTM_0.parameters(), Last_BiLSTM_0_data):
+                    for weight_i, last_weight_i in zip(model.BiLSTM_0.parameters(), Best_BiLSTM_0_data):
                         weight_i.data.copy_(last_weight_i)
                     for weight_i, last_weight_i in zip(model.BiLSTM_1.parameters(), Last_BiLSTM_1_data):
                         weight_i.data.copy_(last_weight_i)
                     for weight_i, last_weight_i in zip(model.BiLSTM_2.parameters(), Last_BiLSTM_2_data):
                         weight_i.data.copy_(last_weight_i)
                     log('backward!')
-                else:
-                    for last_weight_i, weight_i in zip(Last_BiLSTM_0_data, model.BiLSTM_0.parameters()):
-                        last_weight_i.copy_(weight_i.data)
-                    for last_weight_i, weight_i in zip(Last_BiLSTM_1_data, model.BiLSTM_1.parameters()):
-                        last_weight_i.copy_(weight_i.data)
-                    for last_weight_i, weight_i in zip(Last_BiLSTM_2_data, model.BiLSTM_2.parameters()):
-                        last_weight_i.copy_(weight_i.data)
+                """
+
+
 
                 Last_SRL_score = F1
                 Last_DEP_score = F_label + F_link
-                """
+
 
 
 
