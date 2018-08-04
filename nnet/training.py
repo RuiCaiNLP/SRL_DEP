@@ -39,7 +39,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     random.seed(1234)
     for e in range(epochs):
         tic = time.time()
-        if e == 20:
+        if e == 20 and False:
             for weight_i, best_weight_i in zip(model.BiLSTM_0.parameters(), Best_BiLSTM_0_data):
                 weight_i.data.copy_(best_weight_i)
             for weight_i, best_weight_i in zip(model.BiLSTM_1.parameters(), Best_BiLSTM_1_data):
@@ -143,10 +143,10 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             idx += 1
-            if e < 20:
+            if e < 20 and False:
                 DEPloss.backward()
             else:
-                SRLloss.backward()
+                loss.backward()
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)
             #clip_grad_value_(parameters=model.parameters(), clip_value=3)
