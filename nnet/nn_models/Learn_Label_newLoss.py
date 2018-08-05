@@ -203,7 +203,7 @@ class BiLSTMTagger(nn.Module):
         TagProbs_use = F.softmax(dep_tag_space_use, dim=1).view(self.batch_size, len(sentence[0]), -1)
         #construct SRL input
         TagProbs_noGrad = TagProbs_use.detach()
-        h1 = F.relu(self.tag2hidden(TagProbs_noGrad))
+        h1 = torch.zeros_like(F.relu(self.tag2hidden(TagProbs_noGrad))).to(device)
 
 
         fixed_embeds = self.word_fixed_embeddings(p_sentence)
