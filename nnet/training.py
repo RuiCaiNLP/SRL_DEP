@@ -39,22 +39,23 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     random.seed(1234)
     for e in range(epochs):
         tic = time.time()
-        if idx == 1001:
-            for weight_i, best_weight_i in zip(model.BiLSTM_0.parameters(), Best_BiLSTM_0_data):
-                weight_i.data.copy_(best_weight_i)
-            for weight_i, best_weight_i in zip(model.BiLSTM_1.parameters(), Best_BiLSTM_1_data):
-                weight_i.data.copy_(best_weight_i)
-            model.word_embeddings_DEP.weight.data.copy_(best_word_embeddings_DEP)
-            model.pos_embeddings_DEP.weight.data.copy_(best_pos_embeddings_DEP)
-            model.word_fixed_embeddings_DEP.weight.data.copy_(best_word_fixed_embeddings_DEP)
-            model.hidden2tag.weight.data.copy_(best_hidden2tag)
-            model.MLP.weight.data.copy_(best_MLP)
-            log('best params equiped')
+
 
 
         dataset = [batch for batch in train_set.batches()]
         random.shuffle(dataset)
         for batch in dataset:
+            if idx == 1001:
+                for weight_i, best_weight_i in zip(model.BiLSTM_0.parameters(), Best_BiLSTM_0_data):
+                    weight_i.data.copy_(best_weight_i)
+                for weight_i, best_weight_i in zip(model.BiLSTM_1.parameters(), Best_BiLSTM_1_data):
+                    weight_i.data.copy_(best_weight_i)
+                model.word_embeddings_DEP.weight.data.copy_(best_word_embeddings_DEP)
+                model.pos_embeddings_DEP.weight.data.copy_(best_pos_embeddings_DEP)
+                model.word_fixed_embeddings_DEP.weight.data.copy_(best_word_fixed_embeddings_DEP)
+                model.hidden2tag.weight.data.copy_(best_hidden2tag)
+                model.MLP.weight.data.copy_(best_MLP)
+                log('best params equiped')
             torch.cuda.empty_cache()
             sample_count += len(batch)
 
