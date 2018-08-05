@@ -1,7 +1,7 @@
 from nnet.run.runner import *
 from nnet.ml.voc import *
 from functools import partial
-from nnet.nn_models.Share_wordembeds_Newloss import BiLSTMTagger
+from nnet.nn_models.Share_wordembeds_crossEntropy import BiLSTMTagger
 
 def make_local_voc(labels):
     return {i: label for i, label in enumerate(labels)}
