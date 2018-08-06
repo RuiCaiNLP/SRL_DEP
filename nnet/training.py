@@ -45,7 +45,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
         dataset = [batch for batch in train_set.batches()]
         random.shuffle(dataset)
         for batch in dataset:
-            if idx == 1001:
+            if idx == 1001 and False:
                 for weight_i, best_weight_i in zip(model.BiLSTM_0.parameters(), Best_BiLSTM_0_data):
                     weight_i.data.copy_(best_weight_i)
                 for weight_i, best_weight_i in zip(model.BiLSTM_1.parameters(), Best_BiLSTM_1_data):
@@ -145,7 +145,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             idx += 1
             #if e < 20 and False:
-            if idx < 1000:
+            if idx < 1000 and False:
                 DEPloss.backward()
             else:
                 SRLloss.backward()
@@ -373,7 +373,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 R = right_noNull_predict_spe / (noNUll_truth_spe + 0.0001)
                 F_link = 2 * P * R / (P + R + 0.0001)
                 log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F_link))
-                if F_label> Best_DEP_score and e < 20:
+                if F_label> Best_DEP_score and e < 20 and False:
                     Best_DEP_score = F_label
                     log('New Dep best:' + str(Best_DEP_score))
                     for best_weight_i, weight_i in zip(Best_BiLSTM_0_data, model.BiLSTM_0.parameters()):
