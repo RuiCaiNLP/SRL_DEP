@@ -284,12 +284,12 @@ class BiLSTMTagger(nn.Module):
         loss_function = nn.CrossEntropyLoss(ignore_index=0)
 
         SRLloss = loss_function(tag_space, targets)
-        DEPloss = loss_function(dep_tag_space, dep_tags.view(-1))
+        DEPloss = loss_function(dep_tag_space_spe, dep_tags.view(-1))
 
         loss = DEPloss
-        return SRLloss, DEPloss, DEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums, all_l_nums,  \
-               right_noNull_predict, noNull_predict, noNUll_truth,\
-               right_noNull_predict, noNull_predict, noNUll_truth
+        return SRLloss, DEPloss, DEPloss, loss, SRLprobs, wrong_l_nums_spe, all_l_nums_spe, wrong_l_nums_spe, all_l_nums_spe,  \
+               right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe,\
+               right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
 
     @staticmethod
     def sort_batch(x, l):
