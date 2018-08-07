@@ -66,8 +66,8 @@ class BiLSTMTagger(nn.Module):
 
 
         self.hidden2tag_spe = nn.Linear(4*lstm_hidden_dim, 2*lstm_hidden_dim)
-        self.MLP_spe = nn.Linear(2*lstm_hidden_dim, self.dep_size)
-        self.Link2hidden = nn.Linear(self.dep_size, self.pos_size)
+        self.MLP_spe = nn.Linear(2*lstm_hidden_dim, 4)
+        self.Link2hidden = nn.Linear(4, self.pos_size)
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
         self.DEP_input_dropout = nn.Dropout(p=0.5)
