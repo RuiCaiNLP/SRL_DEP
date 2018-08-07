@@ -22,6 +22,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     model.to(device)
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
 
+    """
     Best_BiLSTM_0_data = []
     for weight in model.BiLSTM_0.parameters():
         Best_BiLSTM_0_data.append(weight.data.clone())
@@ -33,7 +34,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     best_word_fixed_embeddings_DEP = model.word_fixed_embeddings_DEP.weight.data.clone()
     best_hidden2tag = model.hidden2tag.weight.data.clone()
     best_MLP = model.MLP.weight.data.clone()
-
+    """
     Best_DEP_score = -0.1
 
     random.seed(1234)
