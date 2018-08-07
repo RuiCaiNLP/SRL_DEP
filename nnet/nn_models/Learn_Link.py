@@ -65,8 +65,8 @@ class BiLSTMTagger(nn.Module):
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
 
 
-        self.hidden2tag = nn.Linear(4*lstm_hidden_dim, 2*lstm_hidden_dim)
-        self.MLP = nn.Linear(2*lstm_hidden_dim, self.dep_size)
+        self.hidden2tag_spe = nn.Linear(4*lstm_hidden_dim, 2*lstm_hidden_dim)
+        self.MLP_spe = nn.Linear(2*lstm_hidden_dim, self.dep_size)
         self.tag2hidden = nn.Linear(self.dep_size, self.pos_size)
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
