@@ -111,7 +111,7 @@ class BiLSTMTagger(nn.Module):
 
 
         self.num_layers = 4
-        self.BiLSTM_SRL = nn.LSTM(input_size=100 + sent_embedding_dim_SRL , hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_SRL = nn.LSTM(input_size=100 + sent_embedding_dim_SRL + self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
@@ -203,6 +203,13 @@ class BiLSTMTagger(nn.Module):
 
         dep_tag_space = self.MLP(self.label_dropout(F.tanh(self.hidden2tag(Label_features)))).view(
             len(sentence[0]) * self.batch_size, -1)
+        dep_tag_space_use = self.MLP(F.tanh(self.hidden2tag(Label_features))).view(
+            len(sentence[0]) * self.batch_size, -1)
+
+        TagProbs_use = F.softmax(dep_tag_space_use, dim=1).view(self.batch_size, len(sentence[0]), -1)
+        # construct SRL input
+        TagProbs_noGrad = TagProbs_use.detach()
+        h1 = F.relu(self.tag2hidden(TagProbs_noGrad))
 
 
         h_layer_0 = hidden_states_0#.detach()
@@ -219,7 +226,7 @@ class BiLSTMTagger(nn.Module):
         embeds_SRL = embeds_SRL.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
 
-        SRL_hidden_states = torch.cat((embeds_SRL,  fixed_embeds, sent_pred_lemmas_embeds, pos_embeds, region_marks, SRL_composer), 2)
+        SRL_hidden_states = torch.cat((embeds_SRL,  fixed_embeds, sent_pred_lemmas_embeds, pos_embeds, region_marks, SRL_composer, h1), 2)
         SRL_hidden_states = self.SRL_input_dropout(SRL_hidden_states)
 
         # SRL layer
