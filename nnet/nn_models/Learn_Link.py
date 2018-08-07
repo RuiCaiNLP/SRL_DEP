@@ -49,8 +49,10 @@ class BiLSTMTagger(nn.Module):
         self.word_embeddings_SRL = nn.Embedding(vocab_size, hps['sent_edim'])
         self.word_embeddings_DEP = nn.Embedding(vocab_size, hps['sent_edim'])
         self.pos_embeddings = nn.Embedding(self.pos_size, hps['pos_edim'])
+        self.pos_embeddings_DEP = nn.Embedding(self.pos_size, hps['pos_edim'])
         self.p_lemma_embeddings = nn.Embedding(self.frameset_size, hps['sent_edim'])
-        #self.lr_dep_embeddings = nn.Embedding(self.lr_dep_size, hps[])
+        self.dep_embeddings = nn.Embedding(self.dep_size, self.pos_size)
+        # self.lr_dep_embeddings = nn.Embedding(self.lr_dep_size, hps[])
 
         self.word_fixed_embeddings = nn.Embedding(vocab_size, hps['sent_edim'])
         self.word_fixed_embeddings.weight.data.copy_(torch.from_numpy(hps['word_embeddings']))
@@ -145,13 +147,14 @@ class BiLSTMTagger(nn.Module):
         embeds_DEP = self.word_embeddings_DEP(sentence)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
+        pos_embeds_DEP = self.pos_embeddings_DEP(pos_tags)
         region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
+        # sharing pretrained word_embeds
         fixed_embeds_DEP = self.word_fixed_embeddings_DEP(p_sentence)
         fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
-        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds_DEP, pos_embeds), 2)
+        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds_DEP, pos_embeds_DEP, region_marks), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
-        embeds_forDEP = torch.cat((embeds_forDEP, region_marks), 2)
 
         #first layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds_forDEP, lengths)
