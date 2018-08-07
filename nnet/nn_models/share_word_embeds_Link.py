@@ -274,11 +274,11 @@ class BiLSTMTagger(nn.Module):
         noNUll_truth = 0.0
         dep_labels = np.argmax(dep_tag_space.cpu().data.numpy(), axis=1)
         for predict_l, gold_l in zip(dep_labels, specific_dep_relations.cpu().view(-1).data.numpy()):
-            if predict_l > 1:
+            if predict_l != 0 and predict_l != 3:
                 noNull_predict += 1
             if gold_l != 0:
                 all_l_nums += 1
-                if gold_l != 1:
+                if gold_l != 3:
                     noNUll_truth += 1
                     if gold_l == predict_l:
                         right_noNull_predict += 1
