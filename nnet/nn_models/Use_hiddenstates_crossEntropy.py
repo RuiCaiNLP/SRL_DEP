@@ -80,6 +80,8 @@ class BiLSTMTagger(nn.Module):
         self.elmo_mlp = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.elmo_emb_size), nn.ReLU())
         self.elmo_w = nn.Parameter(torch.Tensor([0.5, 0.5]))
         self.elmo_gamma = nn.Parameter(torch.ones(1))
+        self.elmo_gamma_label = nn.Parameter(torch.ones(1))
+
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
         self.DEP_input_dropout = nn.Dropout(p=0.5)
@@ -209,7 +211,7 @@ class BiLSTMTagger(nn.Module):
         TagProbs_use = F.softmax(dep_tag_space_use, dim=1).view(self.batch_size, len(sentence[0]), -1)
         # construct SRL input
         TagProbs_noGrad = TagProbs_use.detach()
-        h1 = F.relu(self.tag2hidden(TagProbs_noGrad))
+        h1 = F.relu(self.tag2hidden(TagProbs_noGrad)) * self.elmo_gamma_label
 
 
         h_layer_0 = hidden_states_0#.detach()
