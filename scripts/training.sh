@@ -17,6 +17,7 @@ python -mnnet.run.srl.run \
 --word-embeddings word_embeddings_proper.sskip.conll2009.txt \
 --elmo-embeddings-0 elmo_embeddings_0 \
 --elmo-embeddings-1 elmo_embeddings_1 \
+--elmo-embeddings-2 elmo_embeddings_2 \
 --dbg-print-rate 500 \
 --eval-dir ./data/ \
 --epochs 20 \

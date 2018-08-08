@@ -61,6 +61,8 @@ class BiLSTMTagger(nn.Module):
         self.dep_embeddings = nn.Embedding(self.dep_size, self.pos_size)
         #self.lr_dep_embeddings = nn.Embedding(self.lr_dep_size, hps[])
 
+
+
         self.word_fixed_embeddings = nn.Embedding(vocab_size, hps['sent_edim'])
         self.word_fixed_embeddings.weight.data.copy_(torch.from_numpy(hps['word_embeddings']))
 
@@ -79,6 +81,19 @@ class BiLSTMTagger(nn.Module):
         self.hidden2tag_spe = nn.Linear(2 * lstm_hidden_dim, 2 * lstm_hidden_dim)
         self.MLP_spe = nn.Linear(2 * lstm_hidden_dim, 4)
         self.tag2hidden_spe = nn.Linear(4, self.pos_size)
+
+        self.elmo_embeddings_0 = nn.Embedding(vocab_size, 1024)
+        self.elmo_embeddings_0.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_0']))
+
+        self.elmo_embeddings_1 = nn.Embedding(vocab_size, 1024)
+        self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
+
+        self.elmo_embeddings_2 = nn.Embedding(vocab_size, 1024)
+        self.elmo_embeddings_2.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_2']))
+
+        self.elmo_mlp_word = nn.Sequential(nn.Linear(1024, self.elmo_emb_size), nn.ReLU())
+        self.elmo_word = nn.Parameter(torch.Tensor([0.5, 0.5, 0.5]))
+        self.elmo_gamma_word = nn.Parameter(torch.ones(1))
 
 
         self.elmo_emb_size = 100
@@ -117,7 +132,7 @@ class BiLSTMTagger(nn.Module):
 
 
         self.num_layers = 4
-        self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + self.elmo_emb_size + 2* self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + self.elmo_emb_size * 2 + 2 * self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
@@ -240,9 +255,20 @@ class BiLSTMTagger(nn.Module):
         embeds_SRL = embeds_SRL.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
 
+        elmo_embedding_0 = self.elmo_embeddings_0(sentence).view(self.batch_size, len(sentence[0]), 1024)
+        elmo_embedding_1 = self.elmo_embeddings_1(sentence).view(self.batch_size, len(sentence[0]), 1024)
+        elmo_embedding_2 = self.elmo_embeddings_2(sentence).view(self.batch_size, len(sentence[0]), 1024)
+        w = F.softmax(self.elmo_w, dim=0)
+        elmo_emb = self.elmo_gamma * (w[0] * elmo_embedding_0 + w[1] * elmo_embedding_1 + w[2] * elmo_embedding_2)
+        elmo_emb_word = self.elmo_mlp_word(elmo_emb)
+
+
         SRL_hidden_states = torch.cat((embeds_SRL,  fixed_embeds, sent_pred_lemmas_embeds, pos_embeds, region_marks,
-                                       h1, h2, SRL_composer), 2)
+                                       h1, h2, SRL_composer, elmo_emb_word), 2)
         SRL_hidden_states = self.SRL_input_dropout(SRL_hidden_states)
+
+
+
 
         # SRL layer
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(SRL_hidden_states, lengths)
