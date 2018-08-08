@@ -259,7 +259,7 @@ class BiLSTMTagger(nn.Module):
         elmo_embedding_0 = self.elmo_embeddings_0(sentence).view(self.batch_size, len(sentence[0]), 1024)
         elmo_embedding_1 = self.elmo_embeddings_1(sentence).view(self.batch_size, len(sentence[0]), 1024)
         elmo_embedding_2 = self.elmo_embeddings_2(sentence).view(self.batch_size, len(sentence[0]), 1024)
-        w = F.softmax(self.elmo_w, dim=0)
+        w = F.softmax(self.elmo_word, dim=0)
         elmo_emb = self.elmo_gamma * (w[0] * elmo_embedding_0 + w[1] * elmo_embedding_1 + w[2] * elmo_embedding_2)
         elmo_emb_word = self.elmo_mlp_word(elmo_emb)
 
