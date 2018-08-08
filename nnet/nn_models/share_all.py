@@ -350,7 +350,7 @@ class BiLSTMTagger(nn.Module):
         DEPloss_spe = loss_function(dep_tag_space_spe, specific_dep_relations.view(-1))
 
 
-        loss = SRLloss + DEPloss + DEPloss_spe
+        loss = SRLloss + 0.5* DEPloss + 0.5*DEPloss_spe
         return SRLloss, DEPloss, DEPloss_spe, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums, all_l_nums,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
