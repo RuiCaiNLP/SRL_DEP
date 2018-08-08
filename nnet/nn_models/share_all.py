@@ -223,7 +223,7 @@ class BiLSTMTagger(nn.Module):
         TagProbs_use = F.softmax(dep_tag_space_spe_use, dim=1).view(self.batch_size, len(sentence[0]), -1)
         # construct SRL input
         TagProbs_noGrad = TagProbs_use.detach()
-        h2 = F.relu(self.tag2hidden(TagProbs_noGrad))
+        h2 = F.relu(self.tag2hidden_spe(TagProbs_noGrad))
 
         h_layer_0 = hidden_states_0  # .detach()
         h_layer_1 = hidden_states_1  # .detach()
