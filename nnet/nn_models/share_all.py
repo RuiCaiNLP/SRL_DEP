@@ -212,7 +212,7 @@ class BiLSTMTagger(nn.Module):
         TagProbs_use = F.softmax(dep_tag_space_use, dim=1).view(self.batch_size, len(sentence[0]), -1)
         # construct SRL input
         TagProbs_noGrad = TagProbs_use.detach()
-        h1 = F.relu(self.tag2hidden(TagProbs_noGrad))
+        h1 = F.tanh(self.tag2hidden(TagProbs_noGrad))
         #####################################################
 
         Label_features = hidden_states_1
@@ -223,7 +223,7 @@ class BiLSTMTagger(nn.Module):
         TagProbs_use = F.softmax(dep_tag_space_spe_use, dim=1).view(self.batch_size, len(sentence[0]), -1)
         # construct SRL input
         TagProbs_noGrad = TagProbs_use.detach()
-        h2 = F.relu(self.tag2hidden_spe(TagProbs_noGrad))
+        h2 = F.tanh(self.tag2hidden_spe(TagProbs_noGrad))
 
         h_layer_0 = hidden_states_0  # .detach()
         h_layer_1 = hidden_states_1  # .detach()
@@ -350,7 +350,7 @@ class BiLSTMTagger(nn.Module):
         DEPloss_spe = loss_function(dep_tag_space_spe, specific_dep_relations.view(-1))
 
 
-        loss = SRLloss + 0.5* DEPloss + 0.5*DEPloss_spe
+        loss = SRLloss + DEPloss + DEPloss_spe
         return SRLloss, DEPloss, DEPloss_spe, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums, all_l_nums,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
