@@ -145,11 +145,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             idx += 1
-            #if e < 20 and False:
-            if idx < 1000 and False:
-                DEPloss.backward()
-            else:
-                loss.backward()
+            Final_loss = SRLloss + 0.5/(1 + 0.3 *(e-1)) * (DEPloss + SPEDEPloss)
+            Final_loss.backward()
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)
             #clip_grad_value_(parameters=model.parameters(), clip_value=3)

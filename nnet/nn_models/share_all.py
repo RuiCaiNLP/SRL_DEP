@@ -87,7 +87,7 @@ class BiLSTMTagger(nn.Module):
         self.elmo_gamma = nn.Parameter(torch.ones(1))
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
-        self.DEP_input_dropout = nn.Dropout(p=0.5)
+        self.DEP_input_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
@@ -117,7 +117,7 @@ class BiLSTMTagger(nn.Module):
 
 
         self.num_layers = 4
-        self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + 100 + 2* self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + self.elmo_emb_size + 2* self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
@@ -350,7 +350,7 @@ class BiLSTMTagger(nn.Module):
         DEPloss_spe = loss_function(dep_tag_space_spe, specific_dep_relations.view(-1))
 
 
-        loss = SRLloss + DEPloss + DEPloss_spe
+        loss = SRLloss + 0.5 *DEPloss + 0.5  * DEPloss_spe
         return SRLloss, DEPloss, DEPloss_spe, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums, all_l_nums,  \
                right_noNull_predict, noNull_predict, noNUll_truth,\
                right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
