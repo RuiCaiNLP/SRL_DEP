@@ -131,7 +131,7 @@ class BiLSTMTagger(nn.Module):
 
 
         self.num_layers = 4
-        self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + self.elmo_emb_size * 2 + 2 * self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + self.elmo_emb_size * 1 + 2 * self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
@@ -174,12 +174,13 @@ class BiLSTMTagger(nn.Module):
                 local_roles_voc, frames, local_roles_mask,
                 sent_pred_lemmas_idx,  dep_tags,  dep_heads, targets, specific_dep_tags, specific_dep_relations, test=False):
 
+        """
         elmo_embedding_0 = self.elmo_embeddings_0(sentence).view(self.batch_size, len(sentence[0]), 1024)
         elmo_embedding_1 = self.elmo_embeddings_1(sentence).view(self.batch_size, len(sentence[0]), 1024)
         w = F.softmax(self.elmo_word, dim=0)
         elmo_emb = self.elmo_gamma_word * (w[0] * elmo_embedding_0 + w[1] * elmo_embedding_1)
         elmo_emb_word = self.elmo_mlp_word(elmo_emb)
-
+        """
         #contruct input for DEP
         embeds_DEP = self.word_embeddings_DEP(sentence)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
@@ -267,7 +268,7 @@ class BiLSTMTagger(nn.Module):
 
 
         SRL_hidden_states = torch.cat((embeds_SRL,  fixed_embeds, sent_pred_lemmas_embeds, pos_embeds, region_marks,
-                                       h1, h2, SRL_composer, elmo_emb_word), 2)
+                                       h1, h2, SRL_composer), 2)
         SRL_hidden_states = self.SRL_input_dropout(SRL_hidden_states)
 
 
