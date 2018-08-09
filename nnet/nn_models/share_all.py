@@ -88,12 +88,10 @@ class BiLSTMTagger(nn.Module):
         self.elmo_embeddings_1 = nn.Embedding(vocab_size, 1024)
         self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
 
-        self.elmo_embeddings_2 = nn.Embedding(vocab_size, 1024)
-        self.elmo_embeddings_2.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_2']))
 
         self.elmo_emb_size = 100
         self.elmo_mlp_word = nn.Sequential(nn.Linear(1024, self.elmo_emb_size), nn.ReLU())
-        self.elmo_word = nn.Parameter(torch.Tensor([0.5, 0.5, 0.5]))
+        self.elmo_word = nn.Parameter(torch.Tensor([0.5, 0.5]))
         self.elmo_gamma_word = nn.Parameter(torch.ones(1))
 
 
@@ -258,9 +256,8 @@ class BiLSTMTagger(nn.Module):
 
         elmo_embedding_0 = self.elmo_embeddings_0(sentence).view(self.batch_size, len(sentence[0]), 1024)
         elmo_embedding_1 = self.elmo_embeddings_1(sentence).view(self.batch_size, len(sentence[0]), 1024)
-        elmo_embedding_2 = self.elmo_embeddings_2(sentence).view(self.batch_size, len(sentence[0]), 1024)
         w = F.softmax(self.elmo_word, dim=0)
-        elmo_emb = self.elmo_gamma_word * (w[0] * elmo_embedding_0 + w[1] * elmo_embedding_1 + w[2] * elmo_embedding_2)
+        elmo_emb = self.elmo_gamma_word * (w[0] * elmo_embedding_0 + w[1] * elmo_embedding_1)
         elmo_emb_word = self.elmo_mlp_word(elmo_emb)
 
 

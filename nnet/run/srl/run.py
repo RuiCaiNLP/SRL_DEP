@@ -246,7 +246,6 @@ class SRLRunner(Runner):
         hps['word_embeddings'] = parse_word_embeddings(self.a.word_embeddings)
         hps['elmo_embeddings_0'] = parse_word_embeddings(self.a.elmo_embeddings_0)
         hps['elmo_embeddings_1'] = parse_word_embeddings(self.a.elmo_embeddings_1)
-        hps['elmo_embeddings_2'] = parse_word_embeddings(self.a.elmo_embeddings_2)
         hps['in_arcs'] = True
         hps['out_arcs'] = True
         torch.manual_seed(1)
