@@ -112,7 +112,7 @@ class BiLSTMTagger(nn.Module):
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
         self.num_layers = 1
-        self.BiLSTM_0 = nn.LSTM(input_size=sent_embedding_dim_DEP + self.elmo_emb_size, hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_0 = nn.LSTM(input_size=sent_embedding_dim_DEP , hidden_size=lstm_hidden_dim, batch_first=True,
                               bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_0.all_weights[0][0])
@@ -189,7 +189,7 @@ class BiLSTMTagger(nn.Module):
         fixed_embeds_DEP = self.word_fixed_embeddings(p_sentence)
         fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
-        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds_DEP, pos_embeds, elmo_emb_word, region_marks), 2)
+        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds_DEP, pos_embeds, region_marks), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
 
 
@@ -227,6 +227,11 @@ class BiLSTMTagger(nn.Module):
             len(sentence[0]) * self.batch_size, -1)
         dep_tag_space_use = self.MLP(F.tanh(self.hidden2tag(Label_features))).view(
             len(sentence[0]) * self.batch_size, -1)
+
+        log('no dropout:')
+        log(dep_tag_space)
+        log('no dropout:')
+        log(dep_tag_space_use)
         TagProbs_use = F.softmax(dep_tag_space_use, dim=1).view(self.batch_size, len(sentence[0]), -1)
         # construct SRL input
         TagProbs_noGrad = TagProbs_use.detach()
