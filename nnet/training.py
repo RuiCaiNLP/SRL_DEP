@@ -42,7 +42,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     for e in range(epochs):
         tic = time.time()
         dataset = [batch for batch in train_set.batches()]
-        init_dataset = copy.deepcopy(dataset)
+        init_dataset = [batch for batch in dataset]
         random.shuffle(dataset)
         dataset_len = len(dataset)
         for batch in dataset:
