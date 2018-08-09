@@ -7,6 +7,7 @@ from torch.nn.utils import clip_grad_value_
 from torch import optim
 import time
 import random
+import copy
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -41,11 +42,12 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     for e in range(epochs):
         tic = time.time()
         dataset = [batch for batch in train_set.batches()]
+        init_dataset = copy.deepcopy(dataset)
         random.shuffle(dataset)
         dataset_len = len(dataset)
         for batch in dataset:
 
-            batch_idx = dataset.index(batch)
+            batch_idx = init_dataset.index(batch)
             sample_count += len(batch)
 
             model.zero_grad()
