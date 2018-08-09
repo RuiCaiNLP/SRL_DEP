@@ -261,14 +261,9 @@ class BiLSTMTagger(nn.Module):
         embeds_SRL = embeds_SRL.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
 
-
-
-
         SRL_hidden_states = torch.cat((embeds_SRL,  fixed_embeds, sent_pred_lemmas_embeds, pos_embeds, region_marks,
                                        h1, h2, SRL_composer), 2)
         SRL_hidden_states = self.SRL_input_dropout(SRL_hidden_states)
-
-
 
 
         # SRL layer
