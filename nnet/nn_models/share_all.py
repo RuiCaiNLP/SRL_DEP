@@ -229,10 +229,7 @@ class BiLSTMTagger(nn.Module):
         dep_tag_space_use = self.MLP(F.tanh(self.hidden2tag(Label_features))).view(
             len(sentence[0]) * self.batch_size, -1)
 
-        log('dropout:')
-        log(dep_tag_space)
-        log('no dropout:')
-        log(dep_tag_space_use)
+
         TagProbs_use = F.softmax(dep_tag_space_use, dim=1).view(self.batch_size, len(sentence[0]), -1)
         # construct SRL input
         TagProbs_noGrad = TagProbs_use.detach()
