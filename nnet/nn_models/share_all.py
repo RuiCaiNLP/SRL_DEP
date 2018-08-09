@@ -82,11 +82,11 @@ class BiLSTMTagger(nn.Module):
         self.MLP_spe = nn.Linear(2 * lstm_hidden_dim, 4)
         self.tag2hidden_spe = nn.Linear(4, self.pos_size)
 
-        self.elmo_embeddings_0 = nn.Embedding(vocab_size, 1024)
-        self.elmo_embeddings_0.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_0']))
+        #self.elmo_embeddings_0 = nn.Embedding(vocab_size, 1024)
+        #self.elmo_embeddings_0.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_0']))
 
-        self.elmo_embeddings_1 = nn.Embedding(vocab_size, 1024)
-        self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
+        #self.elmo_embeddings_1 = nn.Embedding(vocab_size, 1024)
+        #self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
 
 
         self.elmo_emb_size = 100
@@ -228,7 +228,7 @@ class BiLSTMTagger(nn.Module):
         dep_tag_space_use = self.MLP(F.tanh(self.hidden2tag(Label_features))).view(
             len(sentence[0]) * self.batch_size, -1)
 
-        log('no dropout:')
+        log('dropout:')
         log(dep_tag_space)
         log('no dropout:')
         log(dep_tag_space_use)
