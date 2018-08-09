@@ -40,24 +40,12 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     random.seed(1234)
     for e in range(epochs):
         tic = time.time()
-
-
-
         dataset = [batch for batch in train_set.batches()]
         random.shuffle(dataset)
+        dataset_len = len(dataset)
         for batch in dataset:
-            if idx == 1001 and False:
-                for weight_i, best_weight_i in zip(model.BiLSTM_0.parameters(), Best_BiLSTM_0_data):
-                    weight_i.data.copy_(best_weight_i)
-                for weight_i, best_weight_i in zip(model.BiLSTM_1.parameters(), Best_BiLSTM_1_data):
-                    weight_i.data.copy_(best_weight_i)
-                model.word_embeddings_DEP.weight.data.copy_(best_word_embeddings_DEP)
-                model.pos_embeddings_DEP.weight.data.copy_(best_pos_embeddings_DEP)
-                model.word_fixed_embeddings_DEP.weight.data.copy_(best_word_fixed_embeddings_DEP)
-                model.hidden2tag.weight.data.copy_(best_hidden2tag)
-                model.MLP.weight.data.copy_(best_MLP)
-                log('best params equiped')
-            torch.cuda.empty_cache()
+
+            batch_idx = dataset.index(batch)
             sample_count += len(batch)
 
             model.zero_grad()
@@ -146,7 +134,10 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             idx += 1
             #Final_loss = SRLloss + 0.5/(1 + 0.3 *(e-1)) * (DEPloss + SPEDEPloss)
-            Final_loss = SRLloss + 0.5 * (DEPloss + SPEDEPloss)
+            if idx < dataset_len * 0.1:
+                Final_loss = SRLloss + 0.5 * (DEPloss + SPEDEPloss)
+            else:
+                Final_loss = SRLloss
             Final_loss.backward()
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)

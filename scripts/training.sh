@@ -5,7 +5,7 @@ python -mnnet.run.srl.run \
 --train conll2009_batch.train.dep_l \
 --test conll2009_batch.dev.dep_l \
 --data_partition dev \
---batch 1 \
+--batch 30 \
 --freq-voc freq.voc_unk.conll2009 \
 --word-voc words.voc.conll2009 \
 --p-word-voc p.words.voc_sskip.conll2009 \
@@ -17,7 +17,7 @@ python -mnnet.run.srl.run \
 --word-embeddings word_embeddings_proper.sskip.conll2009.txt \
 --elmo-embeddings-0 elmo_embeddings_1 \
 --elmo-embeddings-1 elmo_embeddings_2 \
---dbg-print-rate 5 \
+--dbg-print-rate 500 \
 --eval-dir ./data/ \
 --epochs 20 \
 --out conll2009_rm0_pl_a.25_sskip_h512_d.0_l4 \
