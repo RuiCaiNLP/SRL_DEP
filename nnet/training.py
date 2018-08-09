@@ -136,10 +136,10 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             idx += 1
             #Final_loss = SRLloss + 0.5/(1 + 0.3 *(e-1)) * (DEPloss + SPEDEPloss)
-            if batch_idx < dataset_len * 0.9:
-                Final_loss = SRLloss + 0.5 * (DEPloss + SPEDEPloss)
-            else:
-                Final_loss = SRLloss
+            #if batch_idx < dataset_len * 0.9:
+            Final_loss = SRLloss + 0.5 * (DEPloss + SPEDEPloss)
+            #else:
+            #    Final_loss = SRLloss
             Final_loss.backward()
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)
