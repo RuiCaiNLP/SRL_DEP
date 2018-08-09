@@ -136,7 +136,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             idx += 1
             #Final_loss = SRLloss + 0.5/(1 + 0.3 *(e-1)) * (DEPloss + SPEDEPloss)
-            if batch_idx < dataset_len * 0.7:
+            if batch_idx < dataset_len * 0.8:
                 Final_loss = SRLloss + 0.5 * (DEPloss + SPEDEPloss)
             else:
                 Final_loss = SRLloss
