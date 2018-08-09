@@ -89,7 +89,7 @@ class BiLSTMTagger(nn.Module):
         #self.elmo_embeddings_1.weight.data.copy_(torch.from_numpy(hps['elmo_embeddings_1']))
 
 
-        self.elmo_emb_size = 100
+        self.elmo_emb_size = 200
         self.elmo_mlp_word = nn.Sequential(nn.Linear(1024, self.elmo_emb_size), nn.ReLU())
         self.elmo_word = nn.Parameter(torch.Tensor([0.5, 0.5]))
         self.elmo_gamma_word = nn.Parameter(torch.ones(1))
@@ -101,7 +101,7 @@ class BiLSTMTagger(nn.Module):
         self.elmo_gamma = nn.Parameter(torch.ones(1))
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
-        self.DEP_input_dropout = nn.Dropout(p=0.5)
+        self.DEP_input_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
