@@ -139,10 +139,11 @@ def test(model, train_set, test_set, converter, params_path):
         # model.test_mode_on()
 
         model_input = converter(batch)
-        model.hidden = model.init_hidden_share()
+        model.hidden = model.init_hidden_spe()
+        # model.hidden_0 = model.init_hidden_spe()
         model.hidden_2 = model.init_hidden_spe()
         model.hidden_3 = model.init_hidden_spe()
-        model.hidden_4 = model.init_hidden_spe()
+        model.hidden_4 = model.init_hidden_share()
 
         sentence = model_input[0]
         p_sentence = model_input[1]
