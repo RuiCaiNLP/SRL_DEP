@@ -415,9 +415,9 @@ def test(model, train_set, test_set, converter, params_path):
     log("all_V")
     log(P_V, R_V, F_V)
 
-    Predicat_num = 10500
-    P = (right_NonNullPredicts + Predicat_num*0.9547) / (NonNullPredicts + Predicat_num)
-    R = (right_NonNullPredicts + Predicat_num*0.9547) / (NonNullTruths + Predicat_num)
+    Predicat_num = 1260
+    P = (right_NonNullPredicts + Predicat_num*0.8618) / (NonNullPredicts + Predicat_num)
+    R = (right_NonNullPredicts + Predicat_num*0.8618) / (NonNullTruths + Predicat_num)
     F1 = 2 * P * R / (P + R)
     log(right_NonNullPredicts)
     log(NonNullPredicts)
