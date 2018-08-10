@@ -200,11 +200,13 @@ def test(model, train_set, test_set, converter, params_path):
         specific_dep_relations = model_input[15]
         specific_dep_relations_in = Variable(torch.from_numpy(specific_dep_relations)).to(device)
 
-        SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, spe_wrong_l_nums, spe_all_l_nums \
-            = model(sentence_in, p_sentence_in, pos_tags_in, sen_lengths, target_idx_in, region_mark_in,
+        SRLloss, DEPloss, SPEDEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, spe_wrong_l_nums, spe_all_l_nums, \
+                right_noNull_predict_b, noNull_predict_b, noNUll_truth_b, \
+                right_noNull_predict_spe_b, noNull_predict_spe_b, noNUll_truth_spe_b \
+                    = model(sentence_in, p_sentence_in, pos_tags_in, sen_lengths, target_idx_in, region_mark_in,
                     local_roles_voc_in,
                     frames_in, local_roles_mask_in, sent_pred_lemmas_idx_in, dep_tags_in, dep_heads,
-                    targets, specific_dep_tags_in, specific_dep_relations_in)
+                    targets, specific_dep_tags_in, specific_dep_relations_in, True)
 
         labels = np.argmax(SRLprobs.cpu().data.numpy(), axis=1)
         labels = np.reshape(labels, sentence.shape)
