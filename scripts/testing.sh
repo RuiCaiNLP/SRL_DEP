@@ -19,9 +19,9 @@ python -mnnet.run.srl.run \
 --eval-dir ./data/ \
 --epochs 10 \
 --out conll2009_rm0_pl_a.25_sskip_h512_d.0_l4 \
---params-path model_baseline.pkl \
+--params-path T35_512.pkl \
 --test-mode True \
---hps "{'id': 1, 'sent_edim': 100, 'sent_hdim': 128, \
+--hps "{'id': 1, 'sent_edim': 100, 'sent_hdim': 512, \
 'frame_edim': 128, 'role_edim': 128, 'pos_edim': 16, 'rec_layers': 1, 'gc_layers': 0, \
 'pos': True, 'rm':0, 'alpha': 0.25, \
 'p_lemmas':True}"
