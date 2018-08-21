@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 cd ..
 python -mnnet.run.srl.run \
 --train conll2009_batch.train.dep_l \
