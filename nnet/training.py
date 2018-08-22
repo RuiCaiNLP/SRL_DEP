@@ -336,6 +336,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                     Dep_P[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Predict[i] + 0.0001)
                     Dep_R[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Truth[i] + 0.0001)
                     Dep_F[i] = 2 * Dep_P[i] * Dep_R[i] / (Dep_P[i] + Dep_R[i] + 0.0001)
+                    log(i)
+                    log('___________')
                     if int(Dep_NoNull_Truth[i]) > 0:
                         log(str(int(Dep_NoNull_Truth[i])) + '\t' + str(Dep_P[i]) + '\t' + str(Dep_R[i]) + '\t' + str(Dep_F[i]))
                 Predicat_num = 6300
