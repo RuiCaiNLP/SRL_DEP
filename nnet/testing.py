@@ -16,7 +16,7 @@ class NullTester(object):
     def run(self, *args, **kwargs):
         pass
 
-sigf_file = open('SRLonly_output', 'w')
+
 
 
 def make_local_voc(labels):
@@ -91,6 +91,7 @@ def syntax_analyse(tree, predicate_index):
 
 
 def test(model, train_set, test_set, converter, params_path):
+    sigf_file = open('SRLonly_output', 'w')
     log("start just test...")
     losses, errors, errors_w, NonNullPredicts, right_NonNullPredicts, NonNullTruths = 0., 0, 0., 0., 0., 0.
     log('now fucking batch computing')
