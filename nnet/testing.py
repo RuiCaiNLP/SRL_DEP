@@ -16,6 +16,7 @@ class NullTester(object):
     def run(self, *args, **kwargs):
         pass
 
+sigf_file = open('Ours_output', 'wr')
 
 
 def make_local_voc(labels):
@@ -357,6 +358,7 @@ def test(model, train_set, test_set, converter, params_path):
             #result_file.write(format % tuple(true_labels))
             #result_file.write('\n')
 
+        sigf_file.write(str(int(right_NonNullPredict)) +' '+str(int(NonNullPredict) +' '+str(int( NonNullTruths))))
         NonNullPredicts += NonNullPredict
         right_NonNullPredicts += right_NonNullPredict
         NonNullTruths += NonNullTruth
