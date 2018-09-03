@@ -16,7 +16,7 @@ class NullTester(object):
     def run(self, *args, **kwargs):
         pass
 
-sigf_file = open('Ours_output', 'wr')
+sigf_file = open('SRLonly_output', 'wr')
 
 
 def make_local_voc(labels):
