@@ -3,6 +3,7 @@ from nnet.ml.voc import *
 from functools import partial
 from nnet.nn_models.share_all import BiLSTMTagger
 
+
 def make_local_voc(labels):
     return {i: label for i, label in enumerate(labels)}
 
