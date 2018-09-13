@@ -39,8 +39,9 @@ class BiLSTMTagger(nn.Module):
         sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim'] + 1
         sent_embedding_dim_SRL = 3 * hps['sent_edim'] + 1 * hps['pos_edim'] + 1
         ## for the region mark
-        role_embedding_dim = hps['role_edim']
-        frame_embedding_dim = role_embedding_dim
+        self.role_embedding_dim = hps['role_edim']
+        role_embedding_dim = self.role_embedding_dim
+        frame_embedding_dim = self.role_embedding_dim
         vocab_size = hps['vword']
 
         self.tagset_size = hps['vbio']
@@ -303,7 +304,8 @@ class BiLSTMTagger(nn.Module):
         ## term 1
 
         ## (B* roles * h_r) * (h_r * h * h) = B * roles * h * h
-        W_R = torch.Tensor.dot(role_embeds , self.W_R)
+        W_R = torch.Tensor.mm(role_embeds.view(-1, self.role_embedding_dim) , self.W_R.view(self.role_embedding_dim, -1))
+        W_R = W_R.view(self.batch_size, -1, predicate_embeds.size()[2],  predicate_embeds.size()[2])
         # B * h * roles  * h
         W_R = W_R.permute(0, 2, 1, 3)
         # B * h * (role * h)
