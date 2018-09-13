@@ -345,7 +345,7 @@ class BiLSTMTagger(nn.Module):
         tag_space += sub
         # b, T, roles
         tag_space = torch.transpose(tag_space, 0, 1)
-        tag_space = tag_space.view(len(sentence[0])*self.batch_size, -1)
+        tag_space = tag_space.contiguous().view(len(sentence[0])*self.batch_size, -1)
 
         SRLprobs = F.softmax(tag_space, dim=1)
 
