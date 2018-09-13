@@ -333,7 +333,7 @@ class BiLSTMTagger(nn.Module):
         # term 3
         bias = self.bias_roles_embeddings(local_roles_voc).view(self.batch_size, -1)
 
-        tag_space = (term2.permute(1,0,2) + bias).permute(1, 0, 2)
+        tag_space = (term2.transpose(0,1) + bias).tranpose(0,1)
 
         # b, roles
         #sub = torch.div(torch.add(local_roles_mask, -1.0), _BIG_NUMBER)
