@@ -303,7 +303,7 @@ class BiLSTMTagger(nn.Module):
         ## term 1
 
         ## (B* roles * h_r) * (h_r * h * h) = B * roles * h * h
-        W_R = role_embeds * self.W_R
+        W_R = tensor.dot(role_embeds , self.W_R)
         # B * h * roles  * h
         W_R = W_R.permute(0, 2, 1, 3)
         # B * h * (role * h)
