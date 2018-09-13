@@ -331,7 +331,7 @@ class BiLSTMTagger(nn.Module):
 
 
         # term 3
-        bias = self.bias_roles_embeddings(local_roles_voc).view(self.batch_size, len(sentence[0]), -1)
+        bias = self.bias_roles_embeddings(local_roles_voc).view(self.batch_size, -1)
 
         tag_space = term2 + bias
 
