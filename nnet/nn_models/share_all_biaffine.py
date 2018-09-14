@@ -314,7 +314,7 @@ class BiLSTMTagger(nn.Module):
         # B * h * roles  * h
         W_R = W_R.permute(0, 2, 1, 3)
         # B * h * (role * h)
-        W_R = W_R.view(W_R.size()[0], W_R.size()[1], -1)
+        W_R = W_R.contiguous().view(W_R.size()[0], W_R.size()[1], -1)
 
         ## (B * T * h) * (B * h * roles * h) = B * T * (roles*h)
         part1 = hidden_states_argumenet.bmm(W_R)
