@@ -325,6 +325,8 @@ class BiLSTMTagger(nn.Module):
         ## TB * h * 1
         part1 = part1.view(part1.size()[0] * part1.size()[1], part1.size()[2], part1.size()[3])
         predicate_embeds = predicate_embeds.view(predicate_embeds.size()[0] * predicate_embeds.size()[1], predicate_embeds.size()[2], 1)
+        log(part1.size())
+        log(predicate_embeds.size())
         term1 = torch.bmm(part1, predicate_embeds).view(self.batch_size, len(sentence[0]), -1)
 
         log(term1.size())
