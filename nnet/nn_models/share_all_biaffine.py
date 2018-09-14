@@ -102,7 +102,11 @@ class BiLSTMTagger(nn.Module):
         self.elmo_w = nn.Parameter(torch.Tensor([0.5, 0.5]))
         self.elmo_gamma = nn.Parameter(torch.ones(1))
 
-        self.W_R = nn.Parameter(torch.rand(role_embedding_dim * 2, 2 * lstm_hidden_dim, 2 * lstm_hidden_dim))
+        self.argument_size = 300
+        self.argument_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.ReLU())
+        self.predicate_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.ReLU())
+
+        self.W_R = nn.Parameter(torch.rand(role_embedding_dim * 2, self.argument_size, self.argument_size))
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
         self.DEP_input_dropout = nn.Dropout(p=0.3)
@@ -145,7 +149,7 @@ class BiLSTMTagger(nn.Module):
 
 
         # non-linear map to role embedding
-        self.role_map = nn.Linear(in_features=role_embedding_dim * 2, out_features=self.hidden_dim * 4)
+        self.role_map = nn.Linear(in_features=role_embedding_dim * 2, out_features=self.argument_size * 2)
 
         # Init hidden state
         self.hidden = self.init_hidden_spe()
@@ -290,7 +294,8 @@ class BiLSTMTagger(nn.Module):
         added_embeds = torch.zeros(hidden_states_argumenet.size()[1], hidden_states_argumenet.size()[0], hidden_states_argumenet.size()[2]).to(device)
         predicate_embeds = added_embeds + predicate_embeds
         # B * T * H
-        predicate_embeds = predicate_embeds.transpose(0, 1)
+        hidden_states_argumenet = self.argument_map(hidden_states_argumenet)
+        predicate_embeds = self.predicate_map(predicate_embeds.transpose(0, 1))
         hidden_states = torch.cat((hidden_states_argumenet, predicate_embeds), 2)
 
 
@@ -305,7 +310,7 @@ class BiLSTMTagger(nn.Module):
 
         ## (B* roles * h_r) * (h_r * h * h) = B * roles * h * h
         W_R = torch.Tensor.mm(role_embeds.view(-1, self.role_embedding_dim) , self.W_R.view(self.role_embedding_dim, -1))
-        W_R = W_R.view(self.batch_size, -1, predicate_embeds.size()[2],  predicate_embeds.size()[2])
+        W_R = W_R.view(self.batch_size, -1, self.argument_size,  self.argument_size)
         # B * h * roles  * h
         W_R = W_R.permute(0, 2, 1, 3)
         # B * h * (role * h)
