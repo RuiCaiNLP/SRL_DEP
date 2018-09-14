@@ -327,6 +327,7 @@ class BiLSTMTagger(nn.Module):
         predicate_embeds = predicate_embeds.view(predicate_embeds.size()[0] * predicate_embeds.size()[1], predicate_embeds.size()[2], 1)
         term1 = torch.bmm(part1, predicate_embeds).view(self.batch_size, len(sentence[0]), -1)
 
+        log(term1.size())
         # term 2
         mapped_roles = F.relu(self.role_map(role_embeds))
         mapped_roles = torch.transpose(mapped_roles, 1, 2)
@@ -334,7 +335,7 @@ class BiLSTMTagger(nn.Module):
         term2 = torch.matmul(hidden_states, mapped_roles)
         #tag_space = hidden_states.mm(mapped_roles)
 
-
+        log(term2.size())
         # term 3
         bias = self.bias_roles_embeddings(local_roles_voc).view(self.batch_size, -1)
 
