@@ -309,7 +309,7 @@ class BiLSTMTagger(nn.Module):
         ## term 1
 
         ## (B* roles * h_r) * (h_r * h * h) = B * roles * h * h
-        W_R = torch.Tensor.mm(role_embeds.view(-1, self.role_embedding_dim) , self.W_R.view(self.role_embedding_dim, -1))
+        W_R = torch.Tensor.mm(role_embeds.view(-1, self.role_embedding_dim * 2) , self.W_R.view(2 * self.role_embedding_dim, -1))
         W_R = W_R.view(self.batch_size, -1, self.argument_size,  self.argument_size)
         # B * h * roles  * h
         W_R = W_R.permute(0, 2, 1, 3)
