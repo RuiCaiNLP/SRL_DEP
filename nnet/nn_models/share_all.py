@@ -384,5 +384,3 @@ class BiLSTMTagger(nn.Module):
         x_sorted = x[sidx]
         _, unsort_idx = sidx.sort()
         return x_sorted, l_sorted, unsort_idx
-
-
