@@ -301,12 +301,12 @@ class BiLSTMTagger(nn.Module):
         hidden_states_argument = hidden_states_argument.view(self.batch_size*len(sentence[0]), -1)
         hidden_states_argument = torch.cat((hidden_states_argument, torch.ones(self.batch_size*len(sentence[0]), 1).to(device)), 1)
         # *(B*T) nr*(H+1)
-        lin = torch.mm(hidden_states_argument, self.W_R)
+        lin = torch.matmul(hidden_states_argument, self.W_R)
 
         # B T*r H+1     B H+1 1  -> B  T*r  1
         lin = lin.view(self.batch_size, -1, self.argument_size+1)
         predicate_embeds = predicate_embeds.view(self.batch_size, self.argument_size+1, 1)
-        tag_space = torch.bmm(lin, predicate_embeds)
+        tag_space = torch.matmul(lin, predicate_embeds)
         tag_space = tag_space.view(len(sentence[0])*self.batch_size, self.tagset_size)
 
 
