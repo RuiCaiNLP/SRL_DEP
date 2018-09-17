@@ -106,7 +106,7 @@ class BiLSTMTagger(nn.Module):
         self.argument_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.ReLU())
         self.predicate_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.ReLU())
 
-        self.W_R = nn.Parameter(torch.rand(role_embedding_dim * 2, self.argument_size, self.argument_size))
+        self.W_R = nn.Parameter(torch.rand(self.argument_size + 1,self.tagset_size * (self.argument_size + 1)))
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
         self.DEP_input_dropout = nn.Dropout(p=0.3)
@@ -287,74 +287,28 @@ class BiLSTMTagger(nn.Module):
         hidden_states = self.hidden_state_dropout(hidden_states)
 
 
-        # B * H
-        hidden_states_argumenet = hidden_states
-        predicate_embeds = hidden_states_argumenet[np.arange(0, hidden_states_argumenet.size()[0]), target_idx_in]
-        # T * B * H
-        added_embeds = torch.zeros(hidden_states_argumenet.size()[1], hidden_states_argumenet.size()[0], hidden_states_argumenet.size()[2]).to(device)
-        predicate_embeds = added_embeds + predicate_embeds
+
+        hidden_states_argument = hidden_states
+        predicate_embeds = hidden_states_argument[np.arange(0, hidden_states_argument.size()[0]), target_idx_in]
+
         # B * T * H
-        hidden_states_argumenet = self.argument_map(hidden_states_argumenet)
-        predicate_embeds = self.predicate_map(predicate_embeds.transpose(0, 1))
-        hidden_states = torch.cat((hidden_states_argumenet, predicate_embeds), 2)
+        hidden_states_argument = self.argument_map(hidden_states_argument)
+        # B * H
+        predicate_embeds = self.predicate_map(predicate_embeds)
+        predicate_embeds = torch.cat((predicate_embeds, torch.ones(self.batch_size, 1)), 1)
 
+        # (B*T)(H+1)
+        hidden_states_argument = hidden_states_argument.view(self.batch_size*len(sentence[0]), -1)
+        hidden_states_argument = torch.cat((hidden_states_argument, torch.ones(self.batch_size*len(sentence[0]), 1)), 1)
+        # *(B*T) nr*(H+1)
+        lin = torch.mm(self.W_R, hidden_states_argument)
 
-        ## B * roles * h
-        ## obtain role+frame embeds
-        role_embeds = self.role_embeddings(local_roles_voc)
-        frame_embeds = self.frame_embeddings(frames)
-        role_embeds = torch.cat((role_embeds, frame_embeds), 2)
+        # B T*r H+1     B H+1 1  -> B  T*r  1
+        lin = lin.view(self.batch_size, -1, self.argument_size+1)
+        predicate_embeds = predicate_embeds.view(self.batch_size, self.argument_size+1, 1)
+        tag_space = torch.bmm(lin, predicate_embeds)
+        tag_space = tag_space.view(len(sentence[0])*self.batch_size, self.tagset_size)
 
-
-
-        """
-        ## term 1
-
-        ## (B* roles * h_r) * (h_r * h * h) = B * roles * h * h
-        W_R = torch.Tensor.mm(role_embeds.view(-1, self.role_embedding_dim * 2) , self.W_R.view(2 * self.role_embedding_dim, -1))
-        W_R = W_R.view(self.batch_size, -1, self.argument_size,  self.argument_size)
-        # B * h * roles  * h
-        W_R = W_R.permute(0, 2, 1, 3)
-        # B * h * (role * h)
-        W_R = W_R.contiguous().view(W_R.size()[0], W_R.size()[1], -1)
-
-        ## (B * T * h) * (B * h * roles * h) = B * T * (roles*h)
-        part1 = hidden_states_argumenet.bmm(W_R)
-        ## B*T*role*h
-        part1 = part1.view(self.batch_size, len(sentence[0]), -1, hidden_states_argumenet.size()[2])
-        ## (B * T* role * h) * (B * T * h )
-        ## TB * role * h
-        ## TB * h * 1
-        part1 = part1.view(part1.size()[0] * part1.size()[1], part1.size()[2], part1.size()[3])
-        predicate_embeds = predicate_embeds.view(predicate_embeds.size()[0] * predicate_embeds.size()[1], predicate_embeds.size()[2], 1)
-
-        term1 = torch.bmm(part1, predicate_embeds).view(self.batch_size, len(sentence[0]), -1)
-        """
-
-        # term 2
-        mapped_roles = F.relu(self.role_map(role_embeds))
-        mapped_roles = torch.transpose(mapped_roles, 1, 2)
-        # b, times, roles
-        term2 = torch.matmul(hidden_states, mapped_roles)
-        #tag_space = hidden_states.mm(mapped_roles)
-
-
-        # term 3
-        bias = self.bias_roles_embeddings(local_roles_voc).view(self.batch_size, -1)
-
-        tag_space = torch.transpose(term2, 0, 1) + bias
-        tag_space = torch.transpose(tag_space, 0, 1)
-
-        # b, roles
-        #sub = torch.div(torch.add(local_roles_mask, -1.0), _BIG_NUMBER)
-        sub = torch.add(local_roles_mask, -1.0) * _BIG_NUMBER
-        sub = torch.FloatTensor(sub.cpu().numpy()).to(device)
-        # b, roles, times
-        tag_space = torch.transpose(tag_space, 0, 1)
-        tag_space += sub
-        # b, T, roles
-        tag_space = torch.transpose(tag_space, 0, 1)
-        tag_space = tag_space.contiguous().view(len(sentence[0])*self.batch_size, -1)
 
         SRLprobs = F.softmax(tag_space, dim=1)
 
