@@ -295,11 +295,11 @@ class BiLSTMTagger(nn.Module):
         hidden_states_argument = self.argument_map(hidden_states_argument)
         # B * H
         predicate_embeds = self.predicate_map(predicate_embeds)
-        predicate_embeds = torch.cat((predicate_embeds, torch.ones(self.batch_size, 1).to(device)), 1)
+        predicate_embeds = torch.cat((predicate_embeds, torch.ones(self.batch_size, 1, requires_grad=True).to(device)), 1)
 
         # (B*T)(H+1)
         hidden_states_argument = hidden_states_argument.view(self.batch_size*len(sentence[0]), -1)
-        hidden_states_argument = torch.cat((hidden_states_argument, torch.ones(self.batch_size*len(sentence[0]), 1).to(device)), 1)
+        hidden_states_argument = torch.cat((hidden_states_argument, torch.ones(self.batch_size*len(sentence[0]), 1, requires_grad=True).to(device)), 1)
         # *(B*T) nr*(H+1)
         lin = torch.matmul(hidden_states_argument, self.W_R)
 
