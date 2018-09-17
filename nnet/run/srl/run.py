@@ -1,7 +1,7 @@
 from nnet.run.runner import *
 from nnet.ml.voc import *
 from functools import partial
-from nnet.nn_models.share_all_biaffine import BiLSTMTagger
+from nnet.nn_models.share_all_DBA import BiLSTMTagger
 
 
 def make_local_voc(labels):
