@@ -313,10 +313,9 @@ class BiLSTMTagger(nn.Module):
         #lin = lin.view(self.batch_size, -1, self.argument_size+1)
         #predicate_embeds = predicate_embeds.view(self.batch_size, self.argument_size+1, 1)
         #tag_space = torch.matmul(lin, predicate_embeds)
-        #tag_space = tag_space.view(len(sentence[0])*self.batch_size, self.tagset_size)
+
         tag_space = self.W_R(hidden_states_argument, predicate_embeds)
-
-
+        tag_space = tag_space.view(len(sentence[0]) * self.batch_size, self.tagset_size)
         SRLprobs = F.softmax(tag_space, dim=1)
 
         # +++++++++++++++++++++++
