@@ -36,8 +36,8 @@ class BiLSTMTagger(nn.Module):
 
         batch_size = hps['batch_size']
         lstm_hidden_dim = hps['sent_hdim']
-        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim'] + 1
-        sent_embedding_dim_SRL = 3 * hps['sent_edim'] + 1 * hps['pos_edim'] + 1
+        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim'] + 16
+        sent_embedding_dim_SRL = 3 * hps['sent_edim'] + 1 * hps['pos_edim'] + 16
         ## for the region mark
         role_embedding_dim = hps['role_edim']
         frame_embedding_dim = role_embedding_dim
@@ -59,6 +59,7 @@ class BiLSTMTagger(nn.Module):
         self.pos_embeddings_DEP = nn.Embedding(self.pos_size, hps['pos_edim'])
         self.p_lemma_embeddings = nn.Embedding(self.frameset_size, hps['sent_edim'])
         self.dep_embeddings = nn.Embedding(self.dep_size, self.pos_size)
+        self.region_embeddings = nn.Embedding(2, 16)
         #self.lr_dep_embeddings = nn.Embedding(self.lr_dep_size, hps[])
 
 
@@ -185,7 +186,7 @@ class BiLSTMTagger(nn.Module):
         embeds_DEP = self.word_embeddings_DEP(sentence)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
-        region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
+        region_marks = self.region_embeddings(region_marks).view(self.batch_size, len(sentence[0]), 1)
         #sharing pretrained word_embeds
         fixed_embeds_DEP = self.word_fixed_embeddings(p_sentence)
         fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
