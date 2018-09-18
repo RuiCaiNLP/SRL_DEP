@@ -1,7 +1,7 @@
 from nnet.run.runner import *
 from nnet.ml.voc import *
 from functools import partial
-from nnet.nn_models.share_all import BiLSTMTagger
+from nnet.nn_models.share_all_biaffine import BiLSTMTagger
 
 
 def make_local_voc(labels):
@@ -203,7 +203,7 @@ class SRLRunner(Runner):
             frames_batch, _ = mask_batch(frames)
 
 
-            region_mark = np.zeros(sent_batch.shape, dtype='int64')
+            region_mark = np.zeros(sent_batch.shape, dtype='float32')
             hps = eval(self.a.hps)
             rm = hps['rm']
             if rm >= 0:
