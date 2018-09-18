@@ -298,6 +298,7 @@ class BiLSTMTagger(nn.Module):
         # B * H
         predicate_embeds = self.mlp_pred_dropout(self.predicate_map(predicate_embeds))
         predicate_embeds = torch.cat((predicate_embeds, torch.ones(self.batch_size, 1, requires_grad=True).to(device)), 1)
+        predicate_embeds.view(self.batch_size, 1, -1)
 
         # (B*T)(H+1)
         hidden_states_argument = hidden_states_argument.view(self.batch_size*len(sentence[0]), -1)
