@@ -201,7 +201,7 @@ class SRLRunner(Runner):
             frames_batch, _ = mask_batch(frames)
 
 
-            region_mark = np.zeros(sent_batch.shape, dtype='float32')
+            region_mark = np.zeros(sent_batch.shape, dtype='int64')
             hps = eval(self.a.hps)
             rm = hps['rm']
             if rm >= 0:
