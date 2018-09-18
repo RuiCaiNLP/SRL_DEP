@@ -292,18 +292,20 @@ class BiLSTMTagger(nn.Module):
 
         hidden_states_argument = hidden_states
         predicate_embeds = hidden_states_argument[np.arange(0, hidden_states_argument.size()[0]), target_idx_in]
-
-        # B * T * H
-        hidden_states_argument = self.mlp_argu_dropout(self.argument_map(hidden_states_argument))
-        # B * H
+        added_embeds = torch.zeros(hidden_states.size()[1], hidden_states.size()[0], hidden_states.size()[2]).to(
+            device)
+        predicate_embeds = added_embeds + predicate_embeds
+        predicate_embeds = predicate_embeds.transpose(0, 1)
         predicate_embeds = self.mlp_pred_dropout(self.predicate_map(predicate_embeds))
-        predicate_embeds = torch.cat((predicate_embeds, torch.ones(self.batch_size, 1, requires_grad=True).to(device)), 1)
-        predicate_embeds = predicate_embeds.view(self.batch_size, -1)
+        predicate_embeds = predicate_embeds.view(self.batch_size*len(sentence[0]), -1)
+        predicate_embeds = torch.cat((predicate_embeds, torch.ones(self.batch_size*len(sentence[0]), 1, requires_grad=True).to(device)), 1)
+        predicate_embeds = predicate_embeds.view(self.batch_size, len(sentence[0]), -1)
 
         # (B*T)(H+1)
+        hidden_states_argument = self.mlp_argu_dropout(self.argument_map(hidden_states_argument))
         hidden_states_argument = hidden_states_argument.view(self.batch_size*len(sentence[0]), -1)
         hidden_states_argument = torch.cat((hidden_states_argument, torch.ones(self.batch_size*len(sentence[0]), 1, requires_grad=True).to(device)), 1)
-        hidden_states_argument = hidden_states_argument.view(self.batch_size*len(sentence[0]), -1)
+        hidden_states_argument = hidden_states_argument.view(self.batch_size, len(sentence[0]), -1)
         # *(B*T) nr*(H+1)
         #lin = torch.matmul(hidden_states_argument, self.W_R)
 
