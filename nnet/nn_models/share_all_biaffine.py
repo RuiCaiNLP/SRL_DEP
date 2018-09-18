@@ -106,11 +106,13 @@ class BiLSTMTagger(nn.Module):
         self.argument_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.LeakyReLU())
         self.predicate_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.LeakyReLU())
 
-        self.W_R = nn.Parameter(torch.rand(self.argument_size + 1,self.tagset_size * (self.argument_size + 1)))
+        self.W_R = nn.Bilinear(self.argument_size+1, self.argument_size+1, self.tagset_size)
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
         self.DEP_input_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
+        self.mlp_pred_dropout = nn.Dropout(p=0)
+        self.mlp_argu_dropout = nn.Dropout(p=0)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
         #self.use_dropout = nn.Dropout(p=0.2)
@@ -292,22 +294,24 @@ class BiLSTMTagger(nn.Module):
         predicate_embeds = hidden_states_argument[np.arange(0, hidden_states_argument.size()[0]), target_idx_in]
 
         # B * T * H
-        hidden_states_argument = self.argument_map(hidden_states_argument)
+        hidden_states_argument = self.mlp_argu_dropout(self.argument_map(hidden_states_argument))
         # B * H
-        predicate_embeds = self.predicate_map(predicate_embeds)
+        predicate_embeds = self.mlp_pred_dropout(self.predicate_map(predicate_embeds))
         predicate_embeds = torch.cat((predicate_embeds, torch.ones(self.batch_size, 1, requires_grad=True).to(device)), 1)
 
         # (B*T)(H+1)
         hidden_states_argument = hidden_states_argument.view(self.batch_size*len(sentence[0]), -1)
         hidden_states_argument = torch.cat((hidden_states_argument, torch.ones(self.batch_size*len(sentence[0]), 1, requires_grad=True).to(device)), 1)
+        hidden_states_argument = hidden_states_argument.view(self.batch_size, len(sentence[0]), -1)
         # *(B*T) nr*(H+1)
-        lin = torch.matmul(hidden_states_argument, self.W_R)
+        #lin = torch.matmul(hidden_states_argument, self.W_R)
 
         # B T*r H+1     B H+1 1  -> B  T*r  1
-        lin = lin.view(self.batch_size, -1, self.argument_size+1)
-        predicate_embeds = predicate_embeds.view(self.batch_size, self.argument_size+1, 1)
-        tag_space = torch.matmul(lin, predicate_embeds)
-        tag_space = tag_space.view(len(sentence[0])*self.batch_size, self.tagset_size)
+        #lin = lin.view(self.batch_size, -1, self.argument_size+1)
+        #predicate_embeds = predicate_embeds.view(self.batch_size, self.argument_size+1, 1)
+        #tag_space = torch.matmul(lin, predicate_embeds)
+        #tag_space = tag_space.view(len(sentence[0])*self.batch_size, self.tagset_size)
+        tag_space = self.W_R(hidden_states_argument, predicate_embeds)
 
 
         SRLprobs = F.softmax(tag_space, dim=1)
