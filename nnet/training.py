@@ -36,7 +36,6 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     best_hidden2tag = model.hidden2tag.weight.data.clone()
     best_MLP = model.MLP.weight.data.clone()
     """
-
     Best_DEP_score = -0.1
 
     random.seed(1234)
@@ -68,7 +67,10 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
             sentence_in = torch.from_numpy(sentence).to(device)
             p_sentence_in = torch.from_numpy(p_sentence).to(device)
-
+            #log(sentence_in)
+            #log(p_sentence_in)
+            #sentence_in.requires_grad_(False)
+            #p_sentence_in.requires_grad_(False)
 
             pos_tags = model_input[2]
             pos_tags_in = torch.from_numpy(pos_tags).to(device)
@@ -300,18 +302,18 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         noNUll_truth_spe += noNUll_truth_spe_b
 
                         for i, sent_labels in enumerate(labels):
-                            #labels_voc = batch[i][-4]
-                            #local_voc = make_local_voc(labels_voc)
+                            labels_voc = batch[i][-4]
+                            local_voc = make_local_voc(labels_voc)
                             for j in range(len(labels[i])):
-                                best = labels[i][j]
-                                true = tags[i][j]
+                                best = local_voc[labels[i][j]]
+                                true = local_voc[tags[i][j]]
 
-                                if true != 0 and true != 1:
+                                if true != '<pad>' and true != 'O':
                                     NonNullTruth += 1
                                     Dep_NoNull_Truth[dep_tags_in[i][j]] += 1
                                 if true != best:
                                     errors += 1
-                                if best != 0 and best != 1 and true != 0:
+                                if best != '<pad>' and best != 'O' and true != '<pad>':
                                     NonNullPredict += 1
                                     Dep_NoNull_Predict[dep_tags_in[i][j]] += 1
                                     if true == best:
@@ -365,6 +367,40 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 R = right_noNull_predict_spe / (noNUll_truth_spe + 0.0001)
                 F_link = 2 * P * R / (P + R + 0.0001)
                 log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F_link))
+                if F_label> Best_DEP_score and e < 20 and False:
+                    Best_DEP_score = F_label
+                    log('New Dep best:' + str(Best_DEP_score))
+                    for best_weight_i, weight_i in zip(Best_BiLSTM_0_data, model.BiLSTM_0.parameters()):
+                        best_weight_i.copy_(weight_i.data)
+                    for best_weight_i, weight_i in zip(Best_BiLSTM_1_data, model.BiLSTM_1.parameters()):
+                        best_weight_i.copy_(weight_i.data)
+                    best_word_embeddings_DEP = model.word_embeddings_DEP.weight.data.clone()
+                    best_pos_embeddings_DEP = model.pos_embeddings_DEP.weight.data.clone()
+                    best_word_fixed_embeddings_DEP = model.word_fixed_embeddings_DEP.weight.data.clone()
+                    best_hidden2tag = model.hidden2tag.weight.data.clone()
+                    best_MLP = model.MLP.weight.data.clone()
+                    log("best dep params preserved")
+
+
+
+                """
+                if F1 < Last_SRL_score and F_label+F_link < Last_DEP_score:
+                    for weight_i, last_weight_i in zip(model.BiLSTM_0.parameters(), Best_BiLSTM_0_data):
+                        weight_i.data.copy_(last_weight_i)
+                    for weight_i, last_weight_i in zip(model.BiLSTM_1.parameters(), Last_BiLSTM_1_data):
+                        weight_i.data.copy_(last_weight_i)
+                    for weight_i, last_weight_i in zip(model.BiLSTM_2.parameters(), Last_BiLSTM_2_data):
+                        weight_i.data.copy_(last_weight_i)
+                    log('backward!')
+                """
+
+
+
+                Last_SRL_score = F1
+                Last_DEP_score = F_label + F_link
+
+
+
 
 
        ##########################################################################################
