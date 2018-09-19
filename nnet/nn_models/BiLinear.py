@@ -309,7 +309,7 @@ class BiLSTMTagger(nn.Module):
         mapped_roles = F.relu(self.W_R(role_embeds))
         # B H+1 nr*H+1
         mapped_roles = torch.transpose(mapped_roles, 1, 2)
-        mapped_roles = mapped_roles.view(self.batch_size, self.argument_size+1, -1)
+        mapped_roles = mapped_roles.contiguous().view(self.batch_size, self.argument_size+1, -1)
 
         # B T nr*H+1
         lin = torch.matmul(hidden_states_argument, mapped_roles)
