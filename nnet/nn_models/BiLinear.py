@@ -314,12 +314,12 @@ class BiLSTMTagger(nn.Module):
         # B T nr*H+1
         lin = torch.matmul(hidden_states_argument, mapped_roles)
         # B T*nr H+1
-        lin = lin.view(self.batch_size, (self.argument_size+1)*self.tagset_size, self.argument_size+1)
+        lin = lin.view(self.batch_size, -1, self.argument_size+1)
         predicate_embeds = predicate_embeds.view(self.batch_size, self.argument_size+1, 1)
 
         # b, times, roles
         tag_space = torch.matmul(lin, predicate_embeds)
-        tag_space = tag_space.view(self.batch_size, len(sentence[0]), self.tagset_size)
+        tag_space = tag_space.view(self.batch_size, len(sentence[0]), -1)
 
 
 
