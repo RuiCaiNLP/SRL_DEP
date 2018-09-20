@@ -327,7 +327,7 @@ class BiLSTMTagger(nn.Module):
         #sub = torch.div(torch.add(local_roles_mask, -1.0), _BIG_NUMBER)
         sub = torch.add(local_roles_mask, -1.0) * _BIG_NUMBER
         sub = torch.FloatTensor(sub.cpu().numpy()).to(device)
-        # T B R
+        # T
         tag_space = torch.transpose(tag_space, 0, 1)
         tag_space += sub
         # b, T, roles
