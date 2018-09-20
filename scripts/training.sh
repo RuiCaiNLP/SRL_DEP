@@ -18,7 +18,7 @@ python -mnnet.run.srl.run \
 --elmo-embeddings-1 elmo_embeddings_2 \
 --dbg-print-rate 500 \
 --eval-dir ./data/ \
---epochs 20 \
+--epochs 50 \
 --out conll2009_rm0_pl_a.25_sskip_h512_d.0_l4 \
 --params-path Less_annotation_512_0.9.pkl \
 --hps "{'id': 1, 'sent_edim': 100, 'sent_hdim': 512, \
