@@ -24,7 +24,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
     #optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.002, betas=(0.9, 0.9), eps=1e-12)
     log(optimizer.param_groups['lr'])
-    optimizer.param_groups['lr'] = 0.001
+    optimizer.param_groups[0]['lr'] = 0.001
 
     """
     Best_BiLSTM_0_data = []
