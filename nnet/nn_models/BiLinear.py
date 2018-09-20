@@ -306,7 +306,7 @@ class BiLSTMTagger(nn.Module):
 
         role_embeds = torch.cat((role_embeds, frame_embeds), 2)
         # B nr H+1 H+1
-        mapped_roles = F.relu(self.W_R(role_embeds))
+        mapped_roles = F.relu(self.W_R(role_embeds)).view(self.batch_size, -1, self.argument_size+1, self.argument_size+1)
         # B H+1 nr*H+1
         mapped_roles = torch.transpose(mapped_roles, 1, 2)
         mapped_roles = mapped_roles.contiguous().view(self.batch_size, self.argument_size+1, -1)
