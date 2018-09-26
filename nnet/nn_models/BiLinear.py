@@ -102,8 +102,8 @@ class BiLSTMTagger(nn.Module):
         self.elmo_gamma = nn.Parameter(torch.ones(1))
 
         self.argument_size = 300
-        self.argument_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.LeakyReLU())
-        self.predicate_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.LeakyReLU())
+        self.argument_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.LeakyReLU(0.1))
+        self.predicate_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.LeakyReLU(0.1))
         self.W_R = nn.Linear(in_features=role_embedding_dim * 2, out_features=(self.argument_size + 1)*(self.argument_size + 1))
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
