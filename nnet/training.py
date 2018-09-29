@@ -198,6 +198,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 noNUll_truth_spe = 0
 
 
+                Dep_count_num = [0.0] * 100
                 Dep_NoNull_Truth = [0.0] * 100
                 Dep_NoNull_Predict = [0.0] * 100
                 Dep_Right_NoNull_Predict = [0.0] * 100
@@ -314,7 +315,9 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                             for j in range(len(labels[i])):
                                 best = local_voc[labels[i][j]]
                                 true = local_voc[tags[i][j]]
-
+                                
+                                if true != '<pad>':
+                                    Dep_count_num[dep_tags_in[i][j]] += 1
                                 if true != '<pad>' and true != 'O':
                                     NonNullTruth += 1
                                     Dep_NoNull_Truth[dep_tags_in[i][j]] += 1
@@ -345,8 +348,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                     Dep_P[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Predict[i] + 0.0001)
                     Dep_R[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Truth[i] + 0.0001)
                     Dep_F[i] = 2 * Dep_P[i] * Dep_R[i] / (Dep_P[i] + Dep_R[i] + 0.0001)
-                    if int(Dep_NoNull_Truth[i]) > 0:
-                        log(str(int(Dep_NoNull_Truth[i])) + '\t' + str(Dep_P[i]) + '\t' + str(Dep_R[i]) + '\t' + str(Dep_F[i]))
+                    if int(Dep_count_num[i]) > 0:
+                        log(str(int(Dep_count_num[i])) + '\t' + str(Dep_P[i]) + '\t' + str(Dep_R[i]) + '\t' + str(Dep_F[i]))
                 Predicat_num = 6300
                 P = (right_NonNullPredicts + Predicat_num) / (NonNullPredicts + Predicat_num)
                 R = (right_NonNullPredicts + Predicat_num) / (NonNullTruths + Predicat_num)
