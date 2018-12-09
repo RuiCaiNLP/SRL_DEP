@@ -237,20 +237,23 @@ class BiLSTMTagger(nn.Module):
         elmo_emb_word = self.elmo_mlp_word(elmo_emb)
         """
         #contruct input for DEP
-        embeds_DEP = self.word_embeddings_DEP(sentence)
-        embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
-        pos_embeds = self.pos_embeddings(pos_tags)
-        region_marks = self.region_embeddings(region_marks).view(self.batch_size, len(sentence[0]), 16)
+        sentence_cat = torch.cat((sentence, torch.zeros(self.batch_size, 1).to(device)), 1)
+        embeds_DEP = self.word_embeddings_DEP(sentence_cat)
+        embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0])+1, self.word_emb_dim)
+        pos_tags_cat = torch.cat((pos_tags, torch.zeros(self.batch_size, 1).to(device)), 1)
+        pos_embeds = self.pos_embeddings(pos_tags_cat)
+        region_marks_cat = torch.cat((region_marks, torch.zeros(self.batch_size, 1).to(device)), 1)
+        region_marks = self.region_embeddings(region_marks_cat).view(self.batch_size, len(sentence[0])+1, 16)
         #sharing pretrained word_embeds
-        fixed_embeds_DEP = self.word_fixed_embeddings(p_sentence)
-        fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
+        fixed_embeds_DEP = self.word_fixed_embeddings(sentence_cat)
+        fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0])+1, self.word_emb_dim)
 
         embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds_DEP, pos_embeds, region_marks), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
 
 
         #first layer
-        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds_forDEP, lengths)
+        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds_forDEP, lengths+1)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
         hidden_states, self.hidden = self.BiLSTM_0(embeds_sort, self.hidden)
@@ -261,7 +264,7 @@ class BiLSTMTagger(nn.Module):
         hidden_states_0 = hidden_states[unsort_idx]
 
         # second_layer
-        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_0, lengths)
+        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_0, lengths+1)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
         hidden_states, self.hidden_2 = self.BiLSTM_1(embeds_sort, self.hidden_2)
@@ -273,9 +276,9 @@ class BiLSTMTagger(nn.Module):
 
         ##########################################
 
-        h_2 = torch.zeros(self.batch_size, 1, 2*self.hidden_dim, requires_grad=False).to(device)
 
-        hidden_states_1_cat = torch.cat((h_2, hidden_states_1), 1)
+
+        hidden_states_1_cat = hidden_states_1
         head_states = torch.matmul(hidden_states_1_cat, self.hidLayerFOH)
         modifier_states = torch.matmul(hidden_states_1_cat, self.hidLayerFOM)
         errs = []
@@ -306,8 +309,8 @@ class BiLSTMTagger(nn.Module):
 
 
 
-        h_layer_0 = hidden_states_0  # .detach()
-        h_layer_1 = hidden_states_1  # .detach()
+        h_layer_0 = hidden_states_0[:,1:,:]  # .detach()
+        h_layer_1 = hidden_states_1[:,1:,:]  # .detach()
 
         w = F.softmax(self.elmo_w, dim=0)
         SRL_composer = self.elmo_gamma * (w[0] * h_layer_0 + w[1] * h_layer_1)
