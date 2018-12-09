@@ -378,9 +378,9 @@ class BiLSTMTagger(nn.Module):
         DEPloss = torch.sum(torch.tensor(errs).to(device))
         loss = SRLloss
 
-        return SRLloss, DEPloss, DEPloss, loss, SRLprobs, wrong_l_nums, all_l_nums, wrong_l_nums, all_l_nums,  \
-               right_noNull_predict, noNull_predict, noNUll_truth,\
-               right_noNull_predict_spe, noNull_predict_spe, noNUll_truth_spe
+        return SRLloss, DEPloss, DEPloss, loss, SRLprobs, 1, 1, 1, 1,  \
+               1, 1, 1,\
+               1, 1, 1
 
     @staticmethod
     def sort_batch(x, l):
