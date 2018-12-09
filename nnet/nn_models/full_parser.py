@@ -307,98 +307,11 @@ class BiLSTMTagger(nn.Module):
 
 
 
-
-
-        h_layer_0 = hidden_states_0[:,1:,:]  # .detach()
-        h_layer_1 = hidden_states_1[:,1:,:]  # .detach()
-
-        w = F.softmax(self.elmo_w, dim=0)
-        SRL_composer = self.elmo_gamma * (w[0] * h_layer_0 + w[1] * h_layer_1)
-        SRL_composer = self.elmo_mlp(SRL_composer)
-
-
-        fixed_embeds = self.word_fixed_embeddings(p_sentence)
-        fixed_embeds = fixed_embeds.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
-        sent_pred_lemmas_embeds = self.p_lemma_embeddings(sent_pred_lemmas_idx)
-        embeds_SRL = self.word_embeddings_SRL(sentence)
-        embeds_SRL = embeds_SRL.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
-        pos_embeds = self.pos_embeddings(pos_tags)
-        region_marks = self.region_embeddings(region_marks).view(self.batch_size, len(sentence[0]), 16)
-
-
-        SRL_hidden_states = torch.cat((embeds_SRL,  fixed_embeds, sent_pred_lemmas_embeds, pos_embeds, region_marks, SRL_composer), 2)
-        SRL_hidden_states = self.SRL_input_dropout(SRL_hidden_states)
-
-
-        # SRL layer
-        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(SRL_hidden_states, lengths)
-        embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
-        # hidden states [time_steps * batch_size * hidden_units]
-        hidden_states, self.hidden_4 = self.BiLSTM_SRL(embeds_sort, self.hidden_4)
-        # it seems that hidden states is already batch first, we don't need swap the dims
-        # hidden_states = hidden_states.permute(1, 2, 0).contiguous().view(self.batch_size, -1, )
-        hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
-        # hidden_states = hidden_states.transpose(0, 1)
-        hidden_states = hidden_states[unsort_idx]
-        hidden_states = self.hidden_state_dropout(hidden_states)
-
-
-        # B * H
-        hidden_states_3 = hidden_states
-        predicate_embeds = hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]
-        # T * B * H
-        added_embeds = torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2]).to(device)
-        predicate_embeds = added_embeds + predicate_embeds
-        # B * T * H
-        predicate_embeds = predicate_embeds.transpose(0, 1)
-        hidden_states = torch.cat((hidden_states_3, predicate_embeds), 2)
-        # print(hidden_states)
-        # non-linear map and rectify the roles' embeddings
-        # roles = Variable(torch.from_numpy(np.arange(0, self.tagset_size)))
-
-        # B * roles
-        # log(local_roles_voc)
-        # log(frames)
-
-        # B * roles * h
-        role_embeds = self.role_embeddings(local_roles_voc)
-        frame_embeds = self.frame_embeddings(frames)
-
-        role_embeds = torch.cat((role_embeds, frame_embeds), 2)
-        mapped_roles = F.relu(self.role_map(role_embeds))
-        mapped_roles = torch.transpose(mapped_roles, 1, 2)
-
-        # b, times, roles
-        tag_space = torch.matmul(hidden_states, mapped_roles)
-        #tag_space = hidden_states.mm(mapped_roles)
-
-
-
-        # b, roles
-        #sub = torch.div(torch.add(local_roles_mask, -1.0), _BIG_NUMBER)
-        sub = torch.add(local_roles_mask, -1.0) * _BIG_NUMBER
-        sub = torch.FloatTensor(sub.cpu().numpy()).to(device)
-        # b, roles, times
-        tag_space = torch.transpose(tag_space, 0, 1)
-        tag_space += sub
-        # b, T, roles
-        tag_space = torch.transpose(tag_space, 0, 1)
-        tag_space = tag_space.view(len(sentence[0])*self.batch_size, -1)
-
-        SRLprobs = F.softmax(tag_space, dim=1)
-
-
-        targets = targets.view(-1)
-
-        loss_function = nn.CrossEntropyLoss(ignore_index=0)
-
-        SRLloss = loss_function(tag_space, targets)
-
         DEPloss = torch.sum(torch.tensor(errs).to(device))/7
-        loss = SRLloss
+        loss = DEPloss
 
         log("dep error rate:", wrong_dep_words/total_dep_words)
-        return SRLloss, DEPloss, DEPloss, loss, SRLprobs, 1, 1, 1, 1,  \
+        return DEPloss, DEPloss, DEPloss, loss, SRLprobs, 1, 1, 1, 1,  \
                1, 1, 1,\
                1, 1, 1
 
