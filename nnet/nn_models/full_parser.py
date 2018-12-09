@@ -288,8 +288,9 @@ class BiLSTMTagger(nn.Module):
             scores, exprs = self.__evaluate((head_states[i][:lengths[i]+1], modifier_states[i][:lengths[i]+1]),  True)
             gold = dep_heads[i][:lengths[i]]
             heads = decoder.parse_proj(scores)
-            log(heads)
-            log(gold)
+            if i==0:
+                log(heads)
+                log(gold)
             e = sum([1 for h, g in zip(heads[1:], gold) if h != g])
             wrong_dep_words += e
             if e > 0:
