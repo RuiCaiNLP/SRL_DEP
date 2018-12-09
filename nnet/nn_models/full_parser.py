@@ -237,7 +237,7 @@ class BiLSTMTagger(nn.Module):
         elmo_emb_word = self.elmo_mlp_word(elmo_emb)
         """
         #contruct input for DEP
-        sentence_cat = torch.cat((torch.from_numpy(np.zeros((self.batch_size, 1)).astype('int64'), requires_grad=True).to(device), sentence), 1)
+        sentence_cat = torch.cat((torch.tensor(np.zeros((self.batch_size, 1)).astype('int64'), requires_grad=True).to(device), sentence), 1)
         embeds_DEP = self.word_embeddings_DEP(sentence_cat)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0])+1, self.word_emb_dim)
         pos_tags_cat = torch.cat((torch.from_numpy(np.zeros((self.batch_size, 1)).astype('int64'), requires_grad=True).to(device), pos_tags), 1)
