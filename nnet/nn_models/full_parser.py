@@ -285,9 +285,9 @@ class BiLSTMTagger(nn.Module):
         for i in range(hidden_states_1.size()[0]):
             if i%5 !=0:
                 continue
-            scores, exprs = self.__evaluate((head_states[i], modifier_states[i]),  True)
+            scores, exprs = self.__evaluate((head_states[i][:lengths[i]+1], modifier_states[i][:lengths[i]+1]),  True)
             gold = dep_heads[i][:lengths[i]]
-            heads = decoder.parse_proj(scores[:lengths[i], :lengths[i]])
+            heads = decoder.parse_proj(scores)
             e = sum([1 for h, g in zip(heads[1:], gold) if h != g])
             wrong_dep_words += e
             if e > 0:
