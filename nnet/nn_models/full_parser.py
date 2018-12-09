@@ -280,7 +280,8 @@ class BiLSTMTagger(nn.Module):
         modifier_states = torch.matmul(hidden_states_1_cat, self.hidLayerFOM)
         errs = []
 
-        total_dep_words = 0
+        wrong_dep_words = 0.0
+        total_dep_words = 0.0
         for i in range(hidden_states_1.size()[0]):
             if i%5 !=0:
                 continue
@@ -288,6 +289,7 @@ class BiLSTMTagger(nn.Module):
             gold = dep_heads[i][:lengths[i]]
             heads = decoder.parse_proj(scores[:lengths[i], :lengths[i]])
             e = sum([1 for h, g in zip(heads[1:], gold) if h != g])
+            wrong_dep_words += e
             if e > 0:
                 for j, (h, g) in enumerate(zip(heads[1:], gold)):
                     if j<lengths[i]:
@@ -384,9 +386,10 @@ class BiLSTMTagger(nn.Module):
 
         SRLloss = loss_function(tag_space, targets)
 
-        DEPloss = torch.sum(torch.tensor(errs).to(device))/total_dep_words
+        DEPloss = torch.sum(torch.tensor(errs).to(device))/7
         loss = SRLloss
 
+        log("dep error rate:", wrong_dep_words/total_dep_words)
         return SRLloss, DEPloss, DEPloss, loss, SRLprobs, 1, 1, 1, 1,  \
                1, 1, 1,\
                1, 1, 1
