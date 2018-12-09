@@ -169,7 +169,7 @@ class BiLSTMTagger(nn.Module):
             self.hid2Layer = nn.Parameter(torch.rand(self.hidden_units, self.hidden2_units))
             self.hid2Bias = nn.Parameter(torch.rand(self.hidden2_units))
 
-        self.outLayer = nn.Parameter(
+        self.outLayer = nn.Linear(
             torch.rand(self.hidden2_units if self.hidden2_units > 0 else self.hidden_units, 1))
 
         if self.labelsFlag:
@@ -211,10 +211,8 @@ class BiLSTMTagger(nn.Module):
 
         head, modifier = sentence
 
-        output = torch.mm(
-            F.tanh(
-                head[i] + modifier[j] + self.hidBias),
-            self.outLayer)  # + self.outBias
+        output = self.outLayer(
+            F.tanh(head[i] + modifier[j] + self.hidBias))
 
         return output
 
