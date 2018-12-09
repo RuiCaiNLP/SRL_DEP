@@ -243,12 +243,12 @@ class BiLSTMTagger(nn.Module):
         pos_tags_cat = torch.cat((torch.tensor(np.zeros((self.batch_size, 1)).astype('int64')).to(device), pos_tags), 1)
         pos_embeds = self.pos_embeddings(pos_tags_cat)
         region_marks_cat = torch.cat((torch.tensor(np.zeros((self.batch_size, 1)).astype('int64')).to(device), region_marks), 1)
-        region_marks = self.region_embeddings(region_marks_cat).view(self.batch_size, len(sentence[0])+1, 16)
+        region_marks_embeds = self.region_embeddings(region_marks_cat).view(self.batch_size, len(sentence[0])+1, 16)
         #sharing pretrained word_embeds
         fixed_embeds_DEP = self.word_fixed_embeddings(sentence_cat)
         fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0])+1, self.word_emb_dim)
 
-        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds_DEP, pos_embeds, region_marks), 2)
+        embeds_forDEP = torch.cat((embeds_DEP, fixed_embeds_DEP, pos_embeds, region_marks_embeds), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
 
 
