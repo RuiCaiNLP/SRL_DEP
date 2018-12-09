@@ -281,6 +281,8 @@ class BiLSTMTagger(nn.Module):
         errs = []
 
         for i in range(hidden_states_1.size()[0]):
+            if i>0:
+                break
             scores, exprs = self.__evaluate((head_states[i], modifier_states[i]),  True)
             gold = dep_heads[i]
             heads = decoder.parse_proj(scores)
