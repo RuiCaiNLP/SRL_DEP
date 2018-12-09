@@ -272,8 +272,8 @@ class BiLSTMTagger(nn.Module):
         hidden_states_1 = hidden_states[unsort_idx]
 
         ##########################################
-        h_2, c_2 = self.hidden_2
-        h_2 = h_2.transpose(0,1).contiguous().view(self.batch_size, 1,  -1)
+
+        h_2 = torch.zeros(self.batch_size, 2*self.hidden_dim, requires_grad=False).to(device)
 
         hidden_states_1_cat = torch.cat((h_2, hidden_states_1), 1)
         head_states = torch.matmul(hidden_states_1_cat, self.hidLayerFOH)
