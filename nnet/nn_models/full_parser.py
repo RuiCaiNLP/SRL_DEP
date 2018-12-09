@@ -311,7 +311,7 @@ class BiLSTMTagger(nn.Module):
         loss = DEPloss
 
         log("dep error rate:", wrong_dep_words/total_dep_words)
-        return DEPloss, DEPloss, DEPloss, loss, SRLprobs, 1, 1, 1, 1,  \
+        return DEPloss, DEPloss, DEPloss, loss, 0, 1, 1, 1, 1,  \
                1, 1, 1,\
                1, 1, 1
 
