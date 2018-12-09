@@ -384,7 +384,7 @@ class BiLSTMTagger(nn.Module):
 
         SRLloss = loss_function(tag_space, targets)
 
-        DEPloss = torch.sum(torch.tensor(errs).to(device))
+        DEPloss = torch.sum(torch.tensor(errs).to(device))/total_dep_words
         loss = SRLloss
 
         return SRLloss, DEPloss, DEPloss, loss, SRLprobs, 1, 1, 1, 1,  \
