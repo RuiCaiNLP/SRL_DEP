@@ -158,6 +158,8 @@ class BiLSTMTagger(nn.Module):
 
 
         hidden2_units = 0
+        self.ldims = lstm_hidden_dim
+        self.hidden_units = 100
         self.hidLayerFOH = nn.Parameter((self.ldims * 2, self.hidden_units))
         self.hidLayerFOM = nn.Parameter((self.ldims * 2, self.hidden_units))
         self.hidBias = nn.Parameter((self.hidden_units))
