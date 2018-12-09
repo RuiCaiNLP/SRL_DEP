@@ -157,32 +157,34 @@ class BiLSTMTagger(nn.Module):
         self.hidden_4 = self.init_hidden_share()
 
 
-        hidden2_units = 0
+        self.hidden2_units = 0
+        self.labelsFlag = False
         self.ldims = lstm_hidden_dim
         self.hidden_units = 100
-        self.hidLayerFOH = nn.Parameter((self.ldims * 2, self.hidden_units))
-        self.hidLayerFOM = nn.Parameter((self.ldims * 2, self.hidden_units))
-        self.hidBias = nn.Parameter((self.hidden_units))
+        self.hidLayerFOH = nn.Parameter(torch.rand(self.ldims * 2, self.hidden_units))
+        self.hidLayerFOM = nn.Parameter(torch.rand(self.ldims * 2, self.hidden_units))
+        self.hidBias = nn.Parameter(torch.rand(self.hidden_units))
 
         if self.hidden2_units:
-            self.hid2Layer = nn.Parameter((self.hidden_units, self.hidden2_units))
-            self.hid2Bias = nn.Parameter((self.hidden2_units))
+            self.hid2Layer = nn.Parameter(torch.rand(self.hidden_units, self.hidden2_units))
+            self.hid2Bias = nn.Parameter(torch.rand(self.hidden2_units))
 
         self.outLayer = nn.Parameter(
-            (self.hidden2_units if self.hidden2_units > 0 else self.hidden_units, 1))
+            torch.rand(self.hidden2_units if self.hidden2_units > 0 else self.hidden_units, 1))
 
         if self.labelsFlag:
-            self.rhidLayerFOH = nn.Parameter((2 * self.ldims, self.hidden_units))
-            self.rhidLayerFOM = nn.Parameter((2 * self.ldims, self.hidden_units))
-            self.rhidBias = nn.Parameter((self.hidden_units))
+            self.rhidLayerFOH = nn.Parameter(torch.rand(2 * self.ldims, self.hidden_units))
+            self.rhidLayerFOM = nn.Parameter(torch.rand(2 * self.ldims, self.hidden_units))
+            self.rhidBias = nn.Parameter(torch.rand(self.hidden_units))
 
             if self.hidden2_units:
-                self.rhid2Layer = nn.Parameter((self.hidden_units, self.hidden2_units))
-                self.rhid2Bias = nn.Parameter((self.hidden2_units))
+
+                self.rhid2Layer = nn.Parameter(torch.rand(self.hidden_units, self.hidden2_units))
+                self.rhid2Bias = nn.Parameter(torch.rand(self.hidden2_units))
 
             self.routLayer = nn.Parameter(
-                (self.hidden2_units if self.hidden2_units > 0 else self.hidden_units, len(self.irels)))
-            self.routBias = nn.Parameter((len(self.irels)))
+                torch.rand(self.hidden2_units if self.hidden2_units > 0 else self.hidden_units, len(self.irels)))
+            self.routBias = nn.Parameter(torch.rand(len(self.irels)))
 
     def init_hidden_share(self):
         # Before we've done anything, we dont have any hidden state.
