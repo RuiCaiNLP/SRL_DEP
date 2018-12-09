@@ -138,7 +138,7 @@ class BiLSTMTagger(nn.Module):
 
 
         self.num_layers = 4
-        self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + self.elmo_emb_size * 1 + 2 * self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
+        self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + self.elmo_emb_size * 1 , hidden_size=lstm_hidden_dim, batch_first=True,
                                     bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
@@ -280,7 +280,7 @@ class BiLSTMTagger(nn.Module):
             scores, exprs = self.__evaluate((head_states[i], modifier_states[i]),  True)
             gold = dep_heads[i]
             heads = decoder.parse_proj(scores)
-            e = sum([1 for h, g in zip(heads[1:], gold[1:]) if h != g])
+            e = sum([1 for h, g in zip(heads[1:], gold) if h != g])
             if e > 0:
                 errs += [(exprs[h][i] - exprs[g][i])[0] for i, (h, g) in enumerate(zip(heads[1:], gold)) if h != g]
 
