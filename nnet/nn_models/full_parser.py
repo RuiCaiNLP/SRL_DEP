@@ -280,15 +280,22 @@ class BiLSTMTagger(nn.Module):
         modifier_states = torch.matmul(hidden_states_1_cat, self.hidLayerFOM)
         errs = []
 
+        total_dep_words = 0
         for i in range(hidden_states_1.size()[0]):
-            if i>0:
-                break
+            if i%5 !=0:
+                continue
             scores, exprs = self.__evaluate((head_states[i], modifier_states[i]),  True)
             gold = dep_heads[i]
             heads = decoder.parse_proj(scores)
             e = sum([1 for h, g in zip(heads[1:], gold) if h != g])
             if e > 0:
-                errs += [(exprs[h][i] - exprs[g][i])[0] for i, (h, g) in enumerate(zip(heads[1:], gold)) if h != g]
+                for j, (h, g) in enumerate(zip(heads[1:], gold)):
+                    if j<lengths[i]:
+                        total_dep_words += 1
+                    else:
+                        continue
+                    if h != g :
+                        errs += [(exprs[h][j+1] - exprs[g][j+1])[0]]
 
 
 
