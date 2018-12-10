@@ -303,11 +303,12 @@ class BiLSTMTagger(nn.Module):
                     else:
                         continue
                     if h != g :
+                        log(exprs[h][j], exprs[g][j])
                         errs += [(exprs[h][j] - exprs[g][j])[0]]
 
 
 
-        log(errs)
+        log(errs[0:3])
         DEPloss = errs[0]
         for i in range(len(errs)):
             if i > 0:
