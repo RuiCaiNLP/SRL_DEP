@@ -306,7 +306,7 @@ class BiLSTMTagger(nn.Module):
                         errs += [(exprs[h][j] - exprs[g][j])]
 
 
-
+        log(errs)
         DEPloss = torch.sum(cat(errs))
         loss = DEPloss
         log(DEPloss)
