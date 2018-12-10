@@ -38,7 +38,7 @@ def bio_reader(record):
         dbg_header = 'N'
 
 
-    assert (len(words) == len(labels))
+    #assert (len(words) == len(labels))
 
     # convert labels into indexes in labels_voc
     local_voc = {v: k for k, v in make_local_voc(labels_voc).items()}
