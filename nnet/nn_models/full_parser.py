@@ -291,28 +291,29 @@ class BiLSTMTagger(nn.Module):
             if i%5 !=0:
                 continue
             scores, exprs = self.__evaluate((head_states[i][:lengths[i]], modifier_states[i][:lengths[i]]),  True)
-            gold = dep_heads[i][:lengths[i]-1]
+            gold = dep_heads[i][:lengths[i]]
+            gold.insert(0, -1)
             heads = decoder.parse_proj(scores)
             if i==0:
                 log(heads)
                 log(gold)
                 log(lengths)
-                log(lengths+1)
-            e = sum([1 for h, g in zip(heads[1:], gold) if h != g])
+
+            e = sum([1 for h, g in zip(heads[1:], gold[1:]) if h != g])
             wrong_dep_words += e
             if e > 0:
-                for j, (h, g) in enumerate(zip(heads[1:], gold)):
+                for j, (h, g) in enumerate(zip(heads, gold)):
                     if j<lengths[i]:
                         total_dep_words += 1
                     else:
                         continue
                     if h != g :
-                        errs += [(exprs[h][j+1] - exprs[g][j+1])[0]]
+                        errs += [(exprs[h][j] - exprs[g][j])[0]]
 
         log(wrong_dep_words)
         log(len(errs))
-        log(errs[0:5])
-        DEPloss = torch.sum(cat(errs).to(device))
+
+        DEPloss = torch.sum(torch.tensor(errs).to(device))/7
         loss = DEPloss
 
         log("dep error rate:", wrong_dep_words/total_dep_words)
