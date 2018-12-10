@@ -213,7 +213,7 @@ class BiLSTMTagger(nn.Module):
         output = self.outLayer(
             F.tanh(head[i] + modifier[j]))
 
-        log(i, j, output)
+
 
         return output
 
@@ -317,6 +317,7 @@ class BiLSTMTagger(nn.Module):
 
         DEPloss = torch.sum(torch.tensor(errs).to(device))/7
         loss = DEPloss
+        log(DEPloss)
 
         log("dep error rate:", wrong_dep_words/total_dep_words)
         return DEPloss, DEPloss, DEPloss, loss, 0, 1, 1, 1, 1,  \
