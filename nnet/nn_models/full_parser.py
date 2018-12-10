@@ -239,24 +239,23 @@ class BiLSTMTagger(nn.Module):
         """
         #contruct input for DEP
         #torch.tensor(np.zeros((self.batch_size, 1)).astype('int64'), requires_grad=True).to(device)
-        sentence_cat = torch.cat((sentence[:, 0:1], sentence), 1)
-        log(sentence_cat.requires_grad)
-        log(sentence.requires_grad)
-        embeds_DEP = self.word_embeddings_DEP(sentence_cat)
-        embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0])+1, self.word_emb_dim)
-        pos_tags_cat = torch.cat((pos_tags[:, 0:1], pos_tags), 1)
-        pos_embeds = self.pos_embeddings(pos_tags_cat)
+        #sentence_cat = torch.cat((sentence[:, 0:1], sentence), 1)
+        #log(sentence_cat.requires_grad)
+        #log(sentence.requires_grad)
+        embeds_DEP = self.word_embeddings_DEP(sentence)
+        embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
+        pos_embeds = self.pos_embeddings(pos_tags)
 
         #sharing pretrained word_embeds
-        fixed_embeds_DEP = self.word_fixed_embeddings(sentence_cat)
-        fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0])+1, self.word_emb_dim)
+        fixed_embeds_DEP = self.word_fixed_embeddings(sentence)
+        fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
 
         embeds_forDEP = torch.cat((embeds_DEP,pos_embeds), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
 
 
         #first layer
-        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds_forDEP, lengths+1)
+        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(embeds_forDEP, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
         hidden_states, self.hidden = self.BiLSTM_0(embeds_sort, self.hidden)
@@ -267,7 +266,7 @@ class BiLSTMTagger(nn.Module):
         hidden_states_0 = hidden_states[unsort_idx]
 
         # second_layer
-        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_0, lengths+1)
+        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states_0, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
         hidden_states, self.hidden_2 = self.BiLSTM_1(embeds_sort, self.hidden_2)
