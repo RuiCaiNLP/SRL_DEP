@@ -309,7 +309,7 @@ class BiLSTMTagger(nn.Module):
 
         DEPloss = torch.sum(cat(errs))
         loss = DEPloss
-
+        log(DEPloss)
 
         log("dep error rate:", wrong_dep_words/total_dep_words)
         return DEPloss, DEPloss, DEPloss, loss, 0, 1, 1, 1, 1,  \
