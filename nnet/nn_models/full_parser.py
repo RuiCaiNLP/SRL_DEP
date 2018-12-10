@@ -213,6 +213,8 @@ class BiLSTMTagger(nn.Module):
         output = self.outLayer(
             F.tanh(head[i] + modifier[j]))
 
+        log(i, j, output)
+
         return output
 
     def __evaluate(self, sentence, train):
