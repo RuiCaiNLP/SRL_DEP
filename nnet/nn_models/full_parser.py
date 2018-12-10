@@ -238,10 +238,10 @@ class BiLSTMTagger(nn.Module):
         """
         #contruct input for DEP
         #torch.tensor(np.zeros((self.batch_size, 1)).astype('int64'), requires_grad=True).to(device)
-        sentence_cat = torch.cat((sentence[:, 0], sentence), 1)
+        sentence_cat = torch.cat((sentence[:, 0:1], sentence), 1)
         embeds_DEP = self.word_embeddings_DEP(sentence_cat)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0])+1, self.word_emb_dim)
-        pos_tags_cat = torch.cat((pos_tags[:, 0], pos_tags), 1)
+        pos_tags_cat = torch.cat((pos_tags[:, 0:1], pos_tags), 1)
         pos_embeds = self.pos_embeddings(pos_tags_cat)
 
         #sharing pretrained word_embeds
