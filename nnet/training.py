@@ -178,7 +178,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 del model.hidden_3
                 del model.hidden_4
 
-            if idx % dbg_print_rate == 0:
+            if idx % dbg_print_rate == 0 and False:
                 log('[epoch %i, %i * %i] ' %
                     (e, idx, len(batch)))
 

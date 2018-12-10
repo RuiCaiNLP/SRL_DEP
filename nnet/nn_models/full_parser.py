@@ -245,7 +245,6 @@ class BiLSTMTagger(nn.Module):
         #log(sentence_cat.requires_grad)
         #log(sentence.requires_grad)
         embeds_DEP = self.word_embeddings_DEP(sentence)
-        log(sentence)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
 
@@ -295,10 +294,6 @@ class BiLSTMTagger(nn.Module):
             gold = list(dep_heads[i][:lengths[i]-1])
             gold.insert(0, -1)
             heads = decoder.parse_proj(scores)
-            if i==0:
-                log(heads)
-                log(gold)
-                log(lengths)
 
             e = sum([1 for h, g in zip(heads[1:], gold[1:]) if h != g])
             wrong_dep_words += e
@@ -311,13 +306,11 @@ class BiLSTMTagger(nn.Module):
                     if h != g :
                         errs += [(exprs[h][j] - exprs[g][j])]
 
-        log(errs[0:5])
-        log(wrong_dep_words)
-        log(len(errs))
 
-        DEPloss = torch.sum(cat(errs))/7
+
+        DEPloss = torch.sum(cat(errs))
         loss = DEPloss
-        log(DEPloss)
+
 
         log("dep error rate:", wrong_dep_words/total_dep_words)
         return DEPloss, DEPloss, DEPloss, loss, 0, 1, 1, 1, 1,  \
