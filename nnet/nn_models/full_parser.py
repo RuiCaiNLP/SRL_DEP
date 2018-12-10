@@ -303,13 +303,14 @@ class BiLSTMTagger(nn.Module):
             wrong_dep_words += e
             if e > 0:
                 for j, (h, g) in enumerate(zip(heads, gold)):
-                    if j<lengths[i]:
+                    if j<lengths[i] and j>0:
                         total_dep_words += 1
                     else:
                         continue
                     if h != g :
                         errs += [(exprs[h][j] - exprs[g][j])[0]]
 
+        log(errs[0:5])
         log(wrong_dep_words)
         log(len(errs))
 
