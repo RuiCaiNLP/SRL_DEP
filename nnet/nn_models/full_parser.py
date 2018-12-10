@@ -295,6 +295,7 @@ class BiLSTMTagger(nn.Module):
             heads = decoder.parse_proj(scores)
 
             e = sum([1 for h, g in zip(heads[1:], gold[1:]) if h != g])
+            log(scores[0])
             wrong_dep_words += e
             if e > 0:
                 for j, (h, g) in enumerate(zip(heads, gold)):
@@ -307,14 +308,15 @@ class BiLSTMTagger(nn.Module):
 
 
 
-        log(errs[0:3])
+        log(errs[0])
+
         DEPloss = errs[0]
         for i in range(len(errs)):
             if i > 0:
                 DEPloss += errs[i]
         DEPloss = F.sigmoid(DEPloss)
         loss = DEPloss
-        log(DEPloss)
+        log("loss:", DEPloss)
 
         log("dep error rate:", wrong_dep_words/total_dep_words)
         return DEPloss, DEPloss, DEPloss, loss, 0, 1, 1, 1, 1,  \
