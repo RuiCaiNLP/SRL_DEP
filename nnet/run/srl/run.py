@@ -12,8 +12,7 @@ def bio_reader(record):
     labels, specific_dep_labels, specific_dep_relations = record.split('\t')
     labels_voc = labels_voc.split(' ')
 
-    pos_tags.insert(0, 'NN')
-    sent.insert(0, 'the')
+
     labels_voc.insert(0, '<pad>')
     frame = [frame] * len(labels_voc)
     words = []
@@ -21,9 +20,15 @@ def bio_reader(record):
         words.append(word)
 
     pos_tags = pos_tags.split(' ')
+
+    pos_tags.insert(0, 'NN')
+    words.insert(0, 'the')
+
     labels = labels.split(' ')
     specific_dep_labels = specific_dep_labels.split(' ')
     specific_dep_relations = specific_dep_relations.split(' ')
+
+
 
 
 
