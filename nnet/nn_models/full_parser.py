@@ -291,7 +291,7 @@ class BiLSTMTagger(nn.Module):
             if i%5 !=0:
                 continue
             scores, exprs = self.__evaluate((head_states[i][:lengths[i]], modifier_states[i][:lengths[i]]),  True)
-            gold = dep_heads[i][:lengths[i]]
+            gold = list(dep_heads[i][:lengths[i]])
             gold.insert(0, -1)
             heads = decoder.parse_proj(scores)
             if i==0:
