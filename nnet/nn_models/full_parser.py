@@ -307,6 +307,7 @@ class BiLSTMTagger(nn.Module):
 
 
 
+        log(errs)
         DEPloss = errs[0]
         for i in range(len(errs)):
             if i > 0:
