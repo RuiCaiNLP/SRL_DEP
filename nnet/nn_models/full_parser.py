@@ -295,6 +295,7 @@ class BiLSTMTagger(nn.Module):
             if i==0:
                 log(heads)
                 log(gold)
+                log(lengths)
                 log(lengths+1)
             e = sum([1 for h, g in zip(heads[1:], gold) if h != g])
             wrong_dep_words += e
