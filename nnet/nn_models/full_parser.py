@@ -312,6 +312,7 @@ class BiLSTMTagger(nn.Module):
         for i in range(len(errs)):
             if i > 0:
                 DEPloss += errs[i]
+        DEPloss = F.sigmoid(DEPloss)
         loss = DEPloss
         log(DEPloss)
 
