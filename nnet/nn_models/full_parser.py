@@ -243,6 +243,7 @@ class BiLSTMTagger(nn.Module):
         #log(sentence_cat.requires_grad)
         #log(sentence.requires_grad)
         embeds_DEP = self.word_embeddings_DEP(sentence)
+        log(sentence)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
 
