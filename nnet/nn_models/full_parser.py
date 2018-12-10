@@ -288,8 +288,6 @@ class BiLSTMTagger(nn.Module):
         wrong_dep_words = 0.0
         total_dep_words = 0.0
         for i in range(hidden_states_1.size()[0]):
-            if i%5 !=0:
-                continue
             scores, exprs = self.__evaluate((head_states[i][:lengths[i]], modifier_states[i][:lengths[i]]),  True)
             gold = list(dep_heads[i][:lengths[i]-1])
             gold.insert(0, -1)
