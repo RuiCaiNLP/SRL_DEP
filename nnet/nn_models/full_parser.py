@@ -308,7 +308,7 @@ class BiLSTMTagger(nn.Module):
 
 
         DEPloss = errs[0]
-        for i in range(len(DEPloss)):
+        for i in range(len(errs)):
             if i > 0:
                 DEPloss += errs[i]
         loss = DEPloss
