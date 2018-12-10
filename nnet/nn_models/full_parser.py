@@ -311,7 +311,7 @@ class BiLSTMTagger(nn.Module):
 
         log(wrong_dep_words)
         log(len(errs))
-
+        log(errs[0:5])
         DEPloss = torch.sum(cat(errs).to(device))
         loss = DEPloss
 
