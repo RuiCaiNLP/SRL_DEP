@@ -170,7 +170,7 @@ class BiLSTMTagger(nn.Module):
             self.hid2Layer = nn.Parameter(torch.rand(self.hidden_units, self.hidden2_units))
             self.hid2Bias = nn.Parameter(torch.rand(self.hidden2_units))
 
-        self.outLayer = nn.Linear(self.hidden2_units if self.hidden2_units > 0 else self.hidden_units, 1)
+        self.outLayer = nn.Linear(self.hidden2_units if self.hidden2_units > 0 else self.hidden_units, 1, bias=False)
 
         if self.labelsFlag:
             self.rhidLayerFOH = nn.Parameter(torch.rand(2 * self.ldims, self.hidden_units))
