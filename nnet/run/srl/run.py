@@ -226,9 +226,9 @@ class SRLRunner(Runner):
 
             sent_pred_lemmas_idx = np.array(sent_pred_lemmas_idx, dtype='int64')
 
-            assert (sent_batch.shape == sent_mask.shape)
-            assert (frames_batch.shape == labels_voc_batch.shape == labels_voc_mask.shape)
-            assert (labels_batch.shape == sent_batch.shape)
+            #assert (sent_batch.shape == sent_mask.shape)
+            #assert (frames_batch.shape == labels_voc_batch.shape == labels_voc_mask.shape)
+            #assert (labels_batch.shape == sent_batch.shape)
 
 
             return sent_batch, p_sent_batch, pos_batch, sent_mask, targets, frames_batch, \
