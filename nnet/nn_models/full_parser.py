@@ -221,7 +221,7 @@ class BiLSTMTagger(nn.Module):
                   for j in range(head.size()[0])]
                 for i in range(head.size()[0])]
         scores = np.array([[get_data(output).numpy()[0] for output in exprsRow] for exprsRow in exprs])
-        log(exprs)
+        log(scores.shape)
         return scores, exprs
 
 
