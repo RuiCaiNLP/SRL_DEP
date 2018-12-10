@@ -75,6 +75,7 @@ class BiLSTMTagger(nn.Module):
 
         self.word_fixed_embeddings_DEP = nn.Embedding(vocab_size, hps['sent_edim'])
         self.word_fixed_embeddings_DEP.weight.data.copy_(torch.from_numpy(hps['word_embeddings']))
+        self.word_embeddings_DEP.requires_grad = False
 
 
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
