@@ -309,13 +309,13 @@ class BiLSTMTagger(nn.Module):
                     else:
                         continue
                     if h != g :
-                        errs += [(exprs[h][j] - exprs[g][j])[0]]
+                        errs += [(exprs[h][j] - exprs[g][j])]
 
         log(errs[0:5])
         log(wrong_dep_words)
         log(len(errs))
 
-        DEPloss = torch.sum(torch.tensor(errs).to(device))/7
+        DEPloss = torch.sum(cat(errs))/7
         loss = DEPloss
         log(DEPloss)
 
