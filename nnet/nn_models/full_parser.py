@@ -293,7 +293,9 @@ class BiLSTMTagger(nn.Module):
             scores, exprs = self.__evaluate((head_states[i][:lengths[i]], modifier_states[i][:lengths[i]]),  True)
             gold = list(dep_heads[i][:lengths[i]-1])
             gold.insert(0, -1)
-            heads = decoder.parse_proj(scores)
+            heads = decoder.parse_proj(scores, gold=gold)
+            log(gold)
+            log(heads)
 
             e = sum([1 for h, g in zip(heads[1:], gold[1:]) if h != g])
             log(scores[0])
@@ -309,7 +311,6 @@ class BiLSTMTagger(nn.Module):
 
 
 
-        log(errs[0])
 
         DEPloss = errs[0]
         for i in range(len(errs)):
