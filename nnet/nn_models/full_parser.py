@@ -283,9 +283,11 @@ class BiLSTMTagger(nn.Module):
 
 
         hidden_states_1_cat = self.hidden_state_dropout(hidden_states_1)
+        log('hidden_states')
         log(hidden_states_1[0][0])
         log(hidden_states_1[0][1])
         head_states = torch.matmul(hidden_states_1_cat, self.hidLayerFOH)
+
         modifier_states = torch.matmul(hidden_states_1_cat, self.hidLayerFOM)
         errs = []
 
