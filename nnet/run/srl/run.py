@@ -21,8 +21,8 @@ def bio_reader(record):
 
     pos_tags = pos_tags.split(' ')
 
-    pos_tags.insert(0, 'NN')
-    words.insert(0, 'the')
+    pos_tags.insert(0, '<pad>')
+    words.insert(0, '<pad>')
 
     labels = labels.split(' ')
     specific_dep_labels = specific_dep_labels.split(' ')
