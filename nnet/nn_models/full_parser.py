@@ -212,15 +212,15 @@ class BiLSTMTagger(nn.Module):
         head, modifier = sentence
 
         output = self.outLayer(
-            F.tanh(head[i] + modifier[j]))
+            F.tanh(head[i] + modifier[j] + self.hidBias))
 
 
-        log("###################")
-        log(i, j)
-        log(head[i])
-        log(modifier[j])
-        log(F.tanh(head[i] + modifier[j]))
-        log(output)
+        #log("###################")
+        #log(i, j)
+        #log(head[i])
+        #log(modifier[j])
+        #log(F.tanh(head[i] + modifier[j]))
+        #log(output)
 
         return output
 
@@ -236,7 +236,7 @@ class BiLSTMTagger(nn.Module):
         exprs = [[self.__getExpr(sentence,  i, j, train)
                   for j in xrange(head.size()[0])]
                 for i in xrange(head.size()[0])]
-        log("exprs", exprs)
+        #log("exprs", exprs)
         scores = np.array([[get_data(output).numpy()[0] for output in exprsRow] for exprsRow in exprs])
         return scores, exprs
 
