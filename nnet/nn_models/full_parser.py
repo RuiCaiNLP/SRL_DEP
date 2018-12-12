@@ -214,7 +214,9 @@ class BiLSTMTagger(nn.Module):
         output = self.outLayer(
             F.tanh(head[i] + modifier[j]))
 
+
         log("###################")
+        log(i, j)
         log(F.tanh(head[i] + modifier[j]))
         log(output)
 
