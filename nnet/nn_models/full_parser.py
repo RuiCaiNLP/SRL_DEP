@@ -303,6 +303,7 @@ class BiLSTMTagger(nn.Module):
 
             e = sum([1 for h, g in zip(heads[1:], gold[1:]) if h != g])
             log(scores[1])
+            log(scores[3])
             wrong_dep_words += e
             if e > 0:
                 for j, (h, g) in enumerate(zip(heads, gold)):
