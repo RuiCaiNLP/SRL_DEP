@@ -217,6 +217,8 @@ class BiLSTMTagger(nn.Module):
 
         log("###################")
         log(i, j)
+        log(head[i])
+        log(modifier[j])
         log(F.tanh(head[i] + modifier[j]))
         log(output)
 
