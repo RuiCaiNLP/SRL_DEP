@@ -224,7 +224,13 @@ class BiLSTMTagger(nn.Module):
 
     def __evaluate(self, sentence, train):
         head, modifier = sentence
-        log(head.size()[0])
+        log('head_states:')
+        log(head[1])
+        log(head[2])
+
+        log('modifier_states:')
+        log(modifier[1])
+        log(modifier[2])
         exprs = [[self.__getExpr(sentence,  i, j, train)
                   for j in xrange(head.size()[0])]
                 for i in xrange(head.size()[0])]
@@ -305,13 +311,7 @@ class BiLSTMTagger(nn.Module):
         for i in range(hidden_states_1.size()[0]):
             head_states_scores = head_states[i][:lengths[i]]
             modifier_states_scores = modifier_states[i][:lengths[i]]
-            log('head_states:')
-            log(head_states_scores[0][1])
-            log(head_states_scores[0][2])
 
-            log('modifier_states:')
-            log(modifier_states_scores[0][1])
-            log(modifier_states_scores[0][2])
             scores, exprs = self.__evaluate((head_states_scores, modifier_states_scores),  True)
             gold = list(dep_heads[i][:lengths[i]-1])
             gold.insert(0, -1)
