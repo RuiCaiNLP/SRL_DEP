@@ -234,7 +234,7 @@ class BiLSTMTagger(nn.Module):
         exprs = [[self.__getExpr(sentence,  i, j, train)
                   for j in xrange(head.size()[0])]
                 for i in xrange(head.size()[0])]
-        log(exprs)
+        log("exprs", exprs)
         scores = np.array([[get_data(output).numpy()[0] for output in exprsRow] for exprsRow in exprs])
         return scores, exprs
 
