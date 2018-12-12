@@ -220,6 +220,7 @@ class BiLSTMTagger(nn.Module):
 
     def __evaluate(self, sentence, train):
         head, modifier = sentence
+        log(head.size())
         exprs = [[self.__getExpr(sentence,  i, j, train)
                   for j in range(head.size()[0])]
                 for i in range(head.size()[0])]
