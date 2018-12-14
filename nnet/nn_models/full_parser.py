@@ -225,17 +225,18 @@ class BiLSTMTagger(nn.Module):
 
     def __evaluate(self, sentence, train):
         head, modifier = sentence
-        log('head_states:')
+        #log('head_states:')
         #log(head[1])
         #log(head[2])
 
-        log('modifier_states:')
+        #log('modifier_states:')
         #log(modifier[1])
         #log(modifier[2])
         exprs = [[self.__getExpr(sentence,  i, j, train)
                   for j in xrange(head.size()[0])]
                 for i in xrange(head.size()[0])]
         #log("exprs", exprs)
+
         scores = np.array([[get_data(output).numpy()[0] for output in exprsRow] for exprsRow in exprs])
         return scores, exprs
 
@@ -290,7 +291,7 @@ class BiLSTMTagger(nn.Module):
 
 
 
-        hidden_states_1_cat = self.hidden_state_dropout(hidden_states_1)
+        hidden_states_1_cat = hidden_states_1
 
         head_states = self.hidLayerFOH(hidden_states_1_cat)
 
@@ -306,6 +307,8 @@ class BiLSTMTagger(nn.Module):
             modifier_states_scores = modifier_states[i][:lengths[i]]
 
             scores, exprs = self.__evaluate((head_states_scores, modifier_states_scores),  True)
+            log(scores[0])
+            log(exprs[0])
             gold = list(dep_heads[i][:lengths[i]-1])
             gold.insert(0, -1)
             heads = decoder.parse_proj(scores, gold=gold)
