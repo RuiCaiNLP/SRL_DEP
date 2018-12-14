@@ -312,7 +312,7 @@ class BiLSTMTagger(nn.Module):
             log(exprs[1])
             gold = list(dep_heads[i][:lengths[i]-1])
             gold.insert(0, -1)
-            heads = decoder.parse_proj(scores, gold=gold)
+            heads = decoder.parse_proj(scores)
             log(gold)
             log(heads)
 
