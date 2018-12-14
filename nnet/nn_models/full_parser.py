@@ -307,6 +307,7 @@ class BiLSTMTagger(nn.Module):
             modifier_states_scores = modifier_states[i][:lengths[i]]
 
             scores, exprs = self.__evaluate((head_states_scores, modifier_states_scores),  True)
+            log("scores, exprs")
             log(scores[1])
             log(exprs[1])
             gold = list(dep_heads[i][:lengths[i]-1])
