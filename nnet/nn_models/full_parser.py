@@ -162,9 +162,9 @@ class BiLSTMTagger(nn.Module):
         self.labelsFlag = False
         self.ldims = lstm_hidden_dim
         self.hidden_units = 100
-        self.hidLayerFOH = nn.Parameter(torch.rand(self.ldims * 2, self.hidden_units))
-        self.hidLayerFOM = nn.Parameter(torch.rand(self.ldims * 2, self.hidden_units))
-        self.hidBias = nn.Parameter(torch.rand(self.hidden_units))
+        self.hidLayerFOH = nn.Linear(self.ldims * 2, self.hidden_units, bias=False)
+        self.hidLayerFOM = nn.Linear(self.ldims * 2, self.hidden_units, bias=False)
+
 
         if self.hidden2_units:
             self.hid2Layer = nn.Parameter(torch.rand(self.hidden_units, self.hidden2_units))
@@ -211,8 +211,7 @@ class BiLSTMTagger(nn.Module):
 
         head, modifier = sentence
 
-        output = self.outLayer(
-            F.tanh(head[i] + modifier[j] + self.hidBias))
+        output = self.outLayer(F.relu(head[i] + modifier[j]))
 
 
         #log("###################")
@@ -261,11 +260,6 @@ class BiLSTMTagger(nn.Module):
         embeds_DEP = self.word_embeddings_DEP(sentence)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
-
-        #sharing pretrained word_embeds
-        fixed_embeds_DEP = self.word_fixed_embeddings(sentence)
-        fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
-
         embeds_forDEP = torch.cat((embeds_DEP,pos_embeds), 2)
         embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
 
@@ -297,15 +291,11 @@ class BiLSTMTagger(nn.Module):
 
 
         hidden_states_1_cat = self.hidden_state_dropout(hidden_states_1)
-        log('hidden_states:')
-        log(hidden_states_1[0][1])
-        log(hidden_states_1[0][2])
-        head_states = torch.matmul(hidden_states_1_cat, self.hidLayerFOH)
-        log('head_states:')
-        log(head_states[0][1])
-        log(head_states[0][2])
 
-        modifier_states = torch.matmul(hidden_states_1_cat, self.hidLayerFOM)
+        head_states = self.hidLayerFOH(hidden_states_1_cat)
+
+
+        modifier_states = self.hidLayerFOM(hidden_states_1_cat)
 
         errs = []
 
