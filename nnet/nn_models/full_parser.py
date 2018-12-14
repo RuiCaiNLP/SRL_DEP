@@ -226,12 +226,12 @@ class BiLSTMTagger(nn.Module):
     def __evaluate(self, sentence, train):
         head, modifier = sentence
         log('head_states:')
-        log(head[1])
-        log(head[2])
+        #log(head[1])
+        #log(head[2])
 
         log('modifier_states:')
-        log(modifier[1])
-        log(modifier[2])
+        #log(modifier[1])
+        #log(modifier[2])
         exprs = [[self.__getExpr(sentence,  i, j, train)
                   for j in xrange(head.size()[0])]
                 for i in xrange(head.size()[0])]
@@ -314,7 +314,6 @@ class BiLSTMTagger(nn.Module):
 
             e = sum([1 for h, g in zip(heads[1:], gold[1:]) if h != g])
             log(scores[1])
-            log(scores[3])
             wrong_dep_words += e
             if e > 0:
                 for j, (h, g) in enumerate(zip(heads, gold)):
@@ -334,7 +333,8 @@ class BiLSTMTagger(nn.Module):
                 DEPloss += errs[i]
         DEPloss = DEPloss
         loss = DEPloss
-        log("loss:", DEPloss)
+        log("loss : ", DEPloss)
+        log("avg loss : ", DEPloss/len(errs))
 
         log("dep error rate:", wrong_dep_words/total_dep_words)
         return DEPloss, DEPloss, DEPloss, loss, 0, 1, 1, 1, 1,  \
