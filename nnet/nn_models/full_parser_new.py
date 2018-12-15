@@ -226,13 +226,6 @@ class BiLSTMTagger(nn.Module):
 
     def __evaluate(self, sentence, train):
         head, modifier = sentence
-        #log('head_states:')
-        #log(head[1])
-        #log(head[2])
-
-        #log('modifier_states:')
-        #log(modifier[1])
-        #log(modifier[2])
         exprs = [[self.__getExpr(sentence,  i, j, train)
                   for j in xrange(head.size()[0])]
                 for i in xrange(head.size()[0])]
@@ -297,8 +290,6 @@ class BiLSTMTagger(nn.Module):
         hidden_states_1_cat = hidden_states_1
 
         head_states = self.hidLayerFOH(hidden_states_1_cat)
-
-
         modifier_states = self.hidLayerFOM(hidden_states_1_cat)
 
         errs = []
@@ -306,16 +297,17 @@ class BiLSTMTagger(nn.Module):
         wrong_dep_words = 0.0
         total_dep_words = 0.0
         for i in range(hidden_states_1.size()[0]):
-            head_states_scores = head_states[i][:lengths[i]]
-            modifier_states_scores = modifier_states[i][:lengths[i]]
+            head_states_scores = head_states[i][:lengths[i]+1]
+            modifier_states_scores = modifier_states[i][:lengths[i]+1]
 
             scores, exprs = self.__evaluate((head_states_scores, modifier_states_scores),  True)
             log("scores, exprs")
             log(scores[1])
             log(exprs[1])
-            gold = list(dep_heads[i][:lengths[i]-1])
+            gold = list(dep_heads[i][:lengths[i]])
             gold.insert(0, -1)
-            heads = decoder.parse_proj(scores)
+            #heads = decoder.parse_proj(scores)
+            heads = np.argmax(scores, axis=1)
             log(gold)
             log(heads)
 

@@ -1,7 +1,7 @@
 from nnet.run.runner import *
 from nnet.ml.voc import *
 from functools import partial
-from nnet.nn_models.full_parser import BiLSTMTagger
+from nnet.nn_models.full_parser_new import BiLSTMTagger
 
 
 def make_local_voc(labels):
@@ -21,8 +21,8 @@ def bio_reader(record):
 
     pos_tags = pos_tags.split(' ')
 
-    pos_tags.insert(0, '<pad>')
-    words.insert(0, '.')
+    #pos_tags.insert(0, '<pad>')
+    #words.insert(0, '.')
 
     labels = labels.split(' ')
     specific_dep_labels = specific_dep_labels.split(' ')
