@@ -212,7 +212,7 @@ class BiLSTMTagger(nn.Module):
 
         head, modifier = sentence
 
-        output = self.outLayer(F.tanh(head[i] + modifier[j]))
+        output = self.outLayer(F.relu(head[i] + modifier[j]))
 
 
         #log("###################")
