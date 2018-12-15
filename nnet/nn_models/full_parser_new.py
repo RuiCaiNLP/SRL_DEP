@@ -207,12 +207,12 @@ class BiLSTMTagger(nn.Module):
         return (torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
                 torch.zeros(1 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
-    def __getExpr(self, sentence, i, j, train):
+    def __getExpr(self, sentence, modifier_index, head_index, train):
 
 
         head, modifier = sentence
 
-        output = self.outLayer(F.relu(head[i] + modifier[j]))
+        output = self.outLayer(F.relu(head[head_index] + modifier[modifier_index]))
 
 
         #log("###################")
@@ -226,9 +226,9 @@ class BiLSTMTagger(nn.Module):
 
     def __evaluate(self, sentence, train):
         head, modifier = sentence
-        exprs = [[self.__getExpr(sentence,  j, i, train)
-                  for j in xrange(head.size()[0])]
-                for i in xrange(head.size()[0])]
+        exprs = [[self.__getExpr(sentence,  modifier_index, head_index, train)
+                  for head_index in xrange(head.size()[0])]
+                for modifier_index in xrange(head.size()[0])]
         #log("exprs", exprs)
 
         scores = np.array([[get_data(output).numpy()[0] for output in exprsRow] for exprsRow in exprs])
