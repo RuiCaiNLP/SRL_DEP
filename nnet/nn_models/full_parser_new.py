@@ -304,10 +304,11 @@ class BiLSTMTagger(nn.Module):
             log("scores, exprs")
             log(scores[1])
             log(exprs[1])
-            gold = list(dep_heads[i][:lengths[i]])
+            gold = list(dep_heads[i])
             gold.insert(0, -1)
             #heads = decoder.parse_proj(scores)
             heads = np.argmax(scores, axis=1)
+            heads[0] = -1
             log(gold)
             log(heads)
 
@@ -316,7 +317,7 @@ class BiLSTMTagger(nn.Module):
             wrong_dep_words += e
             if e > 0:
                 for j, (h, g) in enumerate(zip(heads, gold)):
-                    if j<lengths[i] and j>0:
+                    if j<lengths[i]+1 and j>0:
                         total_dep_words += 1
                     else:
                         continue
