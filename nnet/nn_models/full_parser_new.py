@@ -212,7 +212,7 @@ class BiLSTMTagger(nn.Module):
 
         head, modifier = sentence
 
-        output = self.outLayer(F.tanh(head[head_index] + modifier[modifier_index]))
+        output = self.outLayer(F.tanh(head[head_index] + modifier[modifier_index]))[0]
 
 
         #log("###################")
@@ -322,19 +322,15 @@ class BiLSTMTagger(nn.Module):
                         total_dep_words += 1
                     else:
                         continue
-                    if h != g :
-                        log(j, h, g)
-                        errs += [(exprs[j][h] - exprs[j][g])[0]]
 
 
 
 
-        DEPloss = errs[0]
-        for i in range(len(errs)):
-            if i > 0:
-                DEPloss += errs[i]
-        DEPloss = DEPloss
-        loss = DEPloss
+
+
+        loss_function = nn.CrossEntropyLoss()
+
+        DEPloss = loss_function(exprs[1:], gold[1:])
         log("loss : ", DEPloss)
         log("avg loss : ", DEPloss/len(errs))
 
