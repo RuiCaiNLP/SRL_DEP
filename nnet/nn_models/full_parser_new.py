@@ -323,7 +323,7 @@ class BiLSTMTagger(nn.Module):
                     else:
                         continue
                     if h != g :
-                        log(i, h, g)
+                        log(j, h, g)
                         errs += [(exprs[j][h] - exprs[j][g])[0]]
 
 
