@@ -315,7 +315,7 @@ class BiLSTMTagger(nn.Module):
                     else:
                         continue
 
-                    if h != g :
+                    if 1:
                         log(j, h, g)
                         errs.append(exprs[j][h] - exprs[j][g])
 
