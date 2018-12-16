@@ -323,14 +323,14 @@ class BiLSTMTagger(nn.Module):
                     else:
                         continue
 
+                    if h != g :
+                        errs.append(exprs[h][j] - exprs[g][j])
 
 
-
-
-
-        loss_function = nn.CrossEntropyLoss()
-
-        DEPloss = loss_function(exprs[1:], gold[1:])
+        DEPloss = errs.sum()
+        loss = DEPloss
+        log("loss : ", DEPloss)
+        log("avg loss : ", DEPloss/len(errs))
         log("loss : ", DEPloss)
         log("avg loss : ", DEPloss/len(errs))
 
