@@ -317,7 +317,7 @@ class BiLSTMTagger(nn.Module):
                         continue
 
                     if h !=g:
-                        errs.append(F.sigmoid(exprs[j][h] - exprs[j][g]))
+                        errs.append(torch.exp(exprs[j][h] - exprs[j][g]))
 
 
         DEPloss = sum(errs)
