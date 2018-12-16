@@ -305,6 +305,8 @@ class BiLSTMTagger(nn.Module):
             log(scores[1])
             log(exprs[1])
             gold = list(dep_heads[i])
+            log(gold)
+            log(heads)
             gold.insert(0, -1)
             #heads = decoder.parse_proj(scores)
             heads = np.argmax(scores, axis=1)
