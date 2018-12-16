@@ -250,7 +250,7 @@ class BiLSTMTagger(nn.Module):
         pos_embeds = self.pos_embeddings(pos_tags)
         pos_embeds = torch.cat((self.VR_POS_embedding, pos_embeds), 1)
         embeds_forDEP = torch.cat((embeds_DEP, pos_embeds), 2)
-        embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
+        #embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
 
 
         #first layer
@@ -319,7 +319,7 @@ class BiLSTMTagger(nn.Module):
                         log(j, h, g)
                         errs.append(exprs[j][h] - exprs[j][g])
 
-
+        log(errs)
         DEPloss = sum(errs)
         loss = DEPloss
         log("loss : ", DEPloss)
