@@ -79,7 +79,7 @@ class BiLSTMTagger(nn.Module):
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
 
-        self.VR_word_embedding = nn.Parameter(torch.from_numpy(np.zeros((self.batch_size, 1, self.word_emb_dim), dtype='float32')))
+        self.VR_word_embedding = nn.Parameter(torch.from_numpy(np.ones((self.batch_size, 1, self.word_emb_dim), dtype='float32')))
         self.VR_POS_embedding = nn.Parameter(
             torch.from_numpy(np.zeros((self.batch_size, 1, 16), dtype='float32')))
 
@@ -245,7 +245,6 @@ class BiLSTMTagger(nn.Module):
         #log(sentence_cat.requires_grad)
         #log(sentence.requires_grad)
         embeds_DEP = self.word_embeddings_DEP(sentence)
-        log(sentence)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         embeds_DEP = torch.cat((self.VR_word_embedding, embeds_DEP), 1)
         pos_embeds = self.pos_embeddings(pos_tags)
@@ -295,8 +294,6 @@ class BiLSTMTagger(nn.Module):
 
             scores, exprs = self.__evaluate((head_states_scores, modifier_states_scores),  True)
             log("scores, exprs")
-            log(scores[1])
-            log(exprs[1])
             gold = list(dep_heads[i])
             log(gold)
 
@@ -309,7 +306,6 @@ class BiLSTMTagger(nn.Module):
             log(heads)
 
             e = sum([1 for h, g in zip(heads[1:], gold[1:]) if h != g])
-            log(scores[1])
             wrong_dep_words += e
             if e > 0:
                 for j, (h, g) in enumerate(zip(heads, gold)):
