@@ -221,9 +221,6 @@ class BiLSTMTagger(nn.Module):
         #log(modifier[j])
         #log(F.tanh(head[i] + modifier[j]))
         #log(output)
-        log("output")
-        log(output)
-        log(output[0])
         return output[0]
 
     def __evaluate(self, sentence, train):
@@ -326,7 +323,7 @@ class BiLSTMTagger(nn.Module):
                         continue
 
                     if h != g :
-                        errs.append(exprs[h][j] - exprs[g][j])
+                        errs.append(exprs[j][h] - exprs[j][g])
 
 
         DEPloss = sum(errs)
