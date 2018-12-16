@@ -212,7 +212,7 @@ class BiLSTMTagger(nn.Module):
 
         head, modifier = sentence
 
-        output = self.outLayer(F.tanh(head[head_index] + modifier[modifier_index]))[0]
+        output = self.outLayer(F.tanh(head[head_index] + modifier[modifier_index]))
 
 
         #log("###################")
@@ -221,8 +221,10 @@ class BiLSTMTagger(nn.Module):
         #log(modifier[j])
         #log(F.tanh(head[i] + modifier[j]))
         #log(output)
-
-        return output
+        log("output")
+        log(output)
+        log(output[0])
+        return output[0]
 
     def __evaluate(self, sentence, train):
         head, modifier = sentence
