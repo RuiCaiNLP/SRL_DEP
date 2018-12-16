@@ -328,9 +328,6 @@ class BiLSTMTagger(nn.Module):
 
 
         DEPloss = sum(errs)
-        loss = DEPloss
-        log("loss : ", DEPloss)
-        log("avg loss : ", DEPloss/len(errs))
         log("loss : ", DEPloss)
         log("avg loss : ", DEPloss/len(errs))
 
