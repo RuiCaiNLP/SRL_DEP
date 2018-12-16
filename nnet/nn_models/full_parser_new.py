@@ -212,6 +212,7 @@ class BiLSTMTagger(nn.Module):
 
         head, modifier = sentence
 
+        log(F.tanh(head[head_index] + modifier[modifier_index]))
         output = self.outLayer(F.tanh(head[head_index] + modifier[modifier_index]))
 
         return output[0]
@@ -315,11 +316,11 @@ class BiLSTMTagger(nn.Module):
                     else:
                         continue
 
-                    if 1:
-                        log(j, h, g)
+                    if h !=g:
+
                         errs.append(exprs[j][h] - exprs[j][g])
 
-        log(errs)
+
         DEPloss = sum(errs) + 1
         loss = DEPloss
         log("loss : ", DEPloss)
