@@ -46,7 +46,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
         tic = time.time()
         dataset = [batch for batch in train_set.batches()]
         init_dataset = [batch for batch in dataset]
-        #random.shuffle(dataset)
+        random.shuffle(dataset)
         dataset_len = len(dataset)
         for batch in dataset:
 
@@ -145,7 +145,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
             #else:
             #    Final_loss = SRLloss
 
-            Final_loss = DEPloss
+            Final_loss = SRLloss + DEPloss
             Final_loss.backward()
             #clip_grad_norm_(parameters=model.hidden2tag_M.parameters(), max_norm=norm)
             #clip_grad_norm_(parameters=model.hidden2tag_H.parameters(), max_norm=norm)
@@ -179,7 +179,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 del model.hidden_3
                 del model.hidden_4
 
-            if idx % dbg_print_rate == 0 and False:
+            if idx % dbg_print_rate == 0:
                 log('[epoch %i, %i * %i] ' %
                     (e, idx, len(batch)))
 
