@@ -276,7 +276,7 @@ class BiLSTMTagger(nn.Module):
         tag_space_tag = torch.bmm(left_part, Head_hidden_tag).view(
             (len(sentence[0]) + 1) * self.batch_size, self.dep_size, len(sentence[0]) + 1).transpose(1, 2)
 
-        tag_space_tag = tag_space_tag[np.arange(0, hidden_states_1.size()[0]),np.arange(0, len(sentence[0]) + 1), dep_heads]
+        tag_space_tag = tag_space_tag[np.arange(0, (len(sentence[0]) + 1) * self.batch_size), dep_heads.flatten()]
         tag_space_tag = tag_space_tag.view((len(sentence[0]) + 1) * self.batch_size, -1)
         heads_tag = np.argmax(tag_space_tag.cpu().data.numpy(), axis=1)
 
