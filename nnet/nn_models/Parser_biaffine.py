@@ -258,15 +258,14 @@ class BiLSTMTagger(nn.Module):
 
         nums = 0.0
         wrong_nums = 0.0
+        log(heads)
+        log(dep_heads)
         for a, b in zip(heads, dep_heads):
             nums+=1
             if a != b:
                 wrong_nums+=1
 
-        loss_function = nn.CrossEntropyLoss(ignore_index=0)
-
-
-
+        loss_function = nn.CrossEntropyLoss()
         DEPloss = loss_function(tag_space, dep_heads.view(-1))
         log("loss : ", DEPloss)
 
