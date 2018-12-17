@@ -258,8 +258,8 @@ class BiLSTMTagger(nn.Module):
         loss_function = nn.CrossEntropyLoss(ignore_index=-1)
         DEPloss = loss_function(tag_space, torch.from_numpy(dep_heads).to(device).view(-1))
 
-        h_layer_0 = hidden_states_0  # .detach()
-        h_layer_1 = hidden_states_1  # .detach()
+        h_layer_0 = hidden_states_0[:, 1:]  # .detach()
+        h_layer_1 = hidden_states_1[:, 1:]  # .detach()
 
         w = F.softmax(self.elmo_w, dim=0)
         SRL_composer = self.elmo_gamma * (w[0] * h_layer_0 + w[1] * h_layer_1)
