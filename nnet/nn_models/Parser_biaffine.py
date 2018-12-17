@@ -162,7 +162,7 @@ class BiLSTMTagger(nn.Module):
 
         self.hidLayerFOH = nn.Linear(self.ldims * 2, self.ldims)
         self.hidLayerFOM = nn.Linear(self.ldims * 2, self.ldims)
-        self.W_R = nn.Parameter(torch.rand(lstm_hidden_dim, 1 * lstm_hidden_dim))
+        self.W_R = nn.Parameter(torch.rand(lstm_hidden_dim+1, 1+lstm_hidden_dim))
 
 
 
@@ -259,8 +259,8 @@ class BiLSTMTagger(nn.Module):
         nums = 0.0
         wrong_nums = 0.0
         log(heads)
-        log(dep_heads)
-        for a, b in zip(heads, dep_heads):
+        log(dep_heads[0])
+        for a, b in zip(heads, dep_heads[0]):
             nums+=1
             if a != b:
                 wrong_nums+=1
