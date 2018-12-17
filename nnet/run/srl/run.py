@@ -159,7 +159,7 @@ class SRLRunner(Runner):
 
             dep_head = []
             for w in dep_parsing:
-                dep_head.append([int(p[2]) for p in w])
+                dep_head.append([int(p[2]) for p in w].insert(0, -1))
 
 
             frames = [self.frame_voc.vocalize(f) for f in frames]

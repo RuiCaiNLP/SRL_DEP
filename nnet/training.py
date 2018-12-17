@@ -110,8 +110,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
 
             dep_heads = model_input[12]
-            for i in range(len(dep_heads)):
-                dep_heads[i] = np.concatenate([-1], dep_heads[i])
+
 
             #root_dep_tags = model_input[12]
             #root_dep_tags_in = Variable(torch.from_numpy(root_dep_tags), requires_grad=False)
