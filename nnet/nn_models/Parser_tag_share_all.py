@@ -290,7 +290,7 @@ class BiLSTMTagger(nn.Module):
                 wrong_nums_tag += 1
 
         loss_function = nn.CrossEntropyLoss(ignore_index=0)
-        DEPloss_tag = loss_function(tag_space_tag, torch.from_numpy(dep_tags).to(device).view(-1))
+        DEPloss_tag = loss_function(tag_space_tag, dep_tags.view(-1))
 
         h_layer_0 = hidden_states_0[:, 1:]  # .detach()
         h_layer_1 = hidden_states_1[:, 1:]  # .detach()
