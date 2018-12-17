@@ -190,17 +190,17 @@ class SRLRunner(Runner):
 
             ##mask no predicate deptags"
 
-            for i in range(len(dep_tag_batch)):
-                for j in range(len(dep_tag_batch[0])):
-                    if specific_dep_relations_batch[i][j] == 2:
-                        dep_tag_batch[i][j] = dep_tag_batch[i][targets[i]]
+            #for i in range(len(dep_tag_batch)):
+            #    for j in range(len(dep_tag_batch[0])):
+            #        if specific_dep_relations_batch[i][j] == 2:
+            #            dep_tag_batch[i][j] = dep_tag_batch[i][targets[i]]
 
 
 
-            for i in range(len(dep_tag_batch)):
-                for j in range(len(dep_tag_batch[0])):
-                    if specific_dep_relations_batch[i][j] == 3:
-                        dep_tag_batch[i][j] = 1
+            #for i in range(len(dep_tag_batch)):
+            #    for j in range(len(dep_tag_batch[0])):
+            #        if specific_dep_relations_batch[i][j] == 3:
+            #            dep_tag_batch[i][j] = 1
 
 
 
