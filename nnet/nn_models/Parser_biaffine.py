@@ -79,9 +79,9 @@ class BiLSTMTagger(nn.Module):
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
 
-        self.VR_word_embedding = nn.Parameter(torch.from_numpy(np.ones((self.batch_size, 1, self.word_emb_dim), dtype='float32')))
+        self.VR_word_embedding = nn.Parameter(torch.from_numpy(np.ones((1, self.word_emb_dim), dtype='float32')))
         self.VR_POS_embedding = nn.Parameter(
-            torch.from_numpy(np.zeros((self.batch_size, 1, 16), dtype='float32')))
+            torch.from_numpy(np.ones((1, 16), dtype='float32')))
 
         self.hidden2tag = nn.Linear(4*lstm_hidden_dim, 2*lstm_hidden_dim)
         self.MLP = nn.Linear(2*lstm_hidden_dim, self.dep_size)
@@ -206,10 +206,12 @@ class BiLSTMTagger(nn.Module):
         #log(sentence_cat.requires_grad)
         #log(sentence.requires_grad)
         embeds_DEP = self.word_embeddings_DEP(sentence)
+        add_zero = torch.zeros((self.batch_size, 1, self.word_emb_dim)).to(device)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
-        embeds_DEP = torch.cat((self.VR_word_embedding, embeds_DEP), 1)
+        embeds_DEP = torch.cat((self.VR_word_embedding+add_zero, embeds_DEP), 1)
         pos_embeds = self.pos_embeddings(pos_tags)
-        pos_embeds = torch.cat((self.VR_POS_embedding, pos_embeds), 1)
+        add_zero = torch.zeros((self.batch_size, 1, 16)).to(device)
+        pos_embeds = torch.cat((self.VR_POS_embedding+add_zero, pos_embeds), 1)
         embeds_forDEP = torch.cat((embeds_DEP, pos_embeds), 2)
         #embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
 
@@ -252,7 +254,7 @@ class BiLSTMTagger(nn.Module):
         left_part = left_part.view(self.batch_size, (len(sentence[0])+1), -1)
         Head_hidden = Head_hidden.view(self.batch_size, (len(sentence[0])+1), -1).transpose(1,2)
         tag_space = torch.bmm(left_part, Head_hidden).view(
-            (len(sentence[0])+1) * self.batch_size, len(sentence[0])+1)[1:]
+            (len(sentence[0])+1) * self.batch_size, len(sentence[0])+1)
 
         heads = np.argmax(tag_space.cpu().data.numpy(), axis=1)
 
@@ -265,7 +267,7 @@ class BiLSTMTagger(nn.Module):
             if a != b:
                 wrong_nums+=1
 
-        loss_function = nn.CrossEntropyLoss()
+        loss_function = nn.CrossEntropyLoss(ignore_index=-1)
         DEPloss = loss_function(tag_space, torch.from_numpy(dep_heads).to(device).view(-1))
         log("loss : ", DEPloss)
         log("dep error rate:", wrong_nums/nums)
