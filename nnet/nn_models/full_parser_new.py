@@ -162,7 +162,7 @@ class BiLSTMTagger(nn.Module):
         self.hidden2_units = 0
         self.labelsFlag = False
         self.ldims = lstm_hidden_dim
-        self.hidden_units = 100
+        self.hidden_units = 512
         self.hidLayerFOH = nn.Linear(self.ldims * 2, self.hidden_units, bias=False)
         self.hidLayerFOM = nn.Linear(self.ldims * 2, self.hidden_units, bias=False)
 
