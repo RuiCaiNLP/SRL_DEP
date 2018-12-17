@@ -266,7 +266,7 @@ class BiLSTMTagger(nn.Module):
                 wrong_nums+=1
 
         loss_function = nn.CrossEntropyLoss()
-        DEPloss = loss_function(tag_space, dep_heads[0])
+        DEPloss = loss_function(tag_space, torch.from_numpy(dep_heads).to(device).view(-1))
         log("loss : ", DEPloss)
 
 
