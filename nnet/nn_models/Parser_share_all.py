@@ -246,8 +246,6 @@ class BiLSTMTagger(nn.Module):
 
         nums = 0.0
         wrong_nums = 0.0
-        log(heads)
-        log(dep_heads.flatten())
         for a, b in zip(heads, dep_heads.flatten()):
             if b == -1:
                 continue
