@@ -274,9 +274,9 @@ class BiLSTMTagger(nn.Module):
         left_part = left_part.view(self.batch_size, (len(sentence[0]) + 1)* self.dep_size, -1)
         Head_hidden_tag = Head_hidden_tag.view(self.batch_size, (len(sentence[0]) + 1), -1).transpose(1, 2)
         tag_space_tag = torch.bmm(left_part, Head_hidden_tag).view(
-            (len(sentence[0]) + 1) * self.batch_size, self.dep_size, len(sentence[0]) + 1).transpose(2, 3)
+            (len(sentence[0]) + 1) * self.batch_size, self.dep_size, len(sentence[0]) + 1).transpose(1, 2)
 
-        tag_space_tag = tag_space[np.arange(0, hidden_states_1.size()[0]),np.arange(0, len(sentence[0]) + 1), dep_heads]
+        tag_space_tag = tag_space_tag[np.arange(0, hidden_states_1.size()[0]),np.arange(0, len(sentence[0]) + 1), dep_heads]
         tag_space_tag = tag_space_tag.view((len(sentence[0]) + 1) * self.batch_size, -1)
         heads_tag = np.argmax(tag_space_tag.cpu().data.numpy(), axis=1)
 
@@ -381,7 +381,7 @@ class BiLSTMTagger(nn.Module):
         loss = SRLloss + DEPloss+ DEPloss_tag
         return SRLloss, DEPloss, DEPloss_tag, loss, SRLprobs, wrong_nums, nums, wrong_nums, nums,  \
                wrong_nums, nums, nums,\
-               wrong_nums, nums, nums
+               wrong_nums_tag, nums_tag, nums_tag
 
     @staticmethod
     def sort_batch(x, l):
