@@ -36,7 +36,7 @@ class BiLSTMTagger(nn.Module):
 
         batch_size = hps['batch_size']
         lstm_hidden_dim = hps['sent_hdim']
-        sent_embedding_dim_DEP = 1*hps['sent_edim'] + 16
+        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 16
         sent_embedding_dim_SRL = 3 * hps['sent_edim'] + 1 * hps['pos_edim'] + 16
         ## for the region mark
         role_embedding_dim = hps['role_edim']
@@ -162,6 +162,10 @@ class BiLSTMTagger(nn.Module):
 
         self.VR_word_embedding = nn.Parameter(
             torch.from_numpy(np.ones((1, self.word_emb_dim), dtype='float32')))
+
+        self.VR_word_embedding_random = nn.Parameter(
+            torch.from_numpy(np.ones((1, self.word_emb_dim), dtype='float32')))
+
         self.VR_POS_embedding = nn.Parameter(
             torch.from_numpy(np.ones((1, 16), dtype='float32')))
 
@@ -200,12 +204,18 @@ class BiLSTMTagger(nn.Module):
         embeds_DEP = self.word_embeddings_DEP(sentence)
         add_zero = torch.zeros((self.batch_size, 1, self.word_emb_dim)).to(device)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
-        embeds_DEP_cat = torch.cat((self.VR_word_embedding + add_zero, embeds_DEP), 1)
+        embeds_DEP_cat = torch.cat((self.VR_word_embedding_random + add_zero, embeds_DEP), 1)
+
         pos_embeds = self.pos_embeddings(pos_tags)
         add_zero = torch.zeros((self.batch_size, 1, 16)).to(device)
         pos_embeds_cat = torch.cat((self.VR_POS_embedding + add_zero, pos_embeds), 1)
-        embeds_forDEP = torch.cat((embeds_DEP_cat, pos_embeds_cat), 2)
-        # embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
+
+        fixed_embeds_DEP = self.word_fixed_embeddings(p_sentence)
+        fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
+        add_zero = torch.zeros((self.batch_size, 1, self.word_emb_dim)).to(device)
+        fixed_embeds_DEP_cat = torch.cat((self.VR_word_embedding + add_zero, fixed_embeds_DEP), 1)
+        embeds_forDEP = torch.cat((embeds_DEP_cat, fixed_embeds_DEP_cat, pos_embeds_cat), 2)
+        embeds_forDEP = self.DEP_input_dropout(embeds_forDEP)
 
 
         # first layer
