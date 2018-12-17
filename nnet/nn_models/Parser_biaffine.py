@@ -261,8 +261,8 @@ class BiLSTMTagger(nn.Module):
         nums = 0.0
         wrong_nums = 0.0
         log(heads)
-        log(dep_heads[0])
-        for a, b in zip(heads, dep_heads[0]):
+        log(dep_heads)
+        for a, b in zip(heads, dep_heads):
             nums+=1
             if a != b:
                 wrong_nums+=1
