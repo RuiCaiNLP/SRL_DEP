@@ -102,6 +102,7 @@ class BiLSTMTagger(nn.Module):
         self.elmo_gamma = nn.Parameter(torch.ones(1))
 
         self.SRL_input_dropout = nn.Dropout(p=0.3)
+        self.SRL_composer_dropout = nn.Dropout(p=0.3)
         self.DEP_input_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
         self.label_dropout = nn.Dropout(p=0.5)
@@ -290,7 +291,7 @@ class BiLSTMTagger(nn.Module):
         hidden_states = hidden_states[unsort_idx]
 
         # second_layer
-        hidden_states = torch.cat((hidden_states, self.SRL_input_dropout(SRL_composer)), 2)
+        hidden_states = torch.cat((hidden_states, self.SRL_composer_dropout(SRL_composer)), 2)
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
