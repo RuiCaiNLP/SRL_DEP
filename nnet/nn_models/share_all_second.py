@@ -290,7 +290,7 @@ class BiLSTMTagger(nn.Module):
         hidden_states = hidden_states[unsort_idx]
 
         # second_layer
-        hidden_states = torch.cat((hidden_states, self.SRL_input_dropout(SRL_composer)))
+        hidden_states = torch.cat((hidden_states, self.SRL_input_dropout(SRL_composer)), 2)
         embeds_sort, lengths_sort, unsort_idx = self.sort_batch(hidden_states, lengths)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort, batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
