@@ -150,6 +150,7 @@ class BiLSTMTagger(nn.Module):
         self.hidden_3 = self.init_hidden_spe()
         self.hidden_4 = self.init_hidden_share()
         self.ldims = lstm_hidden_dim
+
         self.hidLayerFOH = nn.Linear(self.ldims * 2, self.ldims)
         self.hidLayerFOM = nn.Linear(self.ldims * 2, self.ldims)
         self.W_R = nn.Parameter(torch.rand(lstm_hidden_dim + 1, 1 + lstm_hidden_dim))
