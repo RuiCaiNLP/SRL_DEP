@@ -195,6 +195,11 @@ class BiLSTMTagger(nn.Module):
         elmo_emb_word = self.elmo_mlp_word(elmo_emb)
         """
         #contruct input for DEP
+        log(sentence)
+        log(region_marks)
+        log(lengths)
+        log(targets)
+        return
 
         embeds_DEP = self.word_embeddings_DEP(sentence)
         add_zero = torch.zeros((self.batch_size, 1, self.word_emb_dim)).to(device)
