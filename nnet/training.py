@@ -309,11 +309,12 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         right_noNull_predict_spe += right_noNull_predict_spe_b
                         noNull_predict_spe += noNull_predict_spe_b
                         noNUll_truth_spe += noNUll_truth_spe_b
-                        """
+
                         for i, sent_labels in enumerate(labels):
                             labels_voc = batch[i][-4]
                             local_voc = make_local_voc(labels_voc)
                             for j in range(len(labels[i])):
+                                """
                                 best = local_voc[labels[i][j]]
                                 true = local_voc[tags[i][j]]
                                 
@@ -331,23 +332,23 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                                         right_NonNullPredict += 1
                                         Dep_Right_NoNull_Predict[dep_tags_in[i][j]] += 1
                         """
-                        best = labels[i][j]
-                        true = tags[i][j]
-                        # true = Predicate_Labels_nd[i][j]
+                                best = labels[i][j]
+                                true = tags[i][j]
+                                # true = Predicate_Labels_nd[i][j]
 
-                        if true != 0:
-                            Dep_count_num[dep_tags_in[i][j]] += 1
-                        if true != 0 and true != 1:
-                            NonNullTruth += 1
-                            Dep_NoNull_Truth[dep_tags_in[i][j]] += 1
-                        if true != best:
-                            errors += 1
-                        if best != 0 and best != 1 and true != 0:
-                            NonNullPredict += 1
-                            Dep_NoNull_Predict[dep_tags_in[i][j]] += 1
-                            if true == best:
-                                right_NonNullPredict += 1
-                                Dep_Right_NoNull_Predict[dep_tags_in[i][j]] += 1
+                                if true != 0:
+                                    Dep_count_num[dep_tags_in[i][j]] += 1
+                                if true != 0 and true != 1:
+                                    NonNullTruth += 1
+                                    Dep_NoNull_Truth[dep_tags_in[i][j]] += 1
+                                if true != best:
+                                    errors += 1
+                                if best != 0 and best != 1 and true != 0:
+                                    NonNullPredict += 1
+                                    Dep_NoNull_Predict[dep_tags_in[i][j]] += 1
+                                    if true == best:
+                                        right_NonNullPredict += 1
+                                        Dep_Right_NoNull_Predict[dep_tags_in[i][j]] += 1
 
                         NonNullPredicts += NonNullPredict
                         right_NonNullPredicts += right_NonNullPredict
