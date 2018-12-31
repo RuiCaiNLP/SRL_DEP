@@ -152,7 +152,7 @@ class SRLRunner(Runner):
             dep_seq = []
             for w in dep_parsing:
                 tags = [p[0] for p in w]
-                tags.insert(0, '<pad>')
+                #tags.insert(0, '<pad>')
                 dep_seq.append(tags)
             dep_tags = [self.dep_voc.vocalize(p) for p in dep_seq]
             specific_dep_tags = [self.specific_dep_voc.vocalize(p) for p in specific_dep_labels]
@@ -162,7 +162,7 @@ class SRLRunner(Runner):
             dep_head = []
             for w in dep_parsing:
                 heads = [int(p[2]) for p in w]
-                heads.insert(0, -1)
+                #heads.insert(0, -1)
                 dep_head.append(heads)
 
 
