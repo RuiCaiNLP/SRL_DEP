@@ -287,10 +287,10 @@ class BiLSTMTagger(nn.Module):
         hidden_states_3 = hidden_states
         predicate_embeds = hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]
         # T * B * H
-        added_embeds = torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2]).to(device)
-        predicate_embeds = added_embeds + predicate_embeds
+        #added_embeds = torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2]).to(device)
+        #predicate_embeds = added_embeds + predicate_embeds
         # B * T * H
-        predicate_embeds = predicate_embeds.transpose(0, 1)
+        #predicate_embeds = predicate_embeds.transpose(0, 1)
         # print(hidden_states)
         # non-linear map and rectify the roles' embeddings
         # roles = Variable(torch.from_numpy(np.arange(0, self.tagset_size)))
