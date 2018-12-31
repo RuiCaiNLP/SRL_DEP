@@ -314,7 +314,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                             labels_voc = batch[i][-4]
                             local_voc = make_local_voc(labels_voc)
                             for j in range(len(labels[i])):
-                                """
+
                                 best = local_voc[labels[i][j]]
                                 true = local_voc[tags[i][j]]
                                 
@@ -349,6 +349,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                                     if true == best:
                                         right_NonNullPredict += 1
                                         Dep_Right_NoNull_Predict[dep_tags_in[i][j]] += 1
+                        """
 
                         NonNullPredicts += NonNullPredict
                         right_NonNullPredicts += right_NonNullPredict
