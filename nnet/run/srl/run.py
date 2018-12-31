@@ -84,6 +84,7 @@ class SRLRunner(Runner):
         file_in = open(self.a.role_voc, 'r')
         for line in file_in.readlines():
             all_labels_voc.append(line.strip())
+        file_in.close()
         #log(self.word_voc.direct)
         log('SRLRunner has inistialized!')
 
