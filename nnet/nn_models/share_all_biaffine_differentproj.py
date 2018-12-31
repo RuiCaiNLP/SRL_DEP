@@ -288,8 +288,8 @@ class BiLSTMTagger(nn.Module):
 
         # B * H
         hidden_states_3 = hidden_states
-        hidden_states = F.relu(self.Non_Predicate_Proj(hidden_states))
-        predicate_embeds = F.relu(self.Predicate_Proj(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]))
+        hidden_states = self.predicate_dropout(F.relu(self.Non_Predicate_Proj(hidden_states)))
+        predicate_embeds = self.word_dropout(F.relu(self.Predicate_Proj(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in])))
         # T * B * H
         #added_embeds = torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2]).to(device)
         #predicate_embeds = added_embeds + predicate_embeds
