@@ -298,6 +298,7 @@ class BiLSTMTagger(nn.Module):
         # log(frames)
 
         # B * roles * h
+        log(local_roles_voc)
         role_embeds = self.role_embeddings(local_roles_voc)
         frame_embeds = self.frame_embeddings(frames)
 
