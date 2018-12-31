@@ -36,12 +36,11 @@ class BiLSTMTagger(nn.Module):
 
         batch_size = hps['batch_size']
         lstm_hidden_dim = hps['sent_hdim']
-        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim'] + 1
-        sent_embedding_dim_SRL = 3 * hps['sent_edim'] + 1 * hps['pos_edim'] + 1
+        sent_embedding_dim_DEP = 2*hps['sent_edim'] + 1*hps['pos_edim'] + 16
+        sent_embedding_dim_SRL = 3 * hps['sent_edim'] + 1 * hps['pos_edim'] + 16
         ## for the region mark
-        self.role_embedding_dim = hps['role_edim']
-        role_embedding_dim = self.role_embedding_dim
-        frame_embedding_dim = self.role_embedding_dim
+        role_embedding_dim = hps['role_edim']
+        frame_embedding_dim = role_embedding_dim
         vocab_size = hps['vword']
 
         self.tagset_size = hps['vbio']
@@ -60,6 +59,7 @@ class BiLSTMTagger(nn.Module):
         self.pos_embeddings_DEP = nn.Embedding(self.pos_size, hps['pos_edim'])
         self.p_lemma_embeddings = nn.Embedding(self.frameset_size, hps['sent_edim'])
         self.dep_embeddings = nn.Embedding(self.dep_size, self.pos_size)
+        self.region_embeddings = nn.Embedding(2, 16)
         #self.lr_dep_embeddings = nn.Embedding(self.lr_dep_size, hps[])
 
 
@@ -72,7 +72,6 @@ class BiLSTMTagger(nn.Module):
 
 
         self.role_embeddings = nn.Embedding(self.tagset_size, role_embedding_dim)
-        self.bias_roles_embeddings = nn.Embedding(self.tagset_size, 1)
         self.frame_embeddings = nn.Embedding(self.frameset_size, frame_embedding_dim)
 
 
@@ -102,17 +101,9 @@ class BiLSTMTagger(nn.Module):
         self.elmo_w = nn.Parameter(torch.Tensor([0.5, 0.5]))
         self.elmo_gamma = nn.Parameter(torch.ones(1))
 
-        self.argument_size = 300
-        self.argument_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.LeakyReLU())
-        self.predicate_map = nn.Sequential(nn.Linear(2 * lstm_hidden_dim, self.argument_size), nn.LeakyReLU())
-
-        self.W_R = nn.Bilinear(self.argument_size+1, self.argument_size+1, self.tagset_size)
-
         self.SRL_input_dropout = nn.Dropout(p=0.3)
         self.DEP_input_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
-        self.mlp_pred_dropout = nn.Dropout(p=0.2)
-        self.mlp_argu_dropout = nn.Dropout(p=0.2)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
         #self.use_dropout = nn.Dropout(p=0.2)
@@ -151,7 +142,10 @@ class BiLSTMTagger(nn.Module):
 
 
         # non-linear map to role embedding
-        self.role_map = nn.Linear(in_features=role_embedding_dim * 2, out_features=self.argument_size * 2)
+        self.role_map = nn.Linear(in_features=role_embedding_dim * 2, out_features=self.hidden_dim * 4)
+
+
+        self.W_R = nn.Parameter(torch.rand(2*lstm_hidden_dim+ 1, self.tagset_size * (2*lstm_hidden_dim + 1)))
 
         # Init hidden state
         self.hidden = self.init_hidden_spe()
@@ -195,7 +189,7 @@ class BiLSTMTagger(nn.Module):
         embeds_DEP = self.word_embeddings_DEP(sentence)
         embeds_DEP = embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
-        region_marks = region_marks.view(self.batch_size, len(sentence[0]), 1)
+        region_marks = self.region_embeddings(region_marks).view(self.batch_size, len(sentence[0]), 16)
         #sharing pretrained word_embeds
         fixed_embeds_DEP = self.word_fixed_embeddings(p_sentence)
         fixed_embeds_DEP = fixed_embeds_DEP.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
@@ -289,33 +283,33 @@ class BiLSTMTagger(nn.Module):
         hidden_states = self.hidden_state_dropout(hidden_states)
 
 
-
-        hidden_states_argument = hidden_states
-        predicate_embeds = hidden_states_argument[np.arange(0, hidden_states_argument.size()[0]), target_idx_in]
-        added_embeds = torch.zeros(hidden_states.size()[1], hidden_states.size()[0], hidden_states.size()[2]).to(
-            device)
+        # B * H
+        hidden_states_3 = hidden_states
+        predicate_embeds = hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]
+        # T * B * H
+        added_embeds = torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2]).to(device)
         predicate_embeds = added_embeds + predicate_embeds
+        # B * T * H
         predicate_embeds = predicate_embeds.transpose(0, 1)
-        predicate_embeds = self.mlp_pred_dropout(self.predicate_map(predicate_embeds))
-        predicate_embeds = predicate_embeds.view(self.batch_size*len(sentence[0]), -1)
-        predicate_embeds = torch.cat((predicate_embeds, torch.ones(self.batch_size*len(sentence[0]), 1, requires_grad=True).to(device)), 1)
-        predicate_embeds = predicate_embeds.view(self.batch_size, len(sentence[0]), -1)
+        # print(hidden_states)
+        # non-linear map and rectify the roles' embeddings
+        # roles = Variable(torch.from_numpy(np.arange(0, self.tagset_size)))
 
-        # (B*T)(H+1)
-        hidden_states_argument = self.mlp_argu_dropout(self.argument_map(hidden_states_argument))
-        hidden_states_argument = hidden_states_argument.view(self.batch_size*len(sentence[0]), -1)
-        hidden_states_argument = torch.cat((hidden_states_argument, torch.ones(self.batch_size*len(sentence[0]), 1, requires_grad=True).to(device)), 1)
-        hidden_states_argument = hidden_states_argument.view(self.batch_size, len(sentence[0]), -1)
-        # *(B*T) nr*(H+1)
-        #lin = torch.matmul(hidden_states_argument, self.W_R)
+        # B * roles
+        # log(local_roles_voc)
+        # log(frames)
 
-        # B T*r H+1     B H+1 1  -> B  T*r  1
-        #lin = lin.view(self.batch_size, -1, self.argument_size+1)
-        #predicate_embeds = predicate_embeds.view(self.batch_size, self.argument_size+1, 1)
-        #tag_space = torch.matmul(lin, predicate_embeds)
+        bias_one = torch.ones((self.batch_size, len(sentence[0]), 1)).to(device)
+        hidden_states_word = torch.cat((hidden_states, Variable(bias_one)), 2)
 
-        tag_space = self.W_R(hidden_states_argument, predicate_embeds)
-        tag_space = tag_space.view(len(sentence[0]) * self.batch_size, self.tagset_size)
+        bias_one = torch.ones((self.batch_size, 1)).to(device)
+        hidden_states_predicate = torch.cat((predicate_embeds, Variable(bias_one)), 1)
+
+        left_part = torch.mm(hidden_states_word.view(self.batch_size * len(sentence[0]), -1), self.W_R)
+        left_part = left_part.view(self.batch_size, len(sentence[0]) * self.tagset_size, -1)
+        hidden_states_predicate = hidden_states_predicate.view(self.batch_size, -1, 1)
+        tag_space = torch.bmm(left_part, hidden_states_predicate).view(
+            len(sentence[0]) * self.batch_size, -1)
         SRLprobs = F.softmax(tag_space, dim=1)
 
         # +++++++++++++++++++++++
@@ -379,5 +373,3 @@ class BiLSTMTagger(nn.Module):
         x_sorted = x[sidx]
         _, unsort_idx = sidx.sort()
         return x_sorted, l_sorted, unsort_idx
-
-
