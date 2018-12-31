@@ -81,7 +81,7 @@ class SRLRunner(Runner):
         self.specific_dep_voc = create_voc('file', self.a.specific_dep_voc)
 
         ## read the role_voc
-        file_in = open(self.role_voc, 'r')
+        file_in = open(self.a.role_voc, 'r')
         for line in file_in.readlines():
             all_labels_voc.append(line.strip())
         #log(self.word_voc.direct)
