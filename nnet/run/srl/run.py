@@ -12,11 +12,12 @@ def bio_reader(record):
     dbg_header, sent,  pos_tags, dep_parsing, root_dep_parsing, frame, target, f_lemmas, f_targets, labels_voc, \
     labels, specific_dep_labels, specific_dep_relations = record.split('\t')
 
-    labels_voc = labels_voc.split(' ')
-    log(all_labels_voc)
-    log(labels_voc)
+    #labels_voc = labels_voc.split(' ')
+    #log(all_labels_voc)
+    #log(labels_voc)
+    labels_voc = all_labels_voc
 
-    labels_voc.insert(0, '<pad>')
+    #labels_voc.insert(0, '<pad>')
     frame = [frame] * len(labels_voc)
     words = []
     for word in sent.split(' '):
