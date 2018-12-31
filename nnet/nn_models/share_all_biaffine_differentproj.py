@@ -163,8 +163,8 @@ class BiLSTMTagger(nn.Module):
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
         #return (Variable(torch.zeros(1, self.batch_size, self.hidden_dim)),
         #        Variable(torch.zeros(1, self.batch_size, self.hidden_dim)))
-        return (torch.zeros(4 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
-                torch.zeros(4 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
+        return (torch.zeros(3 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device),
+                torch.zeros(3 * 2, self.batch_size, self.hidden_dim, requires_grad=False).to(device))
 
     def init_hidden_spe(self):
         # Before we've done anything, we dont have any hidden state.
