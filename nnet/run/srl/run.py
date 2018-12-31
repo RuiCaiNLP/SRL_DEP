@@ -3,6 +3,7 @@ from nnet.ml.voc import *
 from functools import partial
 from nnet.nn_models.share_all import BiLSTMTagger
 
+all_labels_voc = []
 
 def make_local_voc(labels):
     return {i: label for i, label in enumerate(labels)}
@@ -10,8 +11,9 @@ def make_local_voc(labels):
 def bio_reader(record):
     dbg_header, sent,  pos_tags, dep_parsing, root_dep_parsing, frame, target, f_lemmas, f_targets, labels_voc, \
     labels, specific_dep_labels, specific_dep_relations = record.split('\t')
-    labels_voc = labels_voc.split(' ')
 
+    #labels_voc = labels_voc.split(' ')
+    labels_voc = all_labels_voc
 
     labels_voc.insert(0, '<pad>')
     frame = [frame] * len(labels_voc)
@@ -78,7 +80,10 @@ class SRLRunner(Runner):
         self.dep_voc = create_voc('file', self.a.dep_voc)
         self.specific_dep_voc = create_voc('file', self.a.specific_dep_voc)
 
-
+        ## read the role_voc
+        file_in = open(self.role_voc, 'r')
+        for line in file_in.readlines():
+            all_labels_voc.append(line.strip())
         #log(self.word_voc.direct)
         log('SRLRunner has inistialized!')
 
