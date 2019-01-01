@@ -29,7 +29,7 @@ def cat(l, dimension=-1):
     return torch.cat(valid_l, dimension)
 
 class Biaffine(nn.Module):
-    def __init__(self, in1_features, in2_features, out_features, bias=(True, True, True)):
+    def __init__(self, in1_features, in2_features, out_features, bias=(True, True, False)):
         super(Biaffine, self).__init__()
         self.in1_features = in1_features
         self.in2_features = in2_features
