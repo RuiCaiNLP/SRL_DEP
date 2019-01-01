@@ -28,6 +28,76 @@ def cat(l, dimension=-1):
         dimension += len(valid_l[0].size())
     return torch.cat(valid_l, dimension)
 
+class Biaffine(nn.Module):
+    def __init__(self, in1_features, in2_features, out_features, bias=(True, True, True)):
+        super(Biaffine, self).__init__()
+        self.in1_features = in1_features
+        self.in2_features = in2_features
+        self.out_features = out_features
+        self._use_bias = bias
+
+        shape = (in1_features + int(bias[0]),
+                 in2_features + int(bias[1]),
+                 out_features)
+        self.weight = nn.Parameter(torch.Tensor(*shape))
+        if bias[2]:
+            self.bias = nn.Parameter(torch.Tensor(out_features))
+        else:
+            # TODO: why not self.bias = None ?
+            self.register_parameter('bias', None)
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        # According to https://github.com/tdozat/Parser-v1/blob/Definitely-working/lib/linalg.py# L97
+        # The parameters are init with orthogonal
+        nn.init.orthogonal_(self.weight)
+        if self.bias is not None:
+            # TODO: need to verify the initialization method
+            # stdv = 1. / math.sqrt(self.bias.size(0))
+            # self.bias.data.uniform_(-stdv, stdv)
+            nn.init.constant_(self.bias, 0)
+
+    def forward(self, input1, input2):
+        # TODO: Might set dropout for the inputs, refer to
+        # https://github.com/tdozat/Parser-v1/blob/Definitely-working/lib/models/nn.py#L303
+        is_cuda = next(self.parameters()).is_cuda
+        device_id = next(self.parameters()).get_device() if is_cuda else None
+        out_size = self.out_features
+        batch_size, len1, dim1 = input1.size()
+        if self._use_bias[0]:
+            ones = torch.ones(batch_size, len1, 1)
+            if is_cuda:
+                ones = ones.cuda(device_id)
+            input1 = torch.cat([input1, Variable(ones)], dim=2)
+            dim1 += 1
+        len2, dim2 = input2.size()[1:]
+        if self._use_bias[1]:
+            ones = torch.ones(batch_size, len2, 1)
+            if is_cuda:
+                ones = ones.cuda(device_id)
+            input2 = torch.cat([input2, Variable(ones)], dim=2)
+            dim2 += 1
+        # input1_reshape = (batch* len, dim1)
+        input1_reshaped = input1.contiguous().view(batch_size * len1, dim1)
+        # W_reshaped = (dim1, output_size * dim2)
+        W_reshaped = torch.transpose(self.weight, 1, 2).contiguous().view(dim1, out_size * dim2)
+        # (bn, d) (d, rd) -> (bn, rd) -> (b, nr, d)
+        affine = torch.mm(input1_reshaped, W_reshaped).view(batch_size, len1* out_size, dim2)
+        # (b, nr, d) (b, n, d)T -> (b, nr, n) -> (b, n, r, n)
+        input2_transpose = torch.transpose(input2, 1, 2)
+        biaffine = torch.bmm(affine, input2_transpose).view(batch_size, len1, out_size, len2)
+        # (b, n, r, n) -> (b, n, n, r)
+        biaffine = torch.transpose(biaffine, 2, 3).contiguous()
+        if self._use_bias[2]:
+            biaffine += self.bias.expand_as(biaffine)
+        return biaffine
+
+    def __repr__(self):
+        return self.__class__.__name__ + ' (' \
+                + 'in1_features=' + str(self.in1_features) \
+                + ', in2_features=' + str(self.in2_features) \
+                + ', out_features=' + str(self.out_features) + ')'
+
 class BiLSTMTagger(nn.Module):
 
     #def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size):
@@ -149,6 +219,8 @@ class BiLSTMTagger(nn.Module):
         self.Non_Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
         self.Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
         self.W_R = nn.Parameter(torch.ones(lstm_hidden_dim+ 1, self.tagset_size * (lstm_hidden_dim + 1)))
+
+        self.biaffine_classifer = Biaffine(lstm_hidden_dim, lstm_hidden_dim, self.tagset_size)
 
         # Init hidden state
         self.hidden = self.init_hidden_spe()
@@ -288,9 +360,10 @@ class BiLSTMTagger(nn.Module):
 
         # B * H
         hidden_states_3 = hidden_states
-        hidden_states = self.predicate_dropout(F.leaky_relu(self.Non_Predicate_Proj(hidden_states), 0.1))
-        predicate_embeds = self.word_dropout(F.leaky_relu(
-            self.Predicate_Proj(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]), 0.1))
+        hidden_states = self.predicate_dropout(self.Non_Predicate_Proj(hidden_states))
+        predicate_embeds = self.word_dropout(
+            self.Predicate_Proj(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]))
+        predicate_embeds = predicate_embeds.unsqueeze(1)
         # T * B * H
         #added_embeds = torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2]).to(device)
         #predicate_embeds = added_embeds + predicate_embeds
@@ -303,7 +376,7 @@ class BiLSTMTagger(nn.Module):
         # B * roles
         # log(local_roles_voc)
         # log(frames)
-
+        """
         bias_one = torch.ones((self.batch_size, len(sentence[0]), 1)).to(device)
         hidden_states_word = torch.cat((hidden_states, Variable(bias_one)), 2)
 
@@ -314,6 +387,9 @@ class BiLSTMTagger(nn.Module):
         left_part = left_part.view(self.batch_size, len(sentence[0]) * self.tagset_size, -1)
         hidden_states_predicate = hidden_states_predicate.view(self.batch_size, -1, 1)
         tag_space = torch.bmm(left_part, hidden_states_predicate).view(
+            len(sentence[0]) * self.batch_size, -1)
+        """
+        tag_space = self.biaffine_classifer.forward(hidden_states, predicate_embeds).view(
             len(sentence[0]) * self.batch_size, -1)
         SRLprobs = F.softmax(tag_space, dim=1)
 
