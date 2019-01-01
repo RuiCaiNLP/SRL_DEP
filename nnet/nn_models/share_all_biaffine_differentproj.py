@@ -326,7 +326,7 @@ class BiLSTMTagger(nn.Module):
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
         # hidden_states = hidden_states.transpose(0, 1)
         hidden_states = hidden_states[unsort_idx]
-        hidden_states = self.hidden_state_dropout(hidden_states)
+        #hidden_states = self.hidden_state_dropout(hidden_states)
 
 
         # B * H
