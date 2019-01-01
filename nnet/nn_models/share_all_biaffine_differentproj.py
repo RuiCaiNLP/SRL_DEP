@@ -148,7 +148,7 @@ class BiLSTMTagger(nn.Module):
 
         self.Non_Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
         self.Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
-        self.W_R = nn.Parameter(torch.zeros(lstm_hidden_dim+ 1, self.tagset_size * (lstm_hidden_dim + 1)))
+        self.W_R = nn.Parameter(torch.ones(lstm_hidden_dim+ 1, self.tagset_size * (lstm_hidden_dim + 1)))
 
         # Init hidden state
         self.hidden = self.init_hidden_spe()
