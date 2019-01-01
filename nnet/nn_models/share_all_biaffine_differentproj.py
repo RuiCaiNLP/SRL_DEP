@@ -104,8 +104,8 @@ class BiLSTMTagger(nn.Module):
         self.SRL_input_dropout = nn.Dropout(p=0.3)
         self.DEP_input_dropout = nn.Dropout(p=0.3)
         self.hidden_state_dropout = nn.Dropout(p=0.3)
-        self.word_dropout = nn.Dropout(p=0.3)
-        self.predicate_dropout = nn.Dropout(p=0.3)
+        self.word_dropout = nn.Dropout(p=0.0)
+        self.predicate_dropout = nn.Dropout(p=0.0)
         self.label_dropout = nn.Dropout(p=0.5)
         self.link_dropout = nn.Dropout(p=0.5)
         #self.use_dropout = nn.Dropout(p=0.2)
@@ -148,7 +148,7 @@ class BiLSTMTagger(nn.Module):
 
         self.Non_Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
         self.Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
-        self.W_R = nn.Parameter(torch.rand(lstm_hidden_dim+ 1, self.tagset_size * (lstm_hidden_dim + 1)))
+        self.W_R = nn.Parameter(torch.zeros(lstm_hidden_dim+ 1, self.tagset_size * (lstm_hidden_dim + 1)))
 
         # Init hidden state
         self.hidden = self.init_hidden_spe()
@@ -288,8 +288,9 @@ class BiLSTMTagger(nn.Module):
 
         # B * H
         hidden_states_3 = hidden_states
-        hidden_states = self.predicate_dropout(F.relu(self.Non_Predicate_Proj(hidden_states)))
-        predicate_embeds = self.word_dropout(F.relu(self.Predicate_Proj(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in])))
+        hidden_states = self.predicate_dropout(F.leaky_relu(self.Non_Predicate_Proj(hidden_states), 0.1))
+        predicate_embeds = self.word_dropout(F.leaky_relu(
+            self.Predicate_Proj(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]), 0.1))
         # T * B * H
         #added_embeds = torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2]).to(device)
         #predicate_embeds = added_embeds + predicate_embeds
