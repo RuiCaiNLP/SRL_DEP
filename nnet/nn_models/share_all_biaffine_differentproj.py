@@ -53,8 +53,8 @@ class Biaffine(nn.Module):
         nn.init.orthogonal_(self.weight)
         if self.bias is not None:
             # TODO: need to verify the initialization method
-            stdv = 1. / math.sqrt(self.bias.size(0))
-            self.bias.data.uniform_(-stdv, stdv)
+            #stdv = 1. / math.sqrt(self.bias.size(0))
+            #self.bias.data.uniform_(-stdv, stdv)
             nn.init.constant_(self.bias, 0)
 
     def forward(self, input1, input2):
