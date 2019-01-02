@@ -163,7 +163,7 @@ class BiLSTMTagger(nn.Module):
 
         self.num_layers = 3
         self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + self.elmo_emb_size * 1 + 2 * self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
-                                    bidirectional=True, num_layers=self.num_layers)
+                                    bidirectional=True, num_layers=self.num_layers, dropout=0.2)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][1])
@@ -176,7 +176,7 @@ class BiLSTMTagger(nn.Module):
 
 
 
-        self.map_dim = 600
+        self.map_dim = lstm_hidden_dim
         self.mlp_word = MLP(
             in_features=2 * lstm_hidden_dim,
             out_features=self.map_dim ,
