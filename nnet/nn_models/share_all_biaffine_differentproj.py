@@ -176,7 +176,7 @@ class BiLSTMTagger(nn.Module):
 
 
 
-        self.map_dim = 300
+        self.map_dim = 600
         self.mlp_word = MLP(
             in_features=2 * lstm_hidden_dim,
             out_features=self.map_dim ,
