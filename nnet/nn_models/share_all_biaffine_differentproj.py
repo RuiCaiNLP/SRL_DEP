@@ -163,7 +163,7 @@ class BiLSTMTagger(nn.Module):
 
         self.num_layers = 3
         self.BiLSTM_SRL = nn.LSTM(input_size=sent_embedding_dim_SRL + self.elmo_emb_size * 1 + 2 * self.pos_size, hidden_size=lstm_hidden_dim, batch_first=True,
-                                    bidirectional=True, num_layers=self.num_layers, dropout=0.2)
+                                    bidirectional=True, num_layers=self.num_layers)
 
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][0])
         init.orthogonal_(self.BiLSTM_SRL.all_weights[0][1])
@@ -174,9 +174,10 @@ class BiLSTMTagger(nn.Module):
         # non-linear map to role embedding
         self.role_map = nn.Linear(in_features=role_embedding_dim * 2, out_features=self.hidden_dim * 4)
 
-
-
         self.map_dim = lstm_hidden_dim
+
+        """
+        
         self.mlp_word = MLP(
             in_features=2 * lstm_hidden_dim,
             out_features=self.map_dim ,
@@ -189,9 +190,10 @@ class BiLSTMTagger(nn.Module):
             activation=nn.LeakyReLU(0.1),
             dropout=0.33)
         nn.init.orthogonal(self.mlp_predicate.weight)
+        """
 
-        #self.Non_Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
-        #self.Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
+        self.Non_Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
+        self.Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
         self.W_R = nn.Parameter(torch.ones(self.map_dim + 1, self.tagset_size * (self.map_dim + 1)))
 
 
@@ -329,13 +331,15 @@ class BiLSTMTagger(nn.Module):
         hidden_states, lens = rnn.pad_packed_sequence(hidden_states, batch_first=True)
         # hidden_states = hidden_states.transpose(0, 1)
         hidden_states = hidden_states[unsort_idx]
-        #hidden_states = self.hidden_state_dropout(hidden_states)
+        hidden_states = self.hidden_state_dropout(hidden_states)
 
 
         # B * H
         hidden_states_3 = hidden_states
-        hidden_states = self.mlp_word(hidden_states)
-        predicate_embeds = self.mlp_predicate(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in])
+        predicate_embeds = self.Predicate_Proj(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in])
+
+        hidden_states = self.Non_Predicate_Proj(hidden_states)
+
 
         # T * B * H
         #added_embeds = torch.zeros(hidden_states_3.size()[1], hidden_states_3.size()[0], hidden_states_3.size()[2]).to(device)
