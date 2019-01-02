@@ -174,22 +174,25 @@ class BiLSTMTagger(nn.Module):
         # non-linear map to role embedding
         self.role_map = nn.Linear(in_features=role_embedding_dim * 2, out_features=self.hidden_dim * 4)
 
-        self.Non_Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
-        self.Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
-        self.W_R = nn.Parameter(torch.ones(lstm_hidden_dim+ 1, self.tagset_size * (lstm_hidden_dim + 1)))
 
+
+        self.map_dim = 400
         self.mlp_word = MLP(
             in_features=2 * lstm_hidden_dim,
-            out_features=400,
+            out_features=self.map_dim ,
             activation=nn.LeakyReLU(0.1),
             dropout=0.33)
         nn.init.orthogonal(self.mlp_word.weight)
         self.mlp_predicate = MLP(
             in_features=2 * lstm_hidden_dim,
-            out_features=400,
+            out_features=self.map_dim ,
             activation=nn.LeakyReLU(0.1),
             dropout=0.33)
         nn.init.orthogonal(self.mlp_predicate.weight)
+
+        #self.Non_Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
+        #self.Predicate_Proj = nn.Linear(2 * lstm_hidden_dim, lstm_hidden_dim)
+        self.W_R = nn.Parameter(torch.zeros(self.map_dim + 1, self.tagset_size * (self.map_dim + 1)))
 
 
 
