@@ -172,7 +172,7 @@ class SRLRunner(Runner):
                 #tags.insert(0, '<pad>')
                 dep_seq.append(tags)
             dep_tags = [self.dep_voc.vocalize(p) for p in dep_seq]
-            specific_dep_tags = [self.specific_dep_voc.vocalize(p) for p in specific_dep_labels]
+            specific_dep_tags = [self.dep_voc.vocalize(p) for p in specific_dep_labels]
 
             specific_dep_relations = [[int(r) for r in s ]for s in specific_dep_relations]
 
