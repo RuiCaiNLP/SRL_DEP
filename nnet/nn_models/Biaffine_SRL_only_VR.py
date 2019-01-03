@@ -234,7 +234,10 @@ class BiLSTMTagger(nn.Module):
 
         # B * H
         hidden_states_3 = hidden_states
-        log(target_idx_in)
+        target_idx_in = list(target_idx_in)
+        for i in range(len(target_idx_in)):
+            target_idx_in[i] += 1
+        target_idx_in = tuple(target_idx_in)
         predicate_embeds = F.relu(
             self.Predicate_Proj(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]))
 
