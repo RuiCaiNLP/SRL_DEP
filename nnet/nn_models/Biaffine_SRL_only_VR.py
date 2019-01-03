@@ -221,7 +221,7 @@ class BiLSTMTagger(nn.Module):
 
 
         # SRL layer
-        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(SRL_hidden_states, lengths)
+        embeds_sort, lengths_sort, unsort_idx = self.sort_batch(SRL_hidden_states, lengths+1)
         embeds_sort = rnn.pack_padded_sequence(embeds_sort, lengths_sort.cpu().numpy(), batch_first=True)
         # hidden states [time_steps * batch_size * hidden_units]
         hidden_states, self.hidden_4 = self.BiLSTM_SRL(embeds_sort, self.hidden_4)
@@ -258,11 +258,11 @@ class BiLSTMTagger(nn.Module):
         bias_one = torch.ones((self.batch_size, 1)).to(device)
         hidden_states_predicate = torch.cat((predicate_embeds, Variable(bias_one)), 1)
 
-        left_part = torch.mm(hidden_states_word.view(self.batch_size * len(sentence[0]), -1), self.W_R)
-        left_part = left_part.view(self.batch_size, len(sentence[0]) * self.tagset_size, -1)
+        left_part = torch.mm(hidden_states_word.view(self.batch_size * (len(sentence[0])+1), -1), self.W_R)
+        left_part = left_part.view(self.batch_size, (len(sentence[0])+1) * self.tagset_size, -1)
         hidden_states_predicate = hidden_states_predicate.view(self.batch_size, -1, 1)
         tag_space = torch.bmm(left_part, hidden_states_predicate).view(
-            len(sentence[0]) * self.batch_size, -1)
+            (len(sentence[0])+1) * self.batch_size, -1)
 
         SRLprobs = F.softmax(tag_space, dim=1)
 

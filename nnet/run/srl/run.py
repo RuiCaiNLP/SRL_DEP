@@ -1,7 +1,7 @@
 from nnet.run.runner import *
 from nnet.ml.voc import *
 from functools import partial
-from nnet.nn_models.Biaffine_SRL_only import BiLSTMTagger
+from nnet.nn_models.Biaffine_SRL_only_VR import BiLSTMTagger
 
 all_labels_voc = []
 
@@ -20,6 +20,7 @@ def bio_reader(record):
     labels_voc = all_labels_voc
 
     #labels_voc.insert(0, '<pad>')
+    frame = frame.split('.')[0]
     frame = [frame] * len(labels_voc)
     words = []
     for word in sent.split(' '):
@@ -184,7 +185,7 @@ class SRLRunner(Runner):
             labels_voc = [self.role_voc.vocalize(r) for r in labels_voc]
 
 
-            lemmas_idx = [self.frame_voc.vocalize(f) for f in f_lemmas]
+            lemmas_idx = [self.frame_voc.vocalize(f.split('.')[0]) for f in f_lemmas]
 
             #labels = [self.role_voc.vocalize(w) for w in labels]
 
