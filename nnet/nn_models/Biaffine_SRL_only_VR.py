@@ -213,8 +213,7 @@ class BiLSTMTagger(nn.Module):
         embeds_SRL = embeds_SRL.view(self.batch_size, len(sentence[0]), self.word_emb_dim)
         pos_embeds = self.pos_embeddings(pos_tags)
         region_marks = self.region_embeddings(region_marks).view(self.batch_size, len(sentence[0]), 16)
-        log(self.VR_embedding)
-        log(target_idx_in)
+
 
         SRL_hidden_states = torch.cat((embeds_SRL, fixed_embeds, sent_pred_lemmas_embeds, pos_embeds, region_marks), 2)
         add_zero = torch.zeros((self.batch_size, 1, self.SRL_input_dim)).to(device)
@@ -240,6 +239,7 @@ class BiLSTMTagger(nn.Module):
         for i in range(len(target_idx_in)):
             target_idx_in[i] += 1
         target_idx_in = tuple(target_idx_in)
+        log(target_idx_in)
         predicate_embeds = F.relu(
             self.Predicate_Proj(hidden_states_3[np.arange(0, hidden_states_3.size()[0]), target_idx_in]))
 
