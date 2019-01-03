@@ -386,6 +386,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 R = (right_NonNullPredicts) / (NonNullTruths)
                 F1 = 2 * P * R / (P + R + 0.0001)
                 log('Precision: ' + str(P), 'recall: ' + str(R), 'F1: ' + str(F1))
+                log(right_disambiguate)
+                log(predicates_num)
                 log('disambiguate accuraccy:', right_disambiguate/predicates_num)
                 log('Best F1: ' + str(best_F1))
                 if F1 > best_F1:
