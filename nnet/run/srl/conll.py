@@ -61,7 +61,7 @@ def from_2009(block, preserve_sense):
         word = parts[1]
         pos_tag = parts[5]
         if parts[13] != '_':
-            if preserve_sense:
+            if True:
                 predicate = parts[13]
             else:
                 predicate, frame_set_id = parts[13].split('.')

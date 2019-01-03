@@ -12,6 +12,8 @@ def bio_reader(record):
     dbg_header, sent,  pos_tags, dep_parsing, root_dep_parsing, frame, target, f_lemmas, f_targets, labels_voc, \
     labels, specific_dep_labels, specific_dep_relations = record.split('\t')
 
+    sense = dbg_header[-2:]
+
     #labels_voc = labels_voc.split(' ')
     #log(all_labels_voc)
     #log(labels_voc)
@@ -29,6 +31,7 @@ def bio_reader(record):
     #words.insert(0, '.')
 
     labels = labels.split(' ')
+    labels.insert(0, sense)
     specific_dep_labels = specific_dep_labels.split(' ')
     specific_dep_relations = specific_dep_relations.split(' ')
 
@@ -45,6 +48,7 @@ def bio_reader(record):
     #assert (len(words) == len(labels))
 
     # convert labels into indexes in labels_voc
+
     local_voc = {v: k for k, v in make_local_voc(labels_voc).items()}
     labels = [local_voc[label] for label in labels]
 
@@ -145,6 +149,8 @@ class SRLRunner(Runner):
         def bio_converter(batch):
             header, sent_, pos_tags, dep_parsing, root_dep_parsing, frames, \
             targets, f_lemmas, f_targets, labels_voc, labels, specific_dep_labels, specific_dep_relations  = list(zip(*batch))
+
+
 
             sent = [self.word_voc.vocalize(w) for w in sent_]
 
