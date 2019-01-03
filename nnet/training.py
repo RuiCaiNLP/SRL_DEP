@@ -208,6 +208,9 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                 Dep_R = [0.0] * 100
                 Dep_F = [0.0] * 100
 
+                predicates_num = 0.0
+                right_disambiguate = 0.0
+
                 log('now dev test')
                 index = 0
 
@@ -310,8 +313,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         noNull_predict_spe += noNull_predict_spe_b
                         noNUll_truth_spe += noNUll_truth_spe_b
 
-                        predicates_num = 0.0
-                        right_disambiguate = 0.0
+
                         for i, sent_labels in enumerate(labels):
                             labels_voc = batch[i][-4]
                             local_voc = make_local_voc(labels_voc)
