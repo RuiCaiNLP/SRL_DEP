@@ -62,6 +62,8 @@ def bio_reader(record):
     root_dep_parsing = [(p[0], int(p[1]), int(p[2])) for p in root_dep_parsing]
 
     f_lemmas = f_lemmas.split(' ')
+    for i in range(len(f_lemmas)):
+        f_lemmas[i] = f_lemmas[i].split('.')[0]
     f_targets = f_targets.split(' ')
 
 
@@ -185,7 +187,7 @@ class SRLRunner(Runner):
             labels_voc = [self.role_voc.vocalize(r) for r in labels_voc]
 
 
-            lemmas_idx = [self.frame_voc.vocalize(f.split('.')[0]) for f in f_lemmas]
+            lemmas_idx = [self.frame_voc.vocalize(f) for f in f_lemmas]
 
             #labels = [self.role_voc.vocalize(w) for w in labels]
 
