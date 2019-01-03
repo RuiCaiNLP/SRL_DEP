@@ -252,7 +252,7 @@ class BiLSTMTagger(nn.Module):
         # log(local_roles_voc)
         # log(frames)
 
-        bias_one = torch.ones((self.batch_size, len(sentence[0]), 1)).to(device)
+        bias_one = torch.ones((self.batch_size, len(sentence[0])+1, 1)).to(device)
         hidden_states_word = torch.cat((hidden_states, Variable(bias_one)), 2)
 
         bias_one = torch.ones((self.batch_size, 1)).to(device)
