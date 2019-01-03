@@ -73,8 +73,8 @@ class FileVoc(TwoWayVoc):
     def get_id(self, entry):
         if entry not in self.inverted:
             if self._add_unks:
-                log('unk has been add')
-                log(entry)
+                #log('unk has been add')
+                #log(entry)
                 return self.unk()
             raise ValueError(
                 "no such value in vocabulary and unks are disabled: %s" % entry)
