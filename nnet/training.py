@@ -297,7 +297,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                                     targets, specific_dep_tags_in, specific_dep_relations_in, True)
 
                         labels = np.argmax(SRLprobs.cpu().data.numpy(), axis=1)
-                        labels = np.reshape(labels, sentence.shape)
+                        labels = np.reshape(labels, (sentence.shape[0], sentence.shape[1]+1))
                         wrong_labels_num += wrong_l_nums
                         total_labels_num += all_l_nums
                         spe_wrong_labels_num += spe_wrong_l_nums
