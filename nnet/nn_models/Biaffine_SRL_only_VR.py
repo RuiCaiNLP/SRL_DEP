@@ -142,7 +142,7 @@ class BiLSTMTagger(nn.Module):
         self.role_map = nn.Linear(in_features=role_embedding_dim * 2, out_features=self.hidden_dim * 4)
 
         self.VR_embedding = nn.Parameter(
-            torch.from_numpy(np.ones((1, sent_embedding_dim_SRL), dtype='float32')))
+            torch.from_numpy(np.zeros((1, sent_embedding_dim_SRL), dtype='float32')))
 
 
         self.map_dim = lstm_hidden_dim
