@@ -314,7 +314,8 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                             labels_voc = batch[i][-4]
                             local_voc = make_local_voc(labels_voc)
                             for j in range(len(labels[i])):
-
+                                if j==0:
+                                    continue
                                 best = local_voc[labels[i][j]]
                                 true = local_voc[tags[i][j]]
 
