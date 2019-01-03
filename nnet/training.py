@@ -317,20 +317,18 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
 
                                 best = local_voc[labels[i][j]]
                                 true = local_voc[tags[i][j]]
-                                
-                                if true != '<pad>':
-                                    Dep_count_num[dep_tags_in[i][j]] += 1
+
                                 if true != '<pad>' and true != 'O':
                                     NonNullTruth += 1
-                                    Dep_NoNull_Truth[dep_tags_in[i][j]] += 1
+                                    #Dep_NoNull_Truth[dep_tags_in[i][j]] += 1
                                 if true != best:
                                     errors += 1
                                 if best != '<pad>' and best != 'O' and true != '<pad>':
                                     NonNullPredict += 1
-                                    Dep_NoNull_Predict[dep_tags_in[i][j]] += 1
+                                    #Dep_NoNull_Predict[dep_tags_in[i][j]] += 1
                                     if true == best:
                                         right_NonNullPredict += 1
-                                        Dep_Right_NoNull_Predict[dep_tags_in[i][j]] += 1
+                                        #Dep_Right_NoNull_Predict[dep_tags_in[i][j]] += 1
                         """
                                 best = labels[i][j]
                                 true = tags[i][j]
@@ -365,12 +363,7 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                         del model.hidden_3
                         del model.hidden_4
 
-                for i in range(len(Dep_P)):
-                    Dep_P[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Predict[i] + 0.0001)
-                    Dep_R[i] = Dep_Right_NoNull_Predict[i] / (Dep_NoNull_Truth[i] + 0.0001)
-                    Dep_F[i] = 2 * Dep_P[i] * Dep_R[i] / (Dep_P[i] + Dep_R[i] + 0.0001)
-                    if int(Dep_count_num[i]) > 0:
-                        log(str(int(Dep_count_num[i])) + '\t' + str(Dep_P[i]) + '\t' + str(Dep_R[i]) + '\t' + str(Dep_F[i]))
+
                 Predicat_num = 6300
                 P = (right_NonNullPredicts + Predicat_num) / (NonNullPredicts + Predicat_num)
                 R = (right_NonNullPredicts + Predicat_num) / (NonNullTruths + Predicat_num)
@@ -389,46 +382,6 @@ def train(model, train_set, dev_set, test_set, epochs, converter, dbg_print_rate
                     torch.save(model.state_dict(), params_path)
                     log('New best, model saved')
 
-                P = right_noNull_predict / (noNull_predict + 0.0001)
-                R = right_noNull_predict / (noNUll_truth + 0.0001)
-                F_label = 2 * P * R / (P + R + 0.0001)
-                log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F_label))
-
-                P = right_noNull_predict_spe / (noNull_predict_spe + 0.0001)
-                R = right_noNull_predict_spe / (noNUll_truth_spe + 0.0001)
-                F_link = 2 * P * R / (P + R + 0.0001)
-                log('Label Precision: P, R, F:' + str(P) + ' ' + str(R) + ' ' + str(F_link))
-                if F_label> Best_DEP_score and e < 20 and False:
-                    Best_DEP_score = F_label
-                    log('New Dep best:' + str(Best_DEP_score))
-                    for best_weight_i, weight_i in zip(Best_BiLSTM_0_data, model.BiLSTM_0.parameters()):
-                        best_weight_i.copy_(weight_i.data)
-                    for best_weight_i, weight_i in zip(Best_BiLSTM_1_data, model.BiLSTM_1.parameters()):
-                        best_weight_i.copy_(weight_i.data)
-                    best_word_embeddings_DEP = model.word_embeddings_DEP.weight.data.clone()
-                    best_pos_embeddings_DEP = model.pos_embeddings_DEP.weight.data.clone()
-                    best_word_fixed_embeddings_DEP = model.word_fixed_embeddings_DEP.weight.data.clone()
-                    best_hidden2tag = model.hidden2tag.weight.data.clone()
-                    best_MLP = model.MLP.weight.data.clone()
-                    log("best dep params preserved")
-
-
-
-                """
-                if F1 < Last_SRL_score and F_label+F_link < Last_DEP_score:
-                    for weight_i, last_weight_i in zip(model.BiLSTM_0.parameters(), Best_BiLSTM_0_data):
-                        weight_i.data.copy_(last_weight_i)
-                    for weight_i, last_weight_i in zip(model.BiLSTM_1.parameters(), Last_BiLSTM_1_data):
-                        weight_i.data.copy_(last_weight_i)
-                    for weight_i, last_weight_i in zip(model.BiLSTM_2.parameters(), Last_BiLSTM_2_data):
-                        weight_i.data.copy_(last_weight_i)
-                    log('backward!')
-                """
-
-
-
-                Last_SRL_score = F1
-                Last_DEP_score = F_label + F_link
 
 
 
